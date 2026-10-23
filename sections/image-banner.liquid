@@ -1,0 +1,2229 @@
+{% liquid
+  assign hero_id = 'kapisa-hero-' | append: section.id
+%}
+
+<section
+  id="{{ hero_id }}"
+  class="kapisa-hero kapisa-hero--{{ section.settings.height }}"
+  data-section-id="{{ section.id }}"
+  data-media-type="{{ section.settings.media_type }}"
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-speed="{{ section.settings.autoplay_speed }}"
+  data-pause-hover="{{ section.settings.pause_on_hover }}"
+>
+
+  <div class="kapisa-hero__slider">
+
+    {%- comment -%}
+      ============================================================
+      IMAGE SLIDES
+      3 DESKTOP IMAGES + 3 OPTIONAL MOBILE IMAGES
+      ============================================================
+    {%- endcomment -%}
+
+    {% if section.settings.media_type == 'images' %}
+
+      {% assign image_count = 0 %}
+
+      {% if section.settings.image_1 != blank %}
+        {% assign image_count = image_count | plus: 1 %}
+      {% endif %}
+
+      {% if section.settings.image_2 != blank %}
+        {% assign image_count = image_count | plus: 1 %}
+      {% endif %}
+
+      {% if section.settings.image_3 != blank %}
+        {% assign image_count = image_count | plus: 1 %}
+      {% endif %}
+
+
+      {% if image_count > 0 %}
+
+        {% for i in (1..3) %}
+
+          {% liquid
+            assign image_key = 'image_' | append: i
+            assign mobile_key = 'mobile_image_' | append: i
+
+            assign image = section.settings[image_key]
+            assign mobile_image = section.settings[mobile_key]
+          %}
+
+
+          {% if image != blank %}
+
+            <div
+              class="kapisa-hero__slide {% if forloop.first %}is-active{% endif %}"
+              data-slide="{{ forloop.index0 }}"
+            >
+
+              <div class="kapisa-hero__media">
+
+                <picture>
+
+                  {% if mobile_image != blank %}
+
+                    <source
+                      media="(max-width: 749px)"
+                      srcset="
+                        {{ mobile_image | image_url: width: 600 }} 600w,
+                        {{ mobile_image | image_url: width: 900 }} 900w,
+                        {{ mobile_image | image_url: width: 1200 }} 1200w
+                      "
+                    >
+
+                  {% endif %}
+
+
+                  {{
+                    image
+                    | image_url: width: 2400
+                    | image_tag:
+                      class: 'kapisa-hero__image',
+                      loading: 'eager',
+                      fetchpriority: 'high',
+                      widths: '600, 900, 1200, 1600, 2000, 2400'
+                  }}
+
+                </picture>
+
+              </div>
+
+            </div>
+
+          {% endif %}
+
+        {% endfor %}
+
+
+      {% else %}
+
+        <div class="kapisa-hero__slide is-active">
+
+          <div class="kapisa-hero__media kapisa-hero__media--empty"></div>
+
+        </div>
+
+      {% endif %}
+
+
+    {%- comment -%}
+      ============================================================
+      VIDEO SLIDES
+      ============================================================
+    {%- endcomment -%}
+
+    {% else %}
+
+      {% assign video_count = 0 %}
+
+      {% if section.settings.video_1 != blank %}
+        {% assign video_count = video_count | plus: 1 %}
+      {% endif %}
+
+      {% if section.settings.video_2 != blank %}
+        {% assign video_count = video_count | plus: 1 %}
+      {% endif %}
+
+
+      {% if video_count > 0 %}
+
+        {% for i in (1..2) %}
+
+          {% liquid
+            assign video_key = 'video_' | append: i
+            assign video = section.settings[video_key]
+          %}
+
+
+          {% if video != blank %}
+
+            <div
+              class="kapisa-hero__slide {% if forloop.first %}is-active{% endif %}"
+              data-slide="{{ forloop.index0 }}"
+            >
+
+              <div class="kapisa-hero__media">
+
+                <video
+                  class="kapisa-hero__video"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+
+                  {% if section.settings.video_poster != blank %}
+                    poster="{{ section.settings.video_poster | image_url: width: 2400 }}"
+                  {% endif %}
+                >
+
+                  {% for source in video.sources %}
+
+                    <source
+                      src="{{ source.url }}"
+                      type="{{ source.mime_type }}"
+                    >
+
+                  {% endfor %}
+
+                </video>
+
+              </div>
+
+            </div>
+
+          {% endif %}
+
+        {% endfor %}
+
+
+      {% else %}
+
+        <div class="kapisa-hero__slide is-active">
+
+          <div class="kapisa-hero__media kapisa-hero__media--empty"></div>
+
+        </div>
+
+      {% endif %}
+
+    {% endif %}
+
+
+    {%- comment -%}
+      ============================================================
+      OVERLAY
+      ============================================================
+    {%- endcomment -%}
+
+    <div class="kapisa-hero__overlay"></div>
+
+
+    {% if section.settings.show_glow %}
+
+      <div class="kapisa-hero__glow kapisa-hero__glow--one"></div>
+
+      <div class="kapisa-hero__glow kapisa-hero__glow--two"></div>
+
+    {% endif %}
+
+
+    {%- comment -%}
+      ============================================================
+      CONTENT
+      ============================================================
+    {%- endcomment -%}
+
+    <div class="kapisa-hero__container">
+
+      <div class="kapisa-hero__content kapisa-hero__content--{{ section.settings.content_alignment }}">
+
+        {% if section.settings.eyebrow != blank %}
+
+          <div class="kapisa-hero__eyebrow">
+
+            {% if section.settings.show_eyebrow_line %}
+
+              <span class="kapisa-hero__eyebrow-line"></span>
+
+            {% endif %}
+
+            <span>
+              {{ section.settings.eyebrow }}
+            </span>
+
+          </div>
+
+        {% endif %}
+
+
+        {% if section.settings.heading != blank %}
+
+          <h1 class="kapisa-hero__heading">
+            {{ section.settings.heading }}
+          </h1>
+
+        {% endif %}
+
+
+        {% if section.settings.description != blank %}
+
+          <div class="kapisa-hero__description">
+            {{ section.settings.description }}
+          </div>
+
+        {% endif %}
+
+
+        {% if section.settings.primary_label != blank or section.settings.secondary_label != blank %}
+
+          <div class="kapisa-hero__buttons">
+
+            {% if section.settings.primary_label != blank %}
+
+              <a
+                href="{{ section.settings.primary_link | default: routes.all_products_collection_url }}"
+                class="kapisa-hero__button kapisa-hero__button--primary"
+              >
+
+                <span>
+                  {{ section.settings.primary_label }}
+                </span>
+
+                {% if section.settings.show_button_arrow %}
+
+                  <svg
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+
+                    <path
+                      d="M4 10h11M10 5l5 5-5 5"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+
+                  </svg>
+
+                {% endif %}
+
+              </a>
+
+            {% endif %}
+
+
+            {% if section.settings.secondary_label != blank %}
+
+              <a
+                href="{{ section.settings.secondary_link | default: routes.all_products_collection_url }}"
+                class="kapisa-hero__button kapisa-hero__button--secondary"
+              >
+
+                <span>
+                  {{ section.settings.secondary_label }}
+                </span>
+
+              </a>
+
+            {% endif %}
+
+          </div>
+
+        {% endif %}
+
+      </div>
+
+    </div>
+
+
+    {%- comment -%}
+      ============================================================
+      NAVIGATION
+      ============================================================
+    {%- endcomment -%}
+
+    {% if section.settings.show_navigation %}
+
+      <div class="kapisa-hero__navigation">
+
+        <button
+          type="button"
+          class="kapisa-hero__arrow kapisa-hero__arrow--prev"
+          aria-label="Previous slide"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+
+            <path
+              d="M15 18l-6-6 6-6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+          </svg>
+
+        </button>
+
+
+        <div class="kapisa-hero__dots"></div>
+
+
+        <button
+          type="button"
+          class="kapisa-hero__arrow kapisa-hero__arrow--next"
+          aria-label="Next slide"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+
+            <path
+              d="M9 6l6 6-6 6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+
+          </svg>
+
+        </button>
+
+      </div>
+
+    {% endif %}
+
+
+    {%- comment -%}
+      ============================================================
+      BOTTOM INFORMATION
+      ============================================================
+    {%- endcomment -%}
+
+    {% if section.settings.show_bottom_info %}
+
+      <div class="kapisa-hero__bottom">
+
+        <div class="kapisa-hero__bottom-item">
+
+          <span class="kapisa-hero__bottom-number">
+            {{ section.settings.bottom_number }}
+          </span>
+
+          <span>
+            {{ section.settings.bottom_text }}
+          </span>
+
+        </div>
+
+
+        {% if section.settings.show_scroll_indicator %}
+
+          <div class="kapisa-hero__scroll">
+
+            <span>
+              {{ section.settings.scroll_text }}
+            </span>
+
+            <span class="kapisa-hero__scroll-line"></span>
+
+          </div>
+
+        {% endif %}
+
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</section>
+
+
+<style>
+
+  /* ============================================================
+     ROOT
+     ============================================================ */
+
+  #{{ hero_id }} {
+
+    --hero-text: {{ section.settings.text_color }};
+    --hero-accent: {{ section.settings.accent_color }};
+    --hero-overlay: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --hero-image-opacity: {{ section.settings.image_opacity | divided_by: 100.0 }};
+    --hero-content-width: {{ section.settings.content_width }}px;
+    --hero-radius: {{ section.settings.border_radius }}px;
+
+    margin-top: 0;
+
+    position: relative;
+
+    isolation: isolate;
+
+    width: 100%;
+
+    min-height: 680px;
+
+    overflow: hidden;
+
+    border-radius: var(--hero-radius);
+
+    background: #0e1f3c;
+
+    color: var(--hero-text);
+  }
+
+
+  /* ============================================================
+     HEIGHT
+     ============================================================ */
+
+  #{{ hero_id }}.kapisa-hero--small {
+
+    min-height: 560px;
+  }
+
+
+  #{{ hero_id }}.kapisa-hero--medium {
+
+    min-height: 680px;
+  }
+
+
+  #{{ hero_id }}.kapisa-hero--large {
+
+    min-height: 820px;
+  }
+
+
+  #{{ hero_id }}.kapisa-hero--screen {
+
+    min-height: 100svh;
+  }
+
+
+  /* ============================================================
+     SLIDER
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__slider {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: inherit;
+
+    overflow: hidden;
+  }
+
+
+  /* ============================================================
+     SLIDES
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__slide {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 0;
+
+    visibility: hidden;
+
+    opacity: 0;
+
+    transition:
+      opacity 0.8s ease,
+      visibility 0.8s ease;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__slide.is-active {
+
+    z-index: 1;
+
+    visibility: visible;
+
+    opacity: 1;
+  }
+
+
+  /* ============================================================
+     MEDIA CONTAINER
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__media {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #0e1f3c;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__media--empty {
+
+    background:
+      radial-gradient(
+        circle at 80% 20%,
+        rgba(201, 162, 39, 0.2),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 15% 80%,
+        rgba(77, 155, 216, 0.18),
+        transparent 35%
+      ),
+      linear-gradient(
+        135deg,
+        #071326,
+        #0e1f3c 55%,
+        #19395b
+      );
+  }
+
+
+  /* ============================================================
+     MAIN HERO IMAGE OPACITY
+     
+     THIS IS THE CONTROL YOU ASKED FOR.
+
+     The opacity applies ONLY to the actual
+     main slider images.
+
+     Desktop images + mobile images both use it.
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__image {
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    min-height: 100%;
+
+    object-fit: cover;
+
+    object-position: {{ section.settings.image_position }};
+
+    opacity: var(--hero-image-opacity);
+
+    transition: opacity 0.3s ease;
+  }
+
+
+  /* ============================================================
+     VIDEO
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__video {
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+
+    min-height: 100%;
+
+    object-fit: cover;
+
+    object-position: {{ section.settings.image_position }};
+
+    background: #0e1f3c;
+
+    opacity: var(--hero-image-opacity);
+
+    transition: opacity 0.3s ease;
+  }
+
+
+  /* ============================================================
+     OVERLAY
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 2;
+
+    pointer-events: none;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(5, 17, 35, 0.97) 0%,
+        rgba(5, 17, 35, 0.78) 35%,
+        rgba(5, 17, 35, 0.38) 68%,
+        rgba(5, 17, 35, 0.12) 100%
+      ),
+      linear-gradient(
+        0deg,
+        rgba(5, 17, 35, 0.55),
+        rgba(5, 17, 35, 0.04) 55%,
+        rgba(5, 17, 35, 0.28)
+      );
+
+    opacity: var(--hero-overlay);
+  }
+
+
+  /* ============================================================
+     CONTENT
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__container {
+
+    position: relative;
+
+    z-index: 4;
+
+    display: flex;
+
+    align-items: center;
+
+    width: 100%;
+
+    min-height: inherit;
+
+    max-width: 1440px;
+
+    margin: 0 auto;
+
+    padding: 110px 6vw 120px;
+
+    pointer-events: none;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content {
+
+    width: 100%;
+
+    max-width: var(--hero-content-width);
+
+    pointer-events: auto;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--center {
+
+    margin: 0 auto;
+
+    text-align: center;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--right {
+
+    margin-left: auto;
+
+    text-align: right;
+  }
+
+
+  /* ============================================================
+     EYEBROW
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__eyebrow {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+
+    color: var(--hero-accent);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.24em;
+
+    line-height: 1.4;
+
+    text-transform: uppercase;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--center
+  .kapisa-hero__eyebrow {
+
+    justify-content: center;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--right
+  .kapisa-hero__eyebrow {
+
+    justify-content: flex-end;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__eyebrow-line {
+
+    width: 38px;
+
+    height: 1px;
+
+    flex: 0 0 38px;
+
+    background: var(--hero-accent);
+  }
+
+
+  /* ============================================================
+     HEADING
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__heading {
+
+    max-width: 900px;
+
+    margin: 0 0 24px;
+
+    color: var(--hero-text);
+
+    font-family:
+      Georgia,
+      'Times New Roman',
+      serif;
+
+    font-size: clamp(44px, 6.2vw, 92px);
+
+    font-weight: 400;
+
+    letter-spacing: -0.055em;
+
+    line-height: 0.98;
+
+    text-wrap: balance;
+  }
+
+
+  /* ============================================================
+     DESCRIPTION
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__description {
+
+    max-width: 570px;
+
+    margin-bottom: 34px;
+
+    color: var(--hero-text);
+
+    font-size: clamp(14px, 1.3vw, 17px);
+
+    line-height: 1.8;
+
+    opacity: 0.88;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--center
+  .kapisa-hero__description {
+
+    margin-right: auto;
+
+    margin-left: auto;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--right
+  .kapisa-hero__description {
+
+    margin-left: auto;
+  }
+
+
+  /* ============================================================
+     BUTTONS
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__buttons {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 12px;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--center
+  .kapisa-hero__buttons {
+
+    justify-content: center;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__content--right
+  .kapisa-hero__buttons {
+
+    justify-content: flex-end;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 20px;
+
+    min-height: 54px;
+
+    padding: 0 25px;
+
+    border: 1px solid transparent;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-decoration: none;
+
+    text-transform: uppercase;
+
+    transition:
+      transform 0.25s ease,
+      background 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button:hover {
+
+    transform: translateY(-3px);
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button svg {
+
+    width: 18px;
+
+    height: 18px;
+
+    transition: transform 0.25s ease;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button:hover svg {
+
+    transform: translateX(4px);
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button--primary {
+
+    background: var(--hero-accent);
+
+    color: #111827;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button--primary:hover {
+
+    background: #f0d477;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button--secondary {
+
+    border-color: rgba(255, 255, 255, 0.5);
+
+    background: rgba(255, 255, 255, 0.07);
+
+    color: var(--hero-text);
+
+    backdrop-filter: blur(12px);
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__button--secondary:hover {
+
+    border-color: var(--hero-accent);
+
+    background: rgba(201, 162, 39, 0.15);
+  }
+
+
+  /* ============================================================
+     NAVIGATION
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__navigation {
+
+    position: absolute;
+
+    right: 6vw;
+
+    bottom: 78px;
+
+    z-index: 7;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__arrow {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 42px;
+
+    height: 42px;
+
+    padding: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.35);
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    color: var(--hero-text);
+
+    cursor: pointer;
+
+    backdrop-filter: blur(10px);
+
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease,
+      transform 0.25s ease;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__arrow:hover {
+
+    border-color: var(--hero-accent);
+
+    background: rgba(201, 162, 39, 0.15);
+
+    transform: translateY(-2px);
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__arrow svg {
+
+    width: 20px;
+
+    height: 20px;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__dots {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    padding: 0 7px;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.45);
+
+    cursor: pointer;
+
+    transition:
+      width 0.25s ease,
+      background 0.25s ease;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__dot.is-active {
+
+    width: 25px;
+
+    border-radius: 10px;
+
+    background: var(--hero-accent);
+  }
+
+
+  /* ============================================================
+     BOTTOM INFORMATION
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__bottom {
+
+    position: absolute;
+
+    right: 6vw;
+
+    bottom: 28px;
+
+    left: 6vw;
+
+    z-index: 7;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    color: var(--hero-text);
+
+    font-size: 10px;
+
+    letter-spacing: 0.16em;
+
+    text-transform: uppercase;
+
+    opacity: 0.8;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__bottom-item,
+  #{{ hero_id }} .kapisa-hero__scroll {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__bottom-number {
+
+    color: var(--hero-accent);
+
+    font-weight: 700;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__scroll-line {
+
+    display: block;
+
+    width: 65px;
+
+    height: 1px;
+
+    background: currentColor;
+  }
+
+
+  /* ============================================================
+     GLOW
+     ============================================================ */
+
+  #{{ hero_id }} .kapisa-hero__glow {
+
+    position: absolute;
+
+    z-index: 3;
+
+    width: 420px;
+
+    height: 420px;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    filter: blur(90px);
+
+    opacity: 0.16;
+
+    animation:
+      kapisaHeroFloat 12s ease-in-out infinite alternate;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__glow--one {
+
+    top: -180px;
+
+    right: -120px;
+
+    background: #c9a227;
+  }
+
+
+  #{{ hero_id }} .kapisa-hero__glow--two {
+
+    bottom: -240px;
+
+    left: 25%;
+
+    background: #4d9bd8;
+
+    animation-delay: -4s;
+  }
+
+
+  @keyframes kapisaHeroFloat {
+
+    from {
+
+      transform:
+        translate3d(0, 0, 0)
+        scale(1);
+
+    }
+
+    to {
+
+      transform:
+        translate3d(35px, 25px, 0)
+        scale(1.12);
+
+    }
+
+  }
+
+
+  /* ============================================================
+     MOBILE
+     ============================================================ */
+
+  @media screen and (max-width: 749px) {
+
+    #{{ hero_id }} {
+
+      margin-top: 0;
+
+      min-height: 650px;
+
+      border-radius: var(--hero-radius);
+    }
+
+
+    #{{ hero_id }}.kapisa-hero--small {
+
+      min-height: 560px;
+    }
+
+
+    #{{ hero_id }}.kapisa-hero--large,
+    #{{ hero_id }}.kapisa-hero--screen {
+
+      min-height: 720px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__overlay {
+
+      background:
+        linear-gradient(
+          0deg,
+          rgba(5, 17, 35, 0.97) 0%,
+          rgba(5, 17, 35, 0.67) 48%,
+          rgba(5, 17, 35, 0.22) 100%
+        );
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__container {
+
+      align-items: flex-end;
+
+      padding:
+        100px
+        24px
+        105px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__heading {
+
+      margin-bottom: 19px;
+
+      font-size:
+        clamp(43px, 12vw, 64px);
+
+      letter-spacing: -0.045em;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__description {
+
+      margin-bottom: 27px;
+
+      font-size: 14px;
+
+      line-height: 1.65;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__buttons {
+
+      flex-direction: column;
+
+      align-items: stretch;
+
+      width: 100%;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__button {
+
+      width: 100%;
+
+      min-height: 52px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__navigation {
+
+      right: 24px;
+
+      bottom: 67px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__arrow {
+
+      width: 38px;
+
+      height: 38px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__bottom {
+
+      right: 24px;
+
+      bottom: 22px;
+
+      left: 24px;
+
+      font-size: 8px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__scroll {
+
+      display: none;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__glow {
+
+      width: 260px;
+
+      height: 260px;
+
+      filter: blur(70px);
+    }
+
+  }
+
+
+  /* ============================================================
+     SMALL PHONES
+     ============================================================ */
+
+  @media screen and (max-width: 380px) {
+
+    #{{ hero_id }} {
+
+      margin-top: 14px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__container {
+
+      padding-right: 18px;
+
+      padding-left: 18px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__navigation {
+
+      right: 18px;
+    }
+
+
+    #{{ hero_id }} .kapisa-hero__bottom {
+
+      right: 18px;
+
+      left: 18px;
+    }
+
+  }
+
+
+  /* ============================================================
+     REDUCED MOTION
+     ============================================================ */
+
+  @media screen and (prefers-reduced-motion: reduce) {
+
+    #{{ hero_id }} *,
+    #{{ hero_id }} *::before,
+    #{{ hero_id }} *::after {
+
+      animation-duration: 0.01ms !important;
+
+      animation-iteration-count: 1 !important;
+
+      transition-duration: 0.01ms !important;
+
+      scroll-behavior: auto !important;
+    }
+
+  }
+
+</style>
+
+
+<script>
+  (() => {
+
+    const root =
+      document.getElementById('{{ hero_id }}');
+
+    if (!root) return;
+
+
+    const slides =
+      Array.from(
+        root.querySelectorAll(
+          '.kapisa-hero__slide'
+        )
+      );
+
+
+    if (!slides.length) return;
+
+
+    const dotsContainer =
+      root.querySelector(
+        '.kapisa-hero__dots'
+      );
+
+
+    const previousButton =
+      root.querySelector(
+        '.kapisa-hero__arrow--prev'
+      );
+
+
+    const nextButton =
+      root.querySelector(
+        '.kapisa-hero__arrow--next'
+      );
+
+
+    const autoplay =
+      root.dataset.autoplay === 'true';
+
+
+    const speed =
+      Number(root.dataset.speed) || 5000;
+
+
+    const pauseOnHover =
+      root.dataset.pauseHover === 'true';
+
+
+    let currentIndex = 0;
+
+    let timer = null;
+
+    let paused = false;
+
+
+    function getVideos(slide) {
+
+      return Array.from(
+        slide.querySelectorAll('video')
+      );
+
+    }
+
+
+    function stopVideo(video) {
+
+      try {
+
+        video.pause();
+
+        video.currentTime = 0;
+
+      } catch (error) {}
+
+    }
+
+
+    function playVideo(video) {
+
+      video.muted = true;
+
+      const promise =
+        video.play();
+
+      if (
+        promise &&
+        typeof promise.catch === 'function'
+      ) {
+
+        promise.catch(() => {});
+
+      }
+
+    }
+
+
+    function updateDots() {
+
+      if (!dotsContainer) return;
+
+
+      const dots =
+        dotsContainer.querySelectorAll(
+          '.kapisa-hero__dot'
+        );
+
+
+      dots.forEach(
+        (dot, index) => {
+
+          dot.classList.toggle(
+            'is-active',
+            index === currentIndex
+          );
+
+
+          dot.setAttribute(
+            'aria-current',
+            index === currentIndex
+              ? 'true'
+              : 'false'
+          );
+
+        }
+      );
+
+    }
+
+
+    function activateSlide(index) {
+
+      if (!slides.length) return;
+
+
+      currentIndex =
+        (index + slides.length) %
+        slides.length;
+
+
+      slides.forEach(
+        (slide, slideIndex) => {
+
+          const active =
+            slideIndex === currentIndex;
+
+
+          slide.classList.toggle(
+            'is-active',
+            active
+          );
+
+
+          getVideos(slide)
+            .forEach(video => {
+
+              if (active) {
+
+                playVideo(video);
+
+              } else {
+
+                stopVideo(video);
+
+              }
+
+            });
+
+        }
+      );
+
+
+      updateDots();
+
+    }
+
+
+    function nextSlide() {
+
+      activateSlide(
+        currentIndex + 1
+      );
+
+    }
+
+
+    function previousSlide() {
+
+      activateSlide(
+        currentIndex - 1
+      );
+
+    }
+
+
+    function stopAutoplay() {
+
+      if (timer) {
+
+        window.clearInterval(timer);
+
+        timer = null;
+
+      }
+
+    }
+
+
+    function startAutoplay() {
+
+      stopAutoplay();
+
+
+      if (
+        !autoplay ||
+        slides.length < 2
+      ) {
+
+        return;
+
+      }
+
+
+      if (paused) return;
+
+
+      timer =
+        window.setInterval(
+          () => {
+
+            nextSlide();
+
+          },
+          speed
+        );
+
+    }
+
+
+    if (
+      dotsContainer &&
+      slides.length > 1
+    ) {
+
+      slides.forEach(
+        (slide, index) => {
+
+          const dot =
+            document.createElement(
+              'button'
+            );
+
+
+          dot.type = 'button';
+
+          dot.className =
+            'kapisa-hero__dot';
+
+
+          dot.setAttribute(
+            'aria-label',
+            `Go to slide ${index + 1}`
+          );
+
+
+          dot.addEventListener(
+            'click',
+            () => {
+
+              activateSlide(index);
+
+              startAutoplay();
+
+            }
+          );
+
+
+          dotsContainer.appendChild(dot);
+
+        }
+      );
+
+    }
+
+
+    if (previousButton) {
+
+      previousButton.addEventListener(
+        'click',
+        () => {
+
+          previousSlide();
+
+          startAutoplay();
+
+        }
+      );
+
+    }
+
+
+    if (nextButton) {
+
+      nextButton.addEventListener(
+        'click',
+        () => {
+
+          nextSlide();
+
+          startAutoplay();
+
+        }
+      );
+
+    }
+
+
+    if (pauseOnHover) {
+
+      root.addEventListener(
+        'mouseenter',
+        () => {
+
+          paused = true;
+
+          stopAutoplay();
+
+        }
+      );
+
+
+      root.addEventListener(
+        'mouseleave',
+        () => {
+
+          paused = false;
+
+          startAutoplay();
+
+        }
+      );
+
+    }
+
+
+    activateSlide(0);
+
+    startAutoplay();
+
+
+    document.addEventListener(
+      'shopify:section:unload',
+      event => {
+
+        if (
+          event.detail &&
+          event.detail.sectionId ===
+            '{{ section.id }}'
+        ) {
+
+          stopAutoplay();
+
+        }
+
+      }
+    );
+
+  })();
+</script>
+
+
+{% schema %}
+{
+  "name": "Kapisa hero",
+  "tag": "section",
+  "class": "section-kapisa-hero",
+
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Media"
+    },
+
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Hero media type",
+      "default": "images",
+
+      "options": [
+        {
+          "value": "images",
+          "label": "Images — up to 3"
+        },
+        {
+          "value": "videos",
+          "label": "Videos — up to 2"
+        }
+      ]
+    },
+
+    {
+      "type": "paragraph",
+      "content": "Upload up to 3 desktop hero images. Each slide can have its own optional mobile image."
+    },
+
+    {
+      "type": "image_picker",
+      "id": "image_1",
+      "label": "Desktop image 1"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "mobile_image_1",
+      "label": "Mobile image 1"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Desktop image 2"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "mobile_image_2",
+      "label": "Mobile image 2"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Desktop image 3"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "mobile_image_3",
+      "label": "Mobile image 3"
+    },
+
+    {
+      "type": "paragraph",
+      "content": "Video mode supports up to 2 Shopify-hosted videos."
+    },
+
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "Video 1"
+    },
+
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "Video 2"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "video_poster",
+      "label": "Video poster / fallback image"
+    },
+
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Media position",
+      "default": "center center",
+
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        },
+        {
+          "value": "left top",
+          "label": "Left top"
+        },
+        {
+          "value": "right top",
+          "label": "Right top"
+        },
+        {
+          "value": "left bottom",
+          "label": "Left bottom"
+        },
+        {
+          "value": "right bottom",
+          "label": "Right bottom"
+        }
+      ]
+    },
+
+
+    {
+      "type": "header",
+      "content": "Image / video appearance"
+    },
+
+    {
+      "type": "range",
+      "id": "image_opacity",
+      "label": "Media opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+
+
+    {
+      "type": "header",
+      "content": "Slideshow"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Automatically change slides",
+      "default": true
+    },
+
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Slide duration",
+      "min": 1000,
+      "max": 9000,
+      "step": 500,
+      "unit": "ms",
+      "default": 5000
+    },
+
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause when mouse is over hero",
+      "default": true
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show arrows and dots",
+      "default": true
+    },
+
+
+    {
+      "type": "header",
+      "content": "Hero content"
+    },
+
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Designed for those who care"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_eyebrow_line",
+      "label": "Show eyebrow line",
+      "default": true
+    },
+
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Main heading",
+      "default": "Move with confidence."
+    },
+
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Premium medical apparel designed around comfort, movement and modern healthcare.</p>"
+    },
+
+    {
+      "type": "text",
+      "id": "primary_label",
+      "label": "Primary button",
+      "default": "Shop all scrubs"
+    },
+
+    {
+      "type": "url",
+      "id": "primary_link",
+      "label": "Primary button link"
+    },
+
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Secondary button",
+      "default": "Explore Kapisa"
+    },
+
+    {
+      "type": "url",
+      "id": "secondary_link",
+      "label": "Secondary button link"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_button_arrow",
+      "label": "Show primary button arrow",
+      "default": true
+    },
+
+
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+
+    {
+      "type": "select",
+      "id": "height",
+      "label": "Hero height",
+      "default": "large",
+
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "screen",
+          "label": "Full screen"
+        }
+      ]
+    },
+
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content alignment",
+      "default": "left",
+
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 400,
+      "max": 850,
+      "step": 10,
+      "unit": "px",
+      "default": 650
+    },
+
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Hero corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+
+
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay strength",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_glow",
+      "label": "Show subtle background glow",
+      "default": true
+    },
+
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FAF7F0"
+    },
+
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#C9A227"
+    },
+
+
+    {
+      "type": "header",
+      "content": "Bottom information"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_bottom_info",
+      "label": "Show bottom information",
+      "default": true
+    },
+
+    {
+      "type": "text",
+      "id": "bottom_number",
+      "label": "Bottom number",
+      "default": "01"
+    },
+
+    {
+      "type": "text",
+      "id": "bottom_text",
+      "label": "Bottom information text",
+      "default": "Premium healthcare apparel"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "label": "Show scroll indicator",
+      "default": true
+    },
+
+    {
+      "type": "text",
+      "id": "scroll_text",
+      "label": "Scroll text",
+      "default": "Scroll to explore"
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name": "Kapisa hero"
+    }
+  ]
+}
+{% endschema %}

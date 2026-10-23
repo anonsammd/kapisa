@@ -1,0 +1,251 @@
+{% doc %}
+  @prompt
+    Add a thin full-width marquee strip directly below the hero, navy 
+    #0E1F3C background, off-white 
+    #FAF7F0 text, continuously auto-scrolling horizontally (infinite loop, smooth, pause on hover). Content repeats items like '500+ Healthcare Heroes Dressed' • 'Premium 4-Way Stretch Fabric' • 'Custom Embroidery Available' • 'Cash on Delivery' separated by small gold 
+    #C9A227 dot dividers. Keep height compact (40–48px), font small and evenly letter-spaced.
+
+    NOTE: this section stays in normal document flow by design — it scrolls
+    up and out of view with the page (not sticky/fixed). Place it after the
+    header section in the theme customizer's section list.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-marquee-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    overflow: hidden;
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  .ai-marquee-{{ ai_gen_id }}__viewport {
+    display: flex;
+    align-items: center;
+    min-height: {{ block.settings.strip_height }}px;
+    overflow: hidden;
+  }
+
+  .ai-marquee-{{ ai_gen_id }}__track {
+    display: flex;
+    width: max-content;
+    animation: ai-marquee-scroll-{{ ai_gen_id }} {{ block.settings.scroll_speed }}s linear infinite;
+  }
+
+  .ai-marquee-{{ ai_gen_id }}__group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+  .ai-marquee-{{ ai_gen_id }}__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 28px;
+    font-family: {{ block.settings.text_font.family }}, {{ block.settings.text_font.fallback_families }};
+    font-size: {{ block.settings.text_size }}px;
+    font-weight: {{ block.settings.text_font.weight }};
+    letter-spacing: {{ block.settings.letter_spacing }}px;
+    line-height: 1;
+  }
+
+  .ai-marquee-{{ ai_gen_id }}__divider {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    flex: 0 0 5px;
+    border-radius: 50%;
+    background: #C9A227;
+  }
+
+  .ai-marquee-{{ ai_gen_id }}:hover .ai-marquee-{{ ai_gen_id }}__track,
+  .ai-marquee-{{ ai_gen_id }}:focus-within .ai-marquee-{{ ai_gen_id }}__track {
+    animation-play-state: paused;
+  }
+
+  @keyframes ai-marquee-scroll-{{ ai_gen_id }} {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-marquee-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-marquee-{{ ai_gen_id }}__item {
+      gap: 20px;
+      padding: 0 20px;
+      font-size: {{ block.settings.text_size | at_most: 13 }}px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-marquee-{{ ai_gen_id }}__track {
+      animation: none;
+      transform: none;
+    }
+
+    .ai-marquee-{{ ai_gen_id }}__group:last-child {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<marquee-strip-{{ ai_gen_id }}
+  class="ai-marquee-{{ ai_gen_id }}"
+  role="region"
+  aria-label="{{ block.settings.accessibility_label | escape }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-marquee-{{ ai_gen_id }}__viewport">
+    <div class="ai-marquee-{{ ai_gen_id }}__track">
+      {% for copy in (1..2) %}
+        <div
+          class="ai-marquee-{{ ai_gen_id }}__group"
+          {% if copy == 2 %}
+            aria-hidden="true"
+          {% endif %}
+        >
+          <span class="ai-marquee-{{ ai_gen_id }}__item">
+            <span>{{ block.settings.item_one | escape }}</span
+            ><span class="ai-marquee-{{ ai_gen_id }}__divider" aria-hidden="true"></span>
+            <span>{{ block.settings.item_two | escape }}</span
+            ><span class="ai-marquee-{{ ai_gen_id }}__divider" aria-hidden="true"></span>
+            <span>{{ block.settings.item_three | escape }}</span
+            ><span class="ai-marquee-{{ ai_gen_id }}__divider" aria-hidden="true"></span>
+            <span>{{ block.settings.item_four | escape }}</span
+            ><span class="ai-marquee-{{ ai_gen_id }}__divider" aria-hidden="true"></span>
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</marquee-strip-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class MarqueeStrip{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        this.setAttribute('data-ready', 'true');
+      }
+    }
+
+    if (!customElements.get('marquee-strip-{{ ai_gen_id }}')) {
+      customElements.define('marquee-strip-{{ ai_gen_id }}', MarqueeStrip{{ ai_gen_id }});
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Marquee strip",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "item_one",
+      "label": "Item one",
+      "default": "500+ Healthcare Heroes Dressed"
+    },
+    {
+      "type": "text",
+      "id": "item_two",
+      "label": "Item two",
+      "default": "Premium 4-Way Stretch Fabric"
+    },
+    {
+      "type": "text",
+      "id": "item_three",
+      "label": "Item three",
+      "default": "Custom Embroidery Available"
+    },
+    {
+      "type": "text",
+      "id": "item_four",
+      "label": "Item four",
+      "default": "Cash on Delivery"
+    },
+    {
+      "type": "text",
+      "id": "accessibility_label",
+      "label": "Accessibility label",
+      "default": "Store highlights"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "label": "Height",
+      "min": 40,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 10,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "label": "Scroll speed",
+      "min": 12,
+      "max": 60,
+      "step": 4,
+      "unit": "s",
+      "default": 28
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee strip"
+    }
+  ],
+  "tag": null,
+  "class": "marquee-strip-block"
+}
+{% endschema %}

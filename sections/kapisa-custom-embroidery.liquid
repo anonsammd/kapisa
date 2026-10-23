@@ -1,0 +1,87 @@
+{%- comment -%}
+  KAPISA — Custom Embroidery Section (Knya Medical Apparel Rebuild)
+  Markup:     snippets/kapisa-custom-embroidery-inner.liquid
+  Styles:     assets/kapisa-embroidery.css
+  Icons:      assets/kapisa-embroidery-icons.js
+  Behavior:   assets/kapisa-embroidery.js (<kapisa-embroidery> custom element)
+  Purchase:   assets/kapisa-purchase.js + assets/kapisa-cart-sync.js
+{%- endcomment -%}
+
+{{ 'kapisa-embroidery.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@700&display=swap');
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'font_option' and block.settings.font != blank -%}
+      {{ block.settings.font | font_face: font_display: 'swap' }}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endstyle -%}
+
+{% render 'kapisa-custom-embroidery-inner' %}
+
+<script src="{{ 'kapisa-embroidery-icons.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'kapisa-embroidery.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Kapisa Custom Embroidery",
+  "class": "section-kapisa-custom-embroidery",
+  "settings": [
+    { "type": "text", "id": "toggle_label", "label": "Toggle button label", "default": "Add embroidery" },
+    { "type": "text", "id": "modal_heading", "label": "Modal initial heading", "default": "Add Your Identity" },
+    { "type": "range", "id": "max_characters", "min": 10, "max": 30, "step": 1, "default": 22, "label": "Max characters per line" },
+    { "type": "checkbox", "id": "show_acknowledgment", "label": "Require acknowledgment checkbox", "default": false },
+    { "type": "text", "id": "acknowledgment_text", "label": "Acknowledgment text", "default": "Embroidered items cannot be returned or exchanged" },
+    {
+      "type": "metaobject_list",
+      "id": "default_options",
+      "label": "Default embroidery options",
+      "info": "Used when a product has no custom.embroidery_options metafield.",
+      "metaobject_type": "embroidery_option"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "thread_color",
+      "name": "Thread colour",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Colour name", "default": "Gold" },
+        { "type": "color", "id": "color", "label": "Colour", "default": "#F5A623" }
+      ]
+    },
+    {
+      "type": "font_option",
+      "name": "Font option",
+      "limit": 4,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Block" },
+        { "type": "font_picker", "id": "font", "label": "Font", "default": "assistant_n7" },
+        {
+          "type": "select",
+          "id": "fallback",
+          "label": "Fallback style",
+          "options": [
+            { "value": "sans", "label": "Block / Sans-serif" },
+            { "value": "script", "label": "Script / Cursive" }
+          ],
+          "default": "sans"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kapisa Custom Embroidery",
+      "blocks": [
+        { "type": "thread_color", "settings": { "name": "White", "color": "#FFFFFF" } },
+        { "type": "thread_color", "settings": { "name": "Black", "color": "#111111" } },
+        { "type": "thread_color", "settings": { "name": "Gold", "color": "#F5A623" } },
+        { "type": "thread_color", "settings": { "name": "Grey", "color": "#9E9E9E" } },
+        { "type": "thread_color", "settings": { "name": "Neon Green", "color": "#D4E157" } },
+        { "type": "thread_color", "settings": { "name": "Pink", "color": "#FF8DA1" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

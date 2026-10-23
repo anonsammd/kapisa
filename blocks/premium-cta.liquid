@@ -1,0 +1,245 @@
+{% doc %}
+  @prompt
+    Create a premium final call-to-action section for the Kapisa Healthcare About Us page.
+    
+    Use deep navy #0E1F3C as the full-width background. Use warm cream #FAF7F0 for the heading and description. Use gold #C9A227 for a thin decorative line above the heading. Use a cream button with navy text for strong contrast.
+    
+    Desktop layout:
+    Center the content inside a maximum width of 900px. Add the heading “Designed for Your Everyday Care” approximately 44px. Add a short description below it with 16px text and comfortable line height. Add one centered CTA button labeled “Shop All Scrubs”. Use approximately 100px vertical padding.
+    
+    Mobile layout:
+    Use 20px horizontal padding. Make the heading 30px and the description 16px. Make the button full width with a minimum height of 52px. Use approximately 64px vertical padding. Keep the layout spacious and comfortable, like a premium mobile shopping app.
+    
+    Animation:
+    Reveal the heading, description, and button with a subtle upward fade. Add a gentle button press animation. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Add editable heading, description, button label, and button link. Set the default button link to /collections/all.
+    
+    Return complete Shopify Liquid, responsive CSS, and valid schema. Do not modify the header or footer.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign cta_link = block.settings.button_link | default: collections.all.url %}
+
+{% style %}
+  .ai-cta-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    padding: 100px 24px;
+    box-sizing: border-box;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__inner {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__line {
+    width: 56px;
+    height: 2px;
+    margin: 0 auto 26px;
+    background: #C9A227;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__heading,
+  .ai-cta-{{ ai_gen_id }}__description,
+  .ai-cta-{{ ai_gen_id }}__button {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  .ai-cta-{{ ai_gen_id }}.is-visible .ai-cta-{{ ai_gen_id }}__heading,
+  .ai-cta-{{ ai_gen_id }}.is-visible .ai-cta-{{ ai_gen_id }}__description,
+  .ai-cta-{{ ai_gen_id }}.is-visible .ai-cta-{{ ai_gen_id }}__button {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 650ms ease, transform 650ms ease;
+  }
+
+  .ai-cta-{{ ai_gen_id }}.is-visible .ai-cta-{{ ai_gen_id }}__description {
+    transition-delay: 100ms;
+  }
+
+  .ai-cta-{{ ai_gen_id }}.is-visible .ai-cta-{{ ai_gen_id }}__button {
+    transition-delay: 180ms;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__heading {
+    margin: 0;
+    color: #FAF7F0;
+    font-family: {{ settings.type_header_font.family }}, sans-serif;
+    font-size: 44px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__description {
+    max-width: 620px;
+    margin: 20px auto 32px;
+    color: #FAF7F0;
+    font-family: {{ settings.type_body_font.family }}, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__button {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 30px;
+    border: 1px solid #FAF7F0;
+    border-radius: {{ settings.buttons_radius }}px;
+    background: #FAF7F0;
+    color: #0E1F3C;
+    font-family: {{ settings.type_body_font.family }}, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 150ms ease, background-color 150ms ease;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__button:hover {
+    background: #ffffff;
+  }
+
+  .ai-cta-{{ ai_gen_id }}__button:active {
+    transform: scale(0.98);
+  }
+
+  .ai-cta-{{ ai_gen_id }}__button:focus-visible {
+    outline: 3px solid #C9A227;
+    outline-offset: 4px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-cta-{{ ai_gen_id }} {
+      padding: 64px 20px;
+    }
+
+    .ai-cta-{{ ai_gen_id }}__heading {
+      font-size: 30px;
+    }
+
+    .ai-cta-{{ ai_gen_id }}__description {
+      margin-top: 18px;
+      margin-bottom: 28px;
+      font-size: 16px;
+    }
+
+    .ai-cta-{{ ai_gen_id }}__button {
+      width: 100%;
+      min-height: 52px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-cta-{{ ai_gen_id }}__heading,
+    .ai-cta-{{ ai_gen_id }}__description,
+    .ai-cta-{{ ai_gen_id }}__button {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .ai-cta-{{ ai_gen_id }}__button {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+<premium-cta-{{ ai_gen_id }} class="ai-cta-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-cta-{{ ai_gen_id }}__inner">
+    <div class="ai-cta-{{ ai_gen_id }}__line" aria-hidden="true"></div>
+    <h2 class="ai-cta-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
+    <div class="ai-cta-{{ ai_gen_id }}__description">{{ block.settings.description | escape | newline_to_br }}</div>
+    <a class="ai-cta-{{ ai_gen_id }}__button" href="{{ cta_link }}">{{ block.settings.button_label | escape }}</a>
+  </div>
+</premium-cta-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class PremiumCta{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          this.classList.add('is-visible');
+          return;
+        }
+        if (!('IntersectionObserver' in window)) {
+          this.classList.add('is-visible');
+          return;
+        }
+        this.observer = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            this.classList.add('is-visible');
+            this.observer.disconnect();
+          }
+        }, { threshold: 0.15 });
+        this.observer.observe(this);
+      }
+    }
+    if (!customElements.get('premium-cta-{{ ai_gen_id }}')) {
+      customElements.define('premium-cta-{{ ai_gen_id }}', PremiumCta{{ ai_gen_id }});
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Premium call to action",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Designed for Your Everyday Care"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Thoughtfully designed scrubs to support your comfort, confidence, and care every day."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop All Scrubs"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Premium call to action"
+    }
+  ],
+  "tag": null,
+  "class": "premium-cta-block"
+}
+{% endschema %}

@@ -1,0 +1,345 @@
+{
+  "sections": {
+    "1789121933839ade8a": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_684b868_eKTA9r": {
+          "type": "kapisa-product-info",
+          "settings": {
+            "desktop_width_percent": 100,
+            "content_width": 1200,
+            "body_font": "assistant_n4",
+            "size_guide": "<p>Choose your usual size. For a relaxed fit, select one size up.</p>"
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_e3a21f5_JHByXM": {
+          "type": "marquee-strip",
+          "name": "Marquee strip",
+          "settings": {
+            "item_one": "500+ Healthcare Heroes Dressed",
+            "item_two": "Premium 4-Way Stretch Fabric",
+            "item_three": "Custom Embroidery Available",
+            "item_four": "Cash on Delivery",
+            "accessibility_label": "Store highlights",
+            "desktop_width_percent": 100,
+            "strip_height": 44,
+            "text_font": "assistant_n4",
+            "text_size": 12,
+            "letter_spacing": 1,
+            "scroll_speed": 28
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_684b868_eKTA9r",
+        "ai_gen_block_e3a21f5_JHByXM"
+      ],
+      "settings": {}
+    },
+    "custom_embroidery_section": {
+      "type": "kapisa-custom-embroidery",
+      "blocks": {
+        "thread_white": {
+          "type": "thread_color",
+          "settings": {
+            "name": "White",
+            "color": "#FFFFFF"
+          }
+        },
+        "thread_black": {
+          "type": "thread_color",
+          "settings": {
+            "name": "Black",
+            "color": "#111111"
+          }
+        },
+        "thread_gold": {
+          "type": "thread_color",
+          "settings": {
+            "name": "Gold",
+            "color": "#F5A623"
+          }
+        },
+        "thread_grey": {
+          "type": "thread_color",
+          "settings": {
+            "name": "Grey",
+            "color": "#9E9E9E"
+          }
+        },
+        "thread_neon": {
+          "type": "thread_color",
+          "settings": {
+            "name": "Neon Green",
+            "color": "#D4E157"
+          }
+        },
+        "thread_pink": {
+          "type": "thread_color",
+          "settings": {
+            "name": "Pink",
+            "color": "#FF8DA1"
+          }
+        }
+      },
+      "block_order": [
+        "thread_white",
+        "thread_black",
+        "thread_gold",
+        "thread_grey",
+        "thread_neon",
+        "thread_pink"
+      ],
+      "settings": {
+        "toggle_label": "Add embroidery",
+        "modal_heading": "Add Your Identity",
+        "max_characters": 22,
+        "show_acknowledgment": false,
+        "acknowledgment_text": "Embroidered items cannot be returned or exchanged"
+      }
+    },
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "vendor": {
+          "type": "text",
+          "settings": {
+            "text": "{{ product.vendor }}",
+            "text_style": "uppercase"
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_shape": "circle"
+          }
+        },
+        "quantity_selector": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "share": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share"
+          }
+        }
+      },
+      "block_order": [
+        "vendor",
+        "title",
+        "price",
+        "variant_picker",
+        "quantity_selector",
+        "buy_buttons",
+        "description",
+        "share"
+      ],
+      "disabled": true,
+      "settings": {
+        "enable_sticky_info": true,
+        "color_scheme": "scheme-1",
+        "media_size": "large",
+        "constrain_to_viewport": true,
+        "media_fit": "contain",
+        "gallery_layout": "stacked",
+        "mobile_thumbnails": "hide",
+        "media_position": "left",
+        "image_zoom": "lightbox",
+        "hide_variants": true,
+        "enable_video_looping": false,
+        "padding_top": 36,
+        "padding_bottom": 12
+      }
+    },
+    "disclosures": {
+      "type": "disclosures",
+      "settings": {
+        "heading": "Disclosures",
+        "heading_size": "h2",
+        "open_by_default": false,
+        "color_scheme": "",
+        "padding_top": 36,
+        "padding_bottom": 0
+      }
+    },
+    "1789181382889b2e07": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_f6ec481_iVp8Yk": {
+          "type": "product-details-accordion",
+          "settings": {
+            "heading": "Product details",
+            "fabric_title": "Fabric & technology",
+            "fabric_content": "<p>Describe the fabric, comfort, stretch and construction.</p>",
+            "care_title": "Care instructions",
+            "care_content": "<p>Follow the recommended washing and care instructions.</p>",
+            "fit_title": "Fit & size guide",
+            "fit_content": "<p>Use the size guide to find your best fit.</p>",
+            "shipping_title": "Shipping & returns",
+            "shipping_content": "<p>Add your shipping and return information here.</p>"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_f6ec481_iVp8Yk"
+      ],
+      "settings": {}
+    },
+    "178918237208eaa2a5": {
+      "type": "_blocks",
+      "settings": {}
+    },
+    "1789186729481b1615": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_baf30a3_XPbYzY": {
+          "type": "complete-the-look",
+          "settings": {
+            "heading": "Complete the Look",
+            "fallback_heading": "You May Also Like",
+            "direct_products": [
+              "apex-v-neck-scrub-set",
+              "classic-v-neck-scrub-top",
+              "core-stretch-scrub-set"
+            ],
+            "fallback_collection": "scrubs",
+            "product_limit": 8,
+            "desktop_width_percent": 100,
+            "heading_size": 28,
+            "section_padding": 28,
+            "mobile_padding": 16,
+            "section_spacing": 0
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_52abba8_TYjEVc": {
+          "type": "trust-badges-strip",
+          "name": "Trust badges strip",
+          "settings": {
+            "label_one": "Cash on Delivery",
+            "label_two": "Easy 7-Day Exchange",
+            "label_three": "1–3 Day Express Delivery",
+            "label_four": "Secure Checkout",
+            "desktop_width_percent": 100,
+            "label_size": 13,
+            "vertical_padding": 14,
+            "mobile_padding": 12,
+            "background_color": "#FAF9F5",
+            "border_color": "#8FA3B8",
+            "icon_color": "#C9A227",
+            "text_color": "#2B2B2B"
+          },
+          "blocks": {}
+        },
+        "ai_gen_block_9e74eb1_kjqUEf": {
+          "type": "customer-reviews",
+          "settings": {
+            "eyebrow": "The Kapisa community",
+            "heading": "Customer Reviews",
+            "average_rating": "5.0",
+            "review_count": "0",
+            "review_count_label": "reviews",
+            "rating_5_percentage": 100,
+            "rating_5_count": "0",
+            "rating_4_percentage": 85,
+            "rating_4_count": "0",
+            "rating_3_percentage": 0,
+            "rating_3_count": "0",
+            "rating_2_percentage": 0,
+            "rating_2_count": "0",
+            "rating_1_percentage": 0,
+            "rating_1_count": "0",
+            "review_link": "",
+            "button_label": "Write a Review",
+            "review_1_name": "Dr. Sarah Jenkins",
+            "review_1_stars": 5,
+            "review_1_text": "<p>Extremely comfortable scrubs. The fabric stretches with every move and keeps its crisp look throughout long 12-hour shifts.</p>",
+            "review_1_verified": true,
+            "review_1_photo": "shopify://shop_images/photo-1559757148-5c350d0d3c56.jpg",
+            "review_2_name": "Michael Vance, RN",
+            "review_2_stars": 5,
+            "review_2_text": "<p>Best scrubs I've owned. Premium material, great fit, and super breathable. Highly recommended!</p>",
+            "review_2_verified": true,
+            "review_2_photo": "shopify://shop_images/photo-1576091160399-112ba8d25d1d.jpg",
+            "review_3_name": "Priya Sharma",
+            "review_3_stars": 5,
+            "review_3_text": "<p>High quality stitching and fast delivery. The color remains vibrant even after multiple washes.</p>",
+            "review_3_verified": true,
+            "review_3_photo": "shopify://shop_images/model-with-leather-jacket-over-shoulders.jpg",
+            "background_color": "#faf7f0",
+            "card_background": "#ffffff",
+            "heading_color": "#2b2b2e",
+            "average_color": "#0e1f3c",
+            "star_color": "#c9a227",
+            "bar_color": "#8fa3b8",
+            "body_color": "#2b2b2e",
+            "reviewer_color": "#2b2b2e",
+            "muted_color": "#5f6368",
+            "button_color": "#0e1f3c",
+            "button_hover_color": "#ffffff"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_baf30a3_XPbYzY",
+        "ai_gen_block_52abba8_TYjEVc",
+        "ai_gen_block_9e74eb1_kjqUEf"
+      ],
+      "settings": {}
+    },
+    "related-products": {
+      "type": "related-products",
+      "disabled": true,
+      "settings": {
+        "heading": "You may also like",
+        "heading_size": "h2",
+        "products_to_show": 4,
+        "columns_desktop": 4,
+        "columns_mobile": "2",
+        "color_scheme": "scheme-1",
+        "image_ratio": "square",
+        "image_shape": "default",
+        "show_secondary_image": true,
+        "show_vendor": false,
+        "show_rating": false,
+        "padding_top": 36,
+        "padding_bottom": 28
+      }
+    }
+  },
+  "order": [
+    "1789121933839ade8a",
+    "custom_embroidery_section",
+    "main",
+    "disclosures",
+    "1789181382889b2e07",
+    "178918237208eaa2a5",
+    "1789186729481b1615",
+    "related-products"
+  ]
+}

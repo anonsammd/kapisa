@@ -1,0 +1,42 @@
+{% doc %}
+  @prompt
+    Create a premium editorial image gallery section for the Kapisa Healthcare About Us page.
+    
+    Use warm cream #FAF7F0 as the section background. Use deep navy #0E1F3C for the heading. Use gold #C9A227 for a small decorative accent. Use 16px rounded corners on all images.
+    
+    Desktop layout:
+    Place the section inside a maximum width of 1200px. Add a heading “The Kapisa Perspective” approximately 42px. Below it, create an asymmetric gallery with one large image on the left and two smaller images stacked on the right. The large image should be approximately 500px tall. The two smaller images should each be approximately 240px tall. Use object-fit cover while preserving a premium editorial composition.
+    
+    Mobile layout:
+    Use 20px horizontal padding. Display the images in a horizontal swipeable carousel. Each image should be approximately 82vw wide and 300px tall. Add scroll-snap behavior so the gallery feels like a native mobile app. Do not create horizontal page overflow.
+    
+    Animation:
+    Images should gently fade in on scroll. Add a subtle image zoom on desktop hover. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Add a heading setting and three image picker blocks. Each block must include an image picker, alt text, and optional caption. Allow merchants to add or remove images.
+    
+    Return complete Shopify Liquid with responsive CSS and valid schema. Do not hardcode image URLs.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% style %}
+  .ai-editorial-gallery-{{ ai_gen_id }}{display:block;width:100%;background:#FAF7F0;color:#0E1F3C;padding:72px 20px}
+  .ai-editorial-gallery-{{ ai_gen_id }}__inner{width:{{ block.settings.desktop_width_percent }}%;max-width:1200px;margin:0 auto}
+  .ai-editorial-gallery-{{ ai_gen_id }}__heading{margin:0 0 34px;color:#0E1F3C;font-size:42px;line-height:1.08;letter-spacing:-.025em;font-weight:600}
+  .ai-editorial-gallery-{{ ai_gen_id }}__accent{display:block;width:48px;height:3px;margin-bottom:18px;background:#C9A227}
+  .ai-editorial-gallery-{{ ai_gen_id }}__grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:20px}
+  .ai-editorial-gallery-{{ ai_gen_id }}__item{position:relative;min-width:0;overflow:hidden;border-radius:16px;background:#ebe5d9;opacity:0;transform:translateY(18px);transition:opacity 700ms ease,transform 700ms ease}
+  .ai-editorial-gallery-{{ ai_gen_id }}__item.is-visible{opacity:1;transform:translateY(0)}
+  .ai-editorial-gallery-{{ ai_gen_id }}__item--large{height:500px}.ai-editorial-gallery-{{ ai_gen_id }}__item--small{height:240px}
+  .ai-editorial-gallery-{{ ai_gen_id }}__stack{display:grid;grid-template-rows:repeat(2,1fr);gap:20px}
+  .ai-editorial-gallery-{{ ai_gen_id }}__image,.ai-editorial-gallery-{{ ai_gen_id }}__placeholder{display:block;width:100%;height:100%;object-fit:cover;transition:transform 600ms ease}
+  .ai-editorial-gallery-{{ ai_gen_id }}__item:hover .ai-editorial-gallery-{{ ai_gen_id }}__image{transform:scale(1.035)}
+  .ai-editorial-gallery-{{ ai_gen_id }}__placeholder svg{width:100%;height:100%;color:#8b8374}
+  .ai-editorial-gallery-{{ ai_gen_id }}__caption{position:absolute;right:16px;bottom:14px;left:16px;margin:0;color:#FFF;font-size:14px;line-height:1.35;text-shadow:0 1px 4px rgba(14,31,60,.7)}
+  @media screen and (max-width:749px){.ai-editorial-gallery-{{ ai_gen_id }}{padding:52px 20px;overflow:hidden}.ai-editorial-gallery-{{ ai_gen_id }}__inner{width:100%}.ai-editorial-gallery-{{ ai_gen_id }}__heading{margin-bottom:28px;font-size:34px}.ai-editorial-gallery-{{ ai_gen_id }}__grid{display:flex;gap:14px;width:calc(100vw - 20px);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-right:20px}.ai-editorial-gallery-{{ ai_gen_id }}__grid::-webkit-scrollbar{display:none}.ai-editorial-gallery-{{ ai_gen_id }}__stack{display:contents}.ai-editorial-gallery-{{ ai_gen_id }}__item,.ai-editorial-gallery-{{ ai_gen_id }}__item--large,.ai-editorial-gallery-{{ ai_gen_id }}__item--small{flex:0 0 82vw;height:300px;scroll-snap-align:start}}
+  @media (prefers-reduced-motion:reduce){.ai-editorial-gallery-{{ ai_gen_id }}__item,.ai-editorial-gallery-{{ ai_gen_id }}__image{transition:none;transform:none}}
+{% endstyle %}
+<editorial-gallery-{{ ai_gen_id }} class="ai-editorial-gallery-{{ ai_gen_id }}" {{ block.shopify_attributes }}><div class="ai-editorial-gallery-{{ ai_gen_id }}__inner"><span class="ai-editorial-gallery-{{ ai_gen_id }}__accent" aria-hidden="true"></span>{% if block.settings.heading != blank %}<h2 class="ai-editorial-gallery-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>{% endif %}<div class="ai-editorial-gallery-{{ ai_gen_id }}__grid">{% for item_number in (1..3) %}{% assign image_key='image_' | append:item_number %}{% assign alt_key='alt_' | append:item_number %}{% assign caption_key='caption_' | append:item_number %}{% assign image=block.settings[image_key] %}<figure class="ai-editorial-gallery-{{ ai_gen_id }}__item {% if forloop.first %}ai-editorial-gallery-{{ ai_gen_id }}__item--large{% else %}ai-editorial-gallery-{{ ai_gen_id }}__item--small{% endif %}">{% if image != blank %}<img class="ai-editorial-gallery-{{ ai_gen_id }}__image" src="{{ image | image_url: width: 1600 }}" alt="{{ block.settings[alt_key] | default: image.alt | escape }}" loading="lazy" width="{{ image.width }}" height="{{ image.height }}">{% else %}<div class="ai-editorial-gallery-{{ ai_gen_id }}__placeholder">{{ 'image' | placeholder_svg_tag }}</div>{% endif %}{% if block.settings[caption_key] != blank %}<figcaption class="ai-editorial-gallery-{{ ai_gen_id }}__caption">{{ block.settings[caption_key] | escape }}</figcaption>{% endif %}</figure>{% endfor %}</div></div></editorial-gallery-{{ ai_gen_id }}>
+<script>(function(){class EditorialGallery{{ ai_gen_id }} extends HTMLElement{connectedCallback(){const items=this.querySelectorAll('.ai-editorial-gallery-{{ ai_gen_id }}__item');if(!('IntersectionObserver' in window)){items.forEach((item)=>item.classList.add('is-visible'));return}const observer=new IntersectionObserver((entries,currentObserver)=>{entries.forEach((entry)=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');currentObserver.unobserve(entry.target)}})},{threshold:.12});items.forEach((item)=>observer.observe(item))}}if(!customElements.get('editorial-gallery-{{ ai_gen_id }}'))customElements.define('editorial-gallery-{{ ai_gen_id }}',EditorialGallery{{ ai_gen_id }})})();</script>
+{% schema %}{"name":"Editorial image gallery","settings":[{"type":"text","id":"heading","label":"Heading","default":"The Kapisa Perspective"},{"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},{"type":"header","content":"Large image"},{"type":"image_picker","id":"image_1","label":"Image"},{"type":"text","id":"alt_1","label":"Alt text"},{"type":"text","id":"caption_1","label":"Caption"},{"type":"header","content":"Small image one"},{"type":"image_picker","id":"image_2","label":"Image"},{"type":"text","id":"alt_2","label":"Alt text"},{"type":"text","id":"caption_2","label":"Caption"},{"type":"header","content":"Small image two"},{"type":"image_picker","id":"image_3","label":"Image"},{"type":"text","id":"alt_3","label":"Alt text"},{"type":"text","id":"caption_3","label":"Caption"}],"presets":[{"name":"Editorial image gallery"}],"tag":null,"class":"editorial-gallery-block"}{% endschema %}

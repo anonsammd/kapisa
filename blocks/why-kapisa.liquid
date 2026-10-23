@@ -1,0 +1,224 @@
+{% doc %}
+  @prompt
+    Create a premium “Why Kapisa” feature section for the Kapisa Healthcare About Us page.
+    
+    Use a soft blue-gray background #F0F4F7 for the entire section. Use deep navy #0E1F3C for the heading and card titles. Use charcoal #2B2B2E for descriptions. Use gold #C9A227 only for small SVG icon accents. Use warm cream #FAF7F0 for the feature cards.
+    
+    Desktop layout:
+    Place the section inside a maximum width of 1200px. Add a centered heading “Why Kapisa” approximately 44px. Below it, create four feature cards in one row. Each card should have 28px padding, 16px rounded corners, a simple elegant SVG icon, a heading, and a short description. Use these default values: Thoughtful Design, Everyday Comfort, Professional Confidence, and Built for Your Routine.
+    
+    Mobile layout:
+    Use 20px horizontal padding. Display the cards in a two-column grid. Each card should have 20px padding and approximately 150px minimum height. Make the heading 30px and card titles 18px. Keep descriptions short and readable. Make the grid feel like a polished native app interface.
+    
+    Animation:
+    Fade cards upward with a subtle stagger. Add a gentle icon animation on desktop hover. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Create four editable blocks. Each block must include an SVG icon field, heading, and description. Allow merchants to add or remove blocks.
+    
+    Return complete Shopify Liquid, responsive CSS, and valid schema. Do not use emoji icons.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-why-kapisa-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    background: #F0F4F7;
+    padding: 72px 24px;
+    color: #2B2B2E;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__heading {
+    margin: 0 0 36px;
+    color: #0E1F3C;
+    text-align: center;
+    font-size: 44px;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__card {
+    min-height: 220px;
+    padding: 28px;
+    background: #FAF7F0;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: ai-why-kapisa-rise-{{ ai_gen_id }} 0.6s ease-out forwards;
+    animation-delay: calc(var(--ai-card-index) * 90ms);
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__icon {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 22px;
+    color: #C9A227;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.7;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__title {
+    margin: 0 0 10px;
+    color: #0E1F3C;
+    font-size: 21px;
+    line-height: 1.25;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__description {
+    margin: 0;
+    color: #2B2B2E;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  @keyframes ai-why-kapisa-rise-{{ ai_gen_id }} {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (hover: hover) and (min-width: 750px) {
+    .ai-why-kapisa-{{ ai_gen_id }}__card:hover .ai-why-kapisa-{{ ai_gen_id }}__icon {
+      transform: translateY(-3px) rotate(-3deg);
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__icon {
+      transition: transform 180ms ease;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-why-kapisa-{{ ai_gen_id }} {
+      padding: 48px 20px;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__heading {
+      margin-bottom: 24px;
+      font-size: 30px;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__card {
+      min-height: 150px;
+      padding: 20px;
+      border-radius: 14px;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__icon {
+      width: 30px;
+      height: 30px;
+      margin-bottom: 16px;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__title {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__description {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-why-kapisa-{{ ai_gen_id }}__card {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
+    .ai-why-kapisa-{{ ai_gen_id }}__icon {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-why-kapisa-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-why-kapisa-{{ ai_gen_id }}__inner">
+    {% if block.settings.show_heading %}
+      <h2 class="ai-why-kapisa-{{ ai_gen_id }}__heading">{{ block.settings.section_heading | escape }}</h2>
+    {% endif %}
+
+    <div class="ai-why-kapisa-{{ ai_gen_id }}__grid">
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 0;">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_one }}</div>
+        <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_one | escape }}</h3>
+        <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_one | escape }}</p>
+      </article>
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 1;">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_two }}</div>
+        <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_two | escape }}</h3>
+        <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_two | escape }}</p>
+      </article>
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 2;">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_three }}</div>
+        <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_three | escape }}</h3>
+        <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_three | escape }}</p>
+      </article>
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 3;">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_four }}</div>
+        <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_four | escape }}</h3>
+        <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_four | escape }}</p>
+      </article>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Why Kapisa features",
+  "settings": [
+    { "type": "checkbox", "id": "show_heading", "label": "Show heading", "default": true },
+    { "type": "text", "id": "section_heading", "label": "Section heading", "default": "Why Kapisa" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "header", "content": "Feature one" },
+    { "type": "html", "id": "icon_one", "label": "SVG icon", "default": "<svg viewBox=\"0 0 24 24\"><path d=\"M12 3v18M3 12h18\"/></svg>" },
+    { "type": "text", "id": "title_one", "label": "Title", "default": "Thoughtful Design" },
+    { "type": "textarea", "id": "description_one", "label": "Description", "default": "Considered details made for a better everyday experience." },
+    { "type": "header", "content": "Feature two" },
+    { "type": "html", "id": "icon_two", "label": "SVG icon", "default": "<svg viewBox=\"0 0 24 24\"><path d=\"M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z\"/></svg>" },
+    { "type": "text", "id": "title_two", "label": "Title", "default": "Everyday Comfort" },
+    { "type": "textarea", "id": "description_two", "label": "Description", "default": "Comfort-focused essentials that fit naturally into your routine." },
+    { "type": "header", "content": "Feature three" },
+    { "type": "html", "id": "icon_three", "label": "SVG icon", "default": "<svg viewBox=\"0 0 24 24\"><path d=\"M4 19h16M6 19V9h12v10M9 9V5h6v4\"/></svg>" },
+    { "type": "text", "id": "title_three", "label": "Title", "default": "Professional Confidence" },
+    { "type": "textarea", "id": "description_three", "label": "Description", "default": "Reliable choices designed to help you feel ready for the day." },
+    { "type": "header", "content": "Feature four" },
+    { "type": "html", "id": "icon_four", "label": "SVG icon", "default": "<svg viewBox=\"0 0 24 24\"><path d=\"M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0zM8 12h8M12 8v8\"/></svg>" },
+    { "type": "text", "id": "title_four", "label": "Title", "default": "Built for Your Routine" },
+    { "type": "textarea", "id": "description_four", "label": "Description", "default": "Simple, dependable solutions that work with the way you live." }
+  ],
+  "presets": [{ "name": "Why Kapisa features" }],
+  "tag": null,
+  "class": "why-kapisa-features"
+}
+{% endschema %}

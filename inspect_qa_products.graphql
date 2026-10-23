@@ -1,0 +1,56 @@
+query {
+  qaProduct: product(id: "gid://shopify/Product/15439908962406") {
+    id
+    title
+    handle
+    status
+    tags
+    options {
+      id
+      name
+      values
+    }
+    variants(first: 20) {
+      nodes {
+        id
+        title
+        price
+        availableForSale
+        inventoryQuantity
+        selectedOptions {
+          name
+          value
+        }
+      }
+    }
+    metafields(first: 20) {
+      nodes {
+        namespace
+        key
+        value
+        type
+      }
+    }
+  }
+  serviceProduct: product(id: "gid://shopify/Product/15439815442534") {
+    id
+    title
+    handle
+    status
+    options {
+      id
+      name
+      values
+    }
+    variants(first: 20) {
+      nodes {
+        id
+        title
+        price
+        availableForSale
+        inventoryQuantity
+      }
+    }
+  }
+}
+

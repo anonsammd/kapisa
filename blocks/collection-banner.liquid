@@ -1,0 +1,182 @@
+{% doc %}
+  @prompt
+    Create a collection page banner section, full-width, navy 
+    #0E1F3C background, off-white 
+    #FAF7F0 text. Collection title in large bold off-white centered text, optional short collection description below it in lighter off-white at 80% opacity, max 2 lines with text truncated using ellipsis (line-clamp: 2, word-wrap: break-word) if the description is longer, so it never overflows the banner height. Breadcrumb trail (Home / Collection Name) in small slate 
+    #8FA3B8 text above the title, left-aligned within the centered content block. Keep banner height compact (180–220px desktop, 140px mobile), no background image required — solid navy color only.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-collection-banner-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    min-height: {{ block.settings.desktop_height }}px;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    box-sizing: border-box;
+  }
+
+  .ai-collection-banner__inner-{{ ai_gen_id }} {
+    width: min(100% - 48px, {{ block.settings.content_width }}px);
+    min-height: inherit;
+    margin: 0 auto;
+    padding: 28px 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .ai-collection-banner__breadcrumb-{{ ai_gen_id }} {
+    align-self: center;
+    width: 100%;
+    margin: 0 0 12px;
+    color: #8FA3B8;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  .ai-collection-banner__breadcrumb-{{ ai_gen_id }} a {
+    color: #8FA3B8;
+    text-decoration: none;
+  }
+
+  .ai-collection-banner__breadcrumb-{{ ai_gen_id }} a:hover,
+  .ai-collection-banner__breadcrumb-{{ ai_gen_id }} a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .ai-collection-banner__title-{{ ai_gen_id }} {
+    max-width: 100%;
+    margin: 0;
+    color: #FAF7F0;
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-weight: 700;
+    line-height: 1.08;
+    overflow-wrap: break-word;
+  }
+
+  .ai-collection-banner__description-{{ ai_gen_id }} {
+    max-width: 720px;
+    margin: 12px auto 0;
+    color: rgba(250, 247, 240, 0.8);
+    font-size: 16px;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: break-word;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-banner-{{ ai_gen_id }} {
+      min-height: 140px;
+    }
+
+    .ai-collection-banner__inner-{{ ai_gen_id }} {
+      width: min(100% - 32px, {{ block.settings.content_width }}px);
+      padding: 20px 0;
+    }
+
+    .ai-collection-banner__breadcrumb-{{ ai_gen_id }} {
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .ai-collection-banner__title-{{ ai_gen_id }} {
+      font-size: clamp(1.75rem, 9vw, 2.5rem);
+    }
+
+    .ai-collection-banner__description-{{ ai_gen_id }} {
+      margin-top: 8px;
+      font-size: 14px;
+    }
+  }
+{% endstyle %}
+
+<collection-banner-{{ ai_gen_id }}
+  class="ai-collection-banner-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-collection-banner__inner-{{ ai_gen_id }}">
+    <nav class="ai-collection-banner__breadcrumb-{{ ai_gen_id }}" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span aria-hidden="true"> / </span>
+      <span>{{ collection.title | escape }}</span>
+    </nav>
+
+    <h1 class="ai-collection-banner__title-{{ ai_gen_id }}">{{ collection.title | escape }}</h1>
+
+    {% if block.settings.show_description and collection.description != blank %}
+      <div class="ai-collection-banner__description-{{ ai_gen_id }}">
+        {{ collection.description | strip_html | escape }}
+      </div>
+    {% endif %}
+  </div>
+</collection-banner-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CollectionBanner{{ ai_gen_id }} extends HTMLElement {}
+
+    if (!customElements.get('collection-banner-{{ ai_gen_id }}')) {
+      customElements.define('collection-banner-{{ ai_gen_id }}', CollectionBanner{{ ai_gen_id }});
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection page banner",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "min": 180,
+      "max": 220,
+      "step": 10,
+      "unit": "px",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 600,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "default": 900
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection page banner"
+    }
+  ],
+  "tag": null,
+  "class": "collection-page-banner-block"
+}
+{% endschema %}

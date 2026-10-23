@@ -1,0 +1,53 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+<div class="kapisa-collections-{{ ai_gen_id }}" style="padding: 40px 20px; text-align: center;">
+  {% if block.settings.eyebrow != blank %}
+    <p style="text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px; color: #c9a227; font-weight: 600; margin-bottom: 8px;">{{ block.settings.eyebrow | escape }}</p>
+  {% endif %}
+  {% if block.settings.heading != blank %}
+    <h2 style="font-size: 32px; color: #0e1f3c; margin-bottom: 12px;">{{ block.settings.heading | escape }}</h2>
+  {% endif %}
+  {% if block.settings.intro != blank %}
+    <p style="font-size: 16px; color: #2b2b2e; max-width: 600px; margin: 0 auto;">{{ block.settings.intro | escape }}</p>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Kapisa collections",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "KAPISA COLLECTIONS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Designed for the people who care."
+    },
+    {
+      "type": "text",
+      "id": "intro",
+      "label": "Intro text",
+      "default": "Premium healthcare apparel designed for comfort, confidence and professional style."
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width percent",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kapisa collections"
+    }
+  ]
+}
+{% endschema %}

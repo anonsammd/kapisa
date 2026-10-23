@@ -1,0 +1,64 @@
+{% doc %}
+  @prompt
+    "Create a newsletter signup section, navy 
+    #0E1F3C background, centered content, off-white heading 'Join the Healthcare Heroes List' and a short subtext about early access to drops and embroidery offers. Inline email input with rounded left corners and a gold 
+    #C9A227 'Subscribe' button with rounded right corners attached directly to the input (single pill-shaped bar look). Keep section height compact, generous top/bottom padding only."
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% capture form_class %}ai-newsletter-{{ ai_gen_id }}__form{% endcapture %}
+
+{% style %}
+  .ai-newsletter-{{ ai_gen_id }} { display: block; width: {{ block.settings.desktop_width_percent }}%; max-width: 100%; box-sizing: border-box; background: #0E1F3C; color: #F7F4ED; padding: {{ block.settings.vertical_padding }}px 24px; }
+  .ai-newsletter-{{ ai_gen_id }}__inner { width: 100%; max-width: 760px; margin: 0 auto; text-align: center; }
+  .ai-newsletter-{{ ai_gen_id }}__heading { margin: 0 0 8px; color: #F7F4ED; font-size: {{ block.settings.heading_size }}px; line-height: 1.2; font-weight: 600; }
+  .ai-newsletter-{{ ai_gen_id }}__text { margin: 0 auto 20px; max-width: 620px; color: #F7F4ED; font-size: 16px; line-height: 1.5; }
+  .ai-newsletter-{{ ai_gen_id }}__form, .ai-newsletter-{{ ai_gen_id }}__field { width: 100%; }
+  .ai-newsletter-{{ ai_gen_id }}__field { display: flex; max-width: 580px; margin: 0 auto; }
+  .ai-newsletter-{{ ai_gen_id }}__input { min-width: 0; flex: 1 1 auto; height: 52px; padding: 0 18px; border: 0; border-radius: 26px 0 0 26px; background: #F7F4ED; color: #0E1F3C; font: inherit; font-size: 16px; }
+  .ai-newsletter-{{ ai_gen_id }}__input::placeholder { color: #4A5568; opacity: 1; }
+  .ai-newsletter-{{ ai_gen_id }}__input:focus-visible, .ai-newsletter-{{ ai_gen_id }}__button:focus-visible { outline: 3px solid #F7F4ED; outline-offset: 3px; z-index: 1; }
+  .ai-newsletter-{{ ai_gen_id }}__button { flex: 0 0 auto; height: 52px; padding: 0 24px; border: 0; border-radius: 0 26px 26px 0; background: #C9A227; color: #0E1F3C; font: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .ai-newsletter-{{ ai_gen_id }}__button:hover { background: #E0BC3A; }
+  .ai-newsletter-{{ ai_gen_id }}__message { margin: 12px 0 0; color: #F7F4ED; font-size: 14px; }
+  .ai-newsletter-{{ ai_gen_id }}__message--error { color: #FFD6D6; }
+  @media screen and (max-width: 749px) { .ai-newsletter-{{ ai_gen_id }} { padding-right: 16px; padding-left: 16px; } .ai-newsletter-{{ ai_gen_id }}__button { padding-right: 18px; padding-left: 18px; } }
+{% endstyle %}
+
+<div class="ai-newsletter-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-newsletter-{{ ai_gen_id }}__inner">
+    <h2 class="ai-newsletter-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
+    <p class="ai-newsletter-{{ ai_gen_id }}__text">{{ block.settings.subtext | escape | newline_to_br }}</p>
+    {% form 'customer', class: form_class %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <div class="ai-newsletter-{{ ai_gen_id }}__field">
+        <label class="visually-hidden" for="ai-newsletter-email-{{ ai_gen_id }}">{{ block.settings.email_label | escape }}</label>
+        <input id="ai-newsletter-email-{{ ai_gen_id }}" class="ai-newsletter-{{ ai_gen_id }}__input" type="email" name="contact[email]" value="{{ form.email | escape }}" placeholder="{{ block.settings.email_placeholder | escape }}" autocomplete="email" required aria-required="true" {% if form.errors %}aria-invalid="true"{% endif %}>
+        <button class="ai-newsletter-{{ ai_gen_id }}__button" type="submit">{{ block.settings.button_label | escape }}</button>
+      </div>
+      {% if form.posted_successfully? %}<p class="ai-newsletter-{{ ai_gen_id }}__message" role="status">{{ block.settings.success_message | escape }}</p>{% elsif form.errors %}<p class="ai-newsletter-{{ ai_gen_id }}__message ai-newsletter-{{ ai_gen_id }}__message--error" role="alert">{{ block.settings.error_message | escape }}</p>{% endif %}
+    {% endform %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Newsletter signup",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Join the Healthcare Heroes List" },
+    { "type": "textarea", "id": "subtext", "label": "Subtext", "default": "Get early access to new drops and exclusive embroidery offers." },
+    { "type": "text", "id": "email_label", "label": "Email label", "default": "Email address" },
+    { "type": "text", "id": "email_placeholder", "label": "Placeholder", "default": "Enter your email" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "Thanks for subscribing!" },
+    { "type": "text", "id": "error_message", "label": "Error message", "default": "Please enter a valid email address." },
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "range", "id": "vertical_padding", "label": "Vertical padding", "min": 24, "max": 80, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 20, "max": 48, "step": 2, "unit": "px", "default": 32 }
+  ],
+  "presets": [{ "name": "Newsletter signup" }],
+  "tag": null,
+  "class": "newsletter-signup-block"
+}
+{% endschema %}

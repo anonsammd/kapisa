@@ -1,0 +1,4414 @@
+{% comment %}
+  @prompt
+    Build a premium production-ready Kapisa Healthcare ecommerce header.
+
+    Requirements:
+    - Keep announcement bar completely separate.
+    - Fixed/static header support.
+    - Desktop navigation with nested dropdowns.
+    - Desktop search.
+    - Desktop wishlist.
+    - Desktop customer account/login/register.
+    - Desktop cart.
+    - Mobile native-app style header.
+    - Mobile hamburger drawer.
+    - Mobile search only in top header.
+    - Mobile bottom navigation: Home, Shop, Wishlist, Cart, Account.
+    - Do not duplicate search or cart on mobile.
+    - Mobile logo must be clearly visible and larger.
+    - No old arrow style in mobile drawer.
+    - Use modern plus buttons for expandable menu groups.
+    - Dynamic header height and spacer so page content never hides underneath header.
+{% endcomment %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+
+  /* =========================================================
+     KAPISA HEADER — DESIGN TOKENS
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }} {
+    --kapisa-cream: #FAF7F0;
+    --kapisa-cream-2: #FFFDF9;
+    --kapisa-navy: #0E1F3C;
+    --kapisa-charcoal: #2B2B2E;
+    --kapisa-gold: #C9A227;
+    --kapisa-slate: #8FA3B8;
+    --kapisa-border: rgba(143,163,184,.25);
+
+    width: 100% !important;
+    z-index: 99990 !important;
+    color: var(--kapisa-charcoal);
+    background: rgba(250,247,240,.98);
+    border-bottom: 1px solid var(--kapisa-border);
+    box-shadow: 0 3px 18px rgba(14,31,60,.035);
+
+    transition:
+      top .24s cubic-bezier(.2,.7,.2,1),
+      background .3s ease,
+      box-shadow .3s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}.kapisa-header--fixed {
+    position: fixed !important;
+    top: var(--kapisa-header-top, 34px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 99990 !important;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}.kapisa-header--static {
+    position: relative !important;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}.is-scrolled {
+    background: rgba(250,247,240,.94);
+    backdrop-filter: blur(18px) saturate(125%);
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+    box-shadow: 0 8px 35px rgba(14,31,60,.09);
+  }
+
+  /* Dynamic spacer - hidden when sticky to avoid extra gap */
+  .kapisa-header-spacer-{{ ai_gen_id }} {
+    display: none !important;
+  }
+
+  /* =========================================================
+     DESKTOP MAIN
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__main {
+    width: 100%;
+    max-width: 1480px;
+    min-height: 76px;
+    margin: 0 auto;
+    padding: 0 34px;
+
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto minmax(300px, 1fr);
+    align-items: center;
+
+    column-gap: 28px;
+
+    transition:
+      min-height .32s cubic-bezier(.2,.7,.2,1),
+      padding .32s cubic-bezier(.2,.7,.2,1);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}.is-scrolled
+  .kapisa-header-{{ ai_gen_id }}__main {
+    min-height: 64px;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  /* =========================================================
+     BRAND
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__brand {
+    justify-self: start;
+
+    display: inline-flex;
+    align-items: center;
+
+    min-width: 0;
+
+    color: var(--kapisa-navy);
+    text-decoration: none;
+    line-height: 0;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__logo {
+    display: block;
+
+    width: {{ block.settings.logo_width }}px;
+    max-width: 100%;
+    height: auto;
+
+    object-fit: contain;
+
+    transition:
+      width .32s cubic-bezier(.2,.7,.2,1),
+      transform .25s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}.is-scrolled
+  .kapisa-header-{{ ai_gen_id }}__logo {
+    width: calc({{ block.settings.logo_width }}px * .86);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__wordmark {
+    color: var(--kapisa-navy);
+    font-size: 20px;
+    font-weight: 750;
+    letter-spacing: .16em;
+    text-transform: lowercase;
+    white-space: nowrap;
+  }
+
+  /* =========================================================
+     DESKTOP NAV
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__desktop-nav {
+    justify-self: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+    height: 100%;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-item {
+    position: relative;
+
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-link {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+
+    gap: 6px;
+
+    height: 42px;
+    padding: 0 13px;
+
+    color: var(--kapisa-charcoal);
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .015em;
+
+    border-radius: 10px;
+
+    transition:
+      color .2s ease,
+      background .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-link:hover {
+    color: var(--kapisa-navy);
+    background: rgba(14,31,60,.045);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-link::after {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    bottom: 2px;
+
+    width: 0;
+    height: 2px;
+
+    border-radius: 999px;
+
+    background: var(--kapisa-gold);
+
+    transform: translateX(-50%);
+
+    transition: width .25s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-link:hover::after {
+    width: 28px;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__chevron {
+    width: 11px;
+    height: 11px;
+
+    flex: 0 0 11px;
+
+    transition: transform .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-item:hover
+  .kapisa-header-{{ ai_gen_id }}__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* =========================================================
+     DESKTOP DROPDOWN
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__dropdown {
+    position: absolute;
+
+    top: calc(100% - 1px);
+    left: 50%;
+
+    min-width: 225px;
+
+    padding: 9px;
+
+    background: rgba(250,247,240,.99);
+
+    border: 1px solid rgba(143,163,184,.25);
+    border-radius: 14px;
+
+    box-shadow: 0 20px 55px rgba(14,31,60,.14);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translate(-50%,-7px);
+
+    transition:
+      opacity .2s ease,
+      transform .22s ease,
+      visibility .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__menu-item:hover >
+  .kapisa-header-{{ ai_gen_id }}__dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    transform: translate(-50%,0);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__dropdown-item {
+    position: relative;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__dropdown-link {
+    min-height: 40px;
+
+    padding: 0 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    color: var(--kapisa-charcoal);
+    text-decoration: none;
+
+    font-size: 12px;
+
+    border-radius: 9px;
+
+    transition:
+      color .18s ease,
+      background .18s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__dropdown-link:hover {
+    color: var(--kapisa-navy);
+    background: rgba(14,31,60,.05);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__dropdown-item >
+  .kapisa-header-{{ ai_gen_id }}__dropdown {
+    top: -10px;
+    left: calc(100% + 7px);
+
+    transform: translateX(-7px);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__dropdown-item:hover >
+  .kapisa-header-{{ ai_gen_id }}__dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    transform: translateX(0);
+  }
+
+  /* =========================================================
+     DESKTOP ACTIONS
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__actions {
+    justify-self: end;
+
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__action {
+    position: relative;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--kapisa-navy);
+
+    background: transparent;
+
+    cursor: pointer;
+    text-decoration: none;
+
+    transition:
+      background .2s ease,
+      transform .2s ease,
+      color .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__action:hover {
+    background: rgba(14,31,60,.055);
+    transform: translateY(-1px);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__action svg,
+  .kapisa-header-{{ ai_gen_id }}__mobile-icon svg,
+  .kapisa-header-{{ ai_gen_id }}__bottom-link svg {
+    width: 20px;
+    height: 20px;
+
+    fill: none;
+
+    stroke: currentColor;
+    stroke-width: 1.65;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* =========================================================
+     BADGES
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__cart-badge,
+  .kapisa-header-{{ ai_gen_id }}__wishlist-badge {
+    position: absolute;
+
+    top: 1px;
+    right: -1px;
+
+    min-width: 17px;
+    height: 17px;
+
+    padding: 0 4px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    background: var(--kapisa-gold);
+    color: var(--kapisa-navy);
+
+    border: 2px solid var(--kapisa-cream);
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__wishlist-badge {
+    background: var(--kapisa-navy);
+    color: var(--kapisa-cream);
+  }
+
+  /* =========================================================
+     ACCOUNT DESKTOP
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__account-wrap {
+    position: relative;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__account-menu {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 220px;
+
+    padding: 9px;
+
+    background: rgba(250,247,240,.99);
+
+    border: 1px solid rgba(143,163,184,.25);
+    border-radius: 15px;
+
+    box-shadow: 0 20px 55px rgba(14,31,60,.14);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateY(-7px);
+
+    transition:
+      opacity .2s ease,
+      transform .2s ease,
+      visibility .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__account-wrap:hover
+  .kapisa-header-{{ ai_gen_id }}__account-menu,
+  .kapisa-header-{{ ai_gen_id }}__account-wrap:focus-within
+  .kapisa-header-{{ ai_gen_id }}__account-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__account-heading {
+    padding: 10px 12px 8px;
+
+    color: var(--kapisa-navy);
+
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__account-link {
+    min-height: 40px;
+
+    padding: 0 12px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--kapisa-charcoal);
+
+    text-decoration: none;
+
+    font-size: 12px;
+
+    border-radius: 9px;
+
+    transition:
+      color .18s ease,
+      background .18s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__account-link:hover {
+    color: var(--kapisa-navy);
+    background: rgba(14,31,60,.05);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__account-divider {
+    height: 1px;
+    margin: 7px 4px;
+
+    background: rgba(143,163,184,.22);
+  }
+
+  /* =========================================================
+     DESKTOP SEARCH
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__search-wrap {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    width: 0;
+
+    opacity: 0;
+
+    overflow: visible;
+    pointer-events: none;
+
+    transition:
+      width .3s cubic-bezier(.2,.7,.2,1),
+      opacity .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__search-wrap.is-open {
+    width: 255px;
+
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__search-input {
+    width: 100%;
+    height: 40px;
+
+    padding: 0 16px;
+
+    border: 1px solid rgba(143,163,184,.45);
+    border-radius: 999px;
+
+    outline: none;
+
+    background: rgba(255,255,255,.62);
+
+    color: var(--kapisa-charcoal);
+
+    font-family: inherit;
+    font-size: 12px;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__search-input:focus {
+    border-color: var(--kapisa-gold);
+
+    box-shadow: 0 0 0 3px rgba(201,162,39,.10);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__search-results {
+    position: absolute;
+
+    top: calc(100% + 11px);
+    right: 0;
+
+    width: 350px;
+    max-height: 430px;
+
+    overflow-y: auto;
+
+    background: rgba(250,247,240,.99);
+
+    border: 1px solid rgba(143,163,184,.28);
+    border-radius: 17px;
+
+    box-shadow: 0 22px 65px rgba(14,31,60,.16);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateY(-6px);
+
+    transition:
+      opacity .2s ease,
+      transform .2s ease,
+      visibility .2s ease;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__search-results.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    transform: translateY(0);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__result {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 11px 13px;
+
+    color: var(--kapisa-charcoal);
+    text-decoration: none;
+
+    border-bottom: 1px solid rgba(143,163,184,.17);
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__result-image {
+    width: 47px;
+    height: 47px;
+
+    flex: 0 0 47px;
+
+    border-radius: 10px;
+
+    object-fit: cover;
+
+    background: #ece8df;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__result-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__result-title {
+    display: block;
+
+    overflow: hidden;
+
+    color: var(--kapisa-charcoal);
+
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__result-price {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--kapisa-navy);
+
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .kapisa-header-{{ ai_gen_id }}__view-results {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 46px;
+
+    color: var(--kapisa-gold);
+
+    text-decoration: none;
+
+    font-size: 11px;
+    font-weight: 750;
+  }
+
+  /* =========================================================
+     MOBILE BASE
+     ========================================================= */
+
+  .kapisa-header-{{ ai_gen_id }}__mobile-controls,
+  .kapisa-header-{{ ai_gen_id }}__mobile-search,
+  .kapisa-header-{{ ai_gen_id }}__bottom-nav {
+    display: none;
+  }
+
+  html {
+    scroll-padding-top: var(--kapisa-header-height, 76px);
+  }
+
+  /* =========================================================
+     TABLET
+     ========================================================= */
+
+  @media (max-width: 980px) and (min-width: 750px) {
+
+    .kapisa-header-{{ ai_gen_id }}__main {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__desktop-nav {
+      gap: 0;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__menu-link {
+      padding-left: 8px;
+      padding-right: 8px;
+      font-size: 12px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__search-wrap.is-open {
+      width: 210px;
+    }
+  }
+
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+
+  @media (max-width: 749px) {
+
+    .kapisa-header-{{ ai_gen_id }} {
+      background: rgba(250,247,240,.98);
+
+      box-shadow:
+        0 4px 20px rgba(14,31,60,.07);
+    }
+
+    /* ---------------------------------------------
+       MAIN MOBILE HEADER
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__main,
+    .kapisa-header-{{ ai_gen_id }}.is-scrolled
+    .kapisa-header-{{ ai_gen_id }}__main {
+
+      position: relative;
+
+      width: 100%;
+
+      min-height: 68px;
+      height: 68px;
+
+      padding: 0 9px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 8px;
+
+      box-sizing: border-box;
+    }
+
+    /* ---------------------------------------------
+       MOBILE BRAND
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__brand,
+    .kapisa-header-{{ ai_gen_id }}.is-scrolled
+    .kapisa-header-{{ ai_gen_id }}__brand {
+
+      position: absolute;
+
+      top: 50%;
+      left: 50%;
+
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 150px;
+      max-width: 45vw;
+
+      height: 68px;
+
+      margin: 0;
+      padding: 0;
+
+      line-height: 0;
+
+      transform: translate(-50%, -50%);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__logo,
+    .kapisa-header-{{ ai_gen_id }}.is-scrolled
+    .kapisa-header-{{ ai_gen_id }}__logo {
+
+      display: block;
+
+      width: min({{ block.settings.mobile_logo_width }}px, 145px);
+
+      max-width: 145px;
+
+      min-width: 92px;
+
+      max-height: 54px;
+
+      height: auto;
+
+      object-fit: contain;
+      object-position: center;
+
+      transform: none;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__wordmark {
+
+      font-size: 19px;
+
+      letter-spacing: .12em;
+
+      white-space: nowrap;
+
+      transform: none;
+    }
+
+    /* ---------------------------------------------
+       HIDE DESKTOP
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__desktop-nav,
+    .kapisa-header-{{ ai_gen_id }}__actions {
+      display: none;
+    }
+
+    /* ---------------------------------------------
+       MOBILE TOP CONTROLS
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-controls {
+
+      position: relative;
+
+      z-index: 4;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: space-between;
+
+      width: 100%;
+
+      height: 68px;
+      min-height: 68px;
+
+      margin: 0;
+      padding: 0;
+
+      pointer-events: none;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-left,
+    .kapisa-header-{{ ai_gen_id }}__mobile-right {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 2px;
+
+      height: 68px;
+
+      pointer-events: auto;
+    }
+
+    /* ---------------------------------------------
+       MOBILE ICON
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-icon {
+
+      position: relative;
+
+      width: 44px;
+      height: 44px;
+
+      flex: 0 0 44px;
+
+      margin: 0;
+      padding: 0;
+
+      border: 0;
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: transparent;
+
+      color: var(--kapisa-navy);
+
+      cursor: pointer;
+
+      -webkit-tap-highlight-color: transparent;
+
+      transition:
+        background .18s ease,
+        transform .18s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-icon:active {
+      background: rgba(14,31,60,.08);
+
+      transform: scale(.94);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-icon svg {
+
+      width: 21px;
+      height: 21px;
+
+      display: block;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 1.65;
+
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ---------------------------------------------
+       MOBILE SEARCH
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-search {
+
+      position: absolute;
+
+      top: calc(100% + 8px);
+
+      left: 9px;
+      right: 9px;
+
+      z-index: 100000;
+
+      display: block;
+
+      padding: 10px;
+
+      background: rgba(250,247,240,.99);
+
+      border: 1px solid rgba(143,163,184,.25);
+
+      border-radius: 17px;
+
+      box-shadow: 0 20px 55px rgba(14,31,60,.14);
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      transform: translateY(-7px);
+
+      transition:
+        opacity .22s ease,
+        transform .22s ease,
+        visibility .22s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-search.is-open {
+
+      opacity: 1;
+
+      visibility: visible;
+
+      pointer-events: auto;
+
+      transform: translateY(0);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-search-input {
+
+      width: 100%;
+      height: 48px;
+
+      box-sizing: border-box;
+
+      padding: 0 16px;
+
+      border: 1px solid rgba(143,163,184,.40);
+
+      border-radius: 13px;
+
+      outline: none;
+
+      background: #FFFDF9;
+
+      color: var(--kapisa-charcoal);
+
+      font-family: inherit;
+
+      font-size: 14px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-search-input:focus {
+
+      border-color: var(--kapisa-gold);
+
+      box-shadow:
+        0 0 0 3px rgba(201,162,39,.10);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-results {
+
+      max-height: 55vh;
+
+      overflow-y: auto;
+
+      margin-top: 7px;
+    }
+
+    /* ---------------------------------------------
+       MOBILE DRAWER
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__drawer {
+
+      position: fixed !important;
+
+      inset: 0 !important;
+
+      width: 100vw !important;
+      height: 100dvh !important;
+
+      z-index: 100100 !important;
+
+      display: block;
+
+      background: rgba(14,31,60,.48);
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+
+      transition:
+        opacity .25s ease,
+        visibility .25s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer.is-open {
+
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-panel {
+
+      position: absolute !important;
+
+      top: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+
+      width: min(88vw, 390px);
+
+      height: 100dvh !important;
+
+      overflow-y: auto;
+
+      overscroll-behavior: contain;
+
+      box-sizing: border-box;
+
+      background: #FAF7F0 !important;
+
+      color: var(--kapisa-charcoal);
+
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        22px
+        calc(105px + env(safe-area-inset-bottom));
+
+      transform: translate3d(-105%,0,0);
+
+      transition:
+        transform .35s cubic-bezier(.2,.75,.2,1);
+
+      box-shadow:
+        18px 0 55px rgba(14,31,60,.20);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer.is-open
+    .kapisa-header-{{ ai_gen_id }}__drawer-panel {
+
+      transform: translate3d(0,0,0);
+    }
+
+    /* ---------------------------------------------
+       DRAWER HEADER
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-head {
+
+      min-height: 56px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 24px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-brand {
+
+      color: var(--kapisa-navy);
+
+      font-size: 19px;
+
+      font-weight: 750;
+
+      letter-spacing: .14em;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-close {
+
+      width: 42px;
+      height: 42px;
+
+      border: 0;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: rgba(14,31,60,.07);
+
+      color: var(--kapisa-navy);
+
+      cursor: pointer;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-close svg {
+
+      width: 19px;
+      height: 19px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 1.6;
+
+      stroke-linecap: round;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-label {
+
+      margin: 0 0 8px;
+
+      color: var(--kapisa-gold);
+
+      font-size: 10px;
+
+      font-weight: 800;
+
+      letter-spacing: .12em;
+
+      text-transform: uppercase;
+    }
+
+    /* ---------------------------------------------
+       MOBILE MENU
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-menu {
+
+      list-style: none;
+
+      margin: 0;
+      padding: 0;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-item {
+
+      border-bottom: 1px solid rgba(143,163,184,.22);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-row {
+
+      min-height: 57px;
+
+      display: flex;
+      align-items: center;
+
+      gap: 8px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-link {
+
+      min-height: 57px;
+
+      flex: 1;
+
+      display: flex;
+      align-items: center;
+
+      color: var(--kapisa-navy);
+
+      text-decoration: none;
+
+      font-size: 16px;
+
+      font-weight: 550;
+
+      transition:
+        color .18s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-link:hover {
+
+      color: var(--kapisa-gold);
+    }
+
+    /* Modern PLUS instead of arrows */
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-expand {
+
+      width: 38px;
+      height: 38px;
+
+      flex: 0 0 38px;
+
+      border: 0;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: rgba(14,31,60,.045);
+
+      color: var(--kapisa-navy);
+
+      cursor: pointer;
+
+      transition:
+        transform .2s ease,
+        background .2s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-expand:hover {
+
+      background: rgba(14,31,60,.08);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-expand svg {
+
+      width: 17px;
+      height: 17px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 1.6;
+
+      stroke-linecap: round;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-item.is-expanded
+    .kapisa-header-{{ ai_gen_id }}__mobile-expand {
+
+      transform: rotate(45deg);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-submenu {
+
+      display: none;
+
+      list-style: none;
+
+      margin: 0 0 10px;
+
+      padding: 0 0 0 13px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-item.is-expanded >
+    .kapisa-header-{{ ai_gen_id }}__mobile-submenu {
+
+      display: block;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-submenu a {
+
+      min-height: 43px;
+
+      display: flex;
+      align-items: center;
+
+      color: #60646b;
+
+      text-decoration: none;
+
+      font-size: 13px;
+
+      padding-left: 12px;
+
+      border-left: 1px solid rgba(201,162,39,.35);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-submenu a:hover {
+
+      color: var(--kapisa-navy);
+    }
+
+    /* ---------------------------------------------
+       MOBILE ACCOUNT AREA IN DRAWER
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-account {
+
+      margin-top: 25px;
+
+      padding: 15px;
+
+      border-radius: 15px;
+
+      background: rgba(14,31,60,.045);
+
+      border: 1px solid rgba(143,163,184,.20);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-account-title {
+
+      color: var(--kapisa-navy);
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      margin-bottom: 10px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-account-links {
+
+      display: grid;
+
+      gap: 4px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-account-link {
+
+      min-height: 40px;
+
+      display: flex;
+      align-items: center;
+
+      color: var(--kapisa-charcoal);
+
+      text-decoration: none;
+
+      font-size: 12px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-account-link:hover {
+
+      color: var(--kapisa-gold);
+    }
+
+    /* ---------------------------------------------
+       MOBILE BOTTOM NAV
+       --------------------------------------------- */
+
+    .kapisa-header-{{ ai_gen_id }}__bottom-nav {
+
+      position: fixed;
+
+      left: 10px;
+      right: 10px;
+
+      bottom: calc(8px + env(safe-area-inset-bottom));
+
+      z-index: 99980;
+
+      height: 66px;
+
+      display: grid;
+
+      grid-template-columns: repeat(5, 1fr);
+
+      align-items: center;
+
+      padding: 4px;
+
+      box-sizing: border-box;
+
+      background: rgba(250,247,240,.95);
+
+      backdrop-filter: blur(20px) saturate(130%);
+      -webkit-backdrop-filter: blur(20px) saturate(130%);
+
+      border: 1px solid rgba(143,163,184,.25);
+
+      border-radius: 21px;
+
+      box-shadow:
+        0 12px 42px rgba(14,31,60,.15);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__bottom-link {
+
+      position: relative;
+
+      height: 57px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      gap: 3px;
+
+      color: #747983;
+
+      text-decoration: none;
+
+      font-size: 8.5px;
+
+      font-weight: 650;
+
+      border-radius: 16px;
+
+      border: 0;
+
+      background: transparent;
+
+      cursor: pointer;
+
+      font-family: inherit;
+
+      -webkit-tap-highlight-color: transparent;
+
+      transition:
+        color .18s ease,
+        background .18s ease,
+        transform .18s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__bottom-link:active {
+
+      transform: scale(.93);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__bottom-link.is-active {
+
+      color: var(--kapisa-navy);
+
+      background: rgba(14,31,60,.055);
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__bottom-link svg {
+
+      width: 20px;
+      height: 20px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 1.65;
+
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-badge {
+
+      position: absolute;
+
+      top: 3px;
+
+      right: calc(50% - 18px);
+
+      min-width: 15px;
+      height: 15px;
+
+      padding: 0 3px;
+
+      box-sizing: border-box;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 999px;
+
+      background: var(--kapisa-gold);
+
+      color: var(--kapisa-navy);
+
+      border: 2px solid var(--kapisa-cream);
+
+      font-size: 8px;
+
+      font-weight: 800;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__mobile-wishlist-badge {
+
+      background: var(--kapisa-navy);
+
+      color: var(--kapisa-cream);
+    }
+
+    /* Bottom nav account avatar */
+
+    .kapisa-header-{{ ai_gen_id }}__account-dot {
+
+      width: 20px;
+      height: 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background: var(--kapisa-navy);
+
+      color: var(--kapisa-cream);
+
+      font-size: 9px;
+      font-weight: 750;
+    }
+
+    /* Mobile page room for bottom nav */
+
+    body {
+
+      padding-bottom:
+        calc(91px + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* =========================================================
+     DESKTOP ONLY HIDE MOBILE
+     ========================================================= */
+
+  @media (min-width: 750px) {
+
+    .kapisa-header-{{ ai_gen_id }}__drawer,
+    .kapisa-header-{{ ai_gen_id }}__bottom-nav {
+
+      display: none !important;
+    }
+  }
+
+  /* =========================================================
+     REDUCED MOTION
+     ========================================================= */
+
+  @media (prefers-reduced-motion: reduce) {
+
+    .kapisa-header-{{ ai_gen_id }},
+    .kapisa-header-{{ ai_gen_id }} *,
+    .kapisa-header-{{ ai_gen_id }}__bottom-nav {
+
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+{% endstyle %}
+
+
+<!-- =========================================================
+     HEADER SPACER
+     ========================================================= -->
+
+<div
+  class="kapisa-header-spacer-{{ ai_gen_id }}"
+  aria-hidden="true"
+></div>
+
+
+<!-- =========================================================
+     MAIN HEADER
+     ========================================================= -->
+
+<header
+  class="
+    kapisa-header-{{ ai_gen_id }}
+    {% if block.settings.always_visible %}
+      kapisa-header--fixed
+    {% else %}
+      kapisa-header--static
+    {% endif %}
+  "
+  data-kapisa-header="true"
+  data-always-visible="{{ block.settings.always_visible }}"
+  {{ block.shopify_attributes }}
+>
+
+  <div class="kapisa-header-{{ ai_gen_id }}__main">
+
+    <!-- =====================================================
+         LOGO
+         ===================================================== -->
+
+    <a
+      class="kapisa-header-{{ ai_gen_id }}__brand"
+      href="{{ routes.root_url }}"
+      aria-label="{{ shop.name | escape }}"
+    >
+
+      {% if block.settings.logo != blank %}
+
+        <img
+          class="kapisa-header-{{ ai_gen_id }}__logo"
+          src="{{ block.settings.logo | image_url: width: 700 }}"
+          alt="{{ shop.name | escape }}"
+          loading="eager"
+          width="{{ block.settings.logo_width }}"
+          height="auto"
+        >
+
+      {% else %}
+
+        <span class="kapisa-header-{{ ai_gen_id }}__wordmark">
+          {{ block.settings.brand_name | default: shop.name | escape }}
+        </span>
+
+      {% endif %}
+
+    </a>
+
+
+    <!-- =====================================================
+         DESKTOP NAVIGATION
+         ===================================================== -->
+
+    <nav
+      class="kapisa-header-{{ ai_gen_id }}__desktop-nav"
+      aria-label="{{ block.settings.menu_aria_label | escape }}"
+    >
+
+      {% assign main_menu = block.settings.main_menu %}
+
+      {% if main_menu != blank %}
+
+        {% for link in main_menu.links %}
+
+          <div class="kapisa-header-{{ ai_gen_id }}__menu-item">
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__menu-link"
+              href="{{ link.url }}"
+            >
+
+              {{ link.title | escape }}
+
+              {% if link.links != blank %}
+
+                <svg
+                  class="kapisa-header-{{ ai_gen_id }}__chevron"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  aria-hidden="true"
+                >
+                  <path d="m2.5 4 3.5 3.5L9.5 4"/>
+                </svg>
+
+              {% endif %}
+
+            </a>
+
+
+            {% if link.links != blank %}
+
+              <div class="kapisa-header-{{ ai_gen_id }}__dropdown">
+
+                {% for child_link in link.links %}
+
+                  <div class="kapisa-header-{{ ai_gen_id }}__dropdown-item">
+
+                    <a
+                      class="kapisa-header-{{ ai_gen_id }}__dropdown-link"
+                      href="{{ child_link.url }}"
+                    >
+
+                      <span>
+                        {{ child_link.title | escape }}
+                      </span>
+
+                      {% if child_link.links != blank %}
+                        <span aria-hidden="true">→</span>
+                      {% endif %}
+
+                    </a>
+
+
+                    {% if child_link.links != blank %}
+
+                      <div class="kapisa-header-{{ ai_gen_id }}__dropdown">
+
+                        {% for grandchild_link in child_link.links %}
+
+                          <a
+                            class="kapisa-header-{{ ai_gen_id }}__dropdown-link"
+                            href="{{ grandchild_link.url }}"
+                          >
+                            {{ grandchild_link.title | escape }}
+                          </a>
+
+                        {% endfor %}
+
+                      </div>
+
+                    {% endif %}
+
+                  </div>
+
+                {% endfor %}
+
+              </div>
+
+            {% endif %}
+
+          </div>
+
+        {% endfor %}
+
+      {% else %}
+
+        <a
+          class="kapisa-header-{{ ai_gen_id }}__menu-link"
+          href="{{ routes.all_products_collection_url }}"
+        >
+          Shop
+        </a>
+
+        <a
+          class="kapisa-header-{{ ai_gen_id }}__menu-link"
+          href="/pages/about"
+        >
+          About
+        </a>
+
+        <a
+          class="kapisa-header-{{ ai_gen_id }}__menu-link"
+          href="/pages/contact"
+        >
+          Contact
+        </a>
+
+      {% endif %}
+
+    </nav>
+
+
+    <!-- =====================================================
+         DESKTOP ACTIONS
+         Search / Wishlist / Account / Cart
+         ===================================================== -->
+
+    <div class="kapisa-header-{{ ai_gen_id }}__actions">
+
+
+      <!-- SEARCH -->
+
+      {% if block.settings.enable_search %}
+
+        <div
+          class="kapisa-header-{{ ai_gen_id }}__search-wrap"
+          data-desktop-search
+        >
+
+          <input
+            class="kapisa-header-{{ ai_gen_id }}__search-input"
+            type="search"
+            placeholder="{{ block.settings.search_placeholder | escape }}"
+            autocomplete="off"
+            aria-label="{{ block.settings.search_aria_label | escape }}"
+            data-desktop-search-input
+          >
+
+          <div
+            class="kapisa-header-{{ ai_gen_id }}__search-results"
+            data-desktop-results
+          ></div>
+
+        </div>
+
+        <button
+          class="kapisa-header-{{ ai_gen_id }}__action"
+          type="button"
+          aria-label="{{ block.settings.search_button_label | escape }}"
+          aria-expanded="false"
+          data-desktop-search-toggle
+        >
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.8" cy="10.8" r="6.3"></circle>
+            <path d="m15.5 15.5 5 5"></path>
+          </svg>
+
+        </button>
+
+      {% endif %}
+
+
+      <!-- WISHLIST -->
+
+      {% if block.settings.enable_wishlist %}
+
+        <a
+          class="kapisa-header-{{ ai_gen_id }}__action"
+          href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
+          aria-label="Wishlist"
+        >
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.8 8.8c0 5.5-8.8 10.2-8.8 10.2S3.2 14.3 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"></path>
+          </svg>
+
+          <span
+            class="kapisa-header-{{ ai_gen_id }}__wishlist-badge"
+            data-wishlist-count
+            hidden
+          >
+            0
+          </span>
+
+        </a>
+
+      {% endif %}
+
+
+      <!-- ACCOUNT -->
+
+      <div class="kapisa-header-{{ ai_gen_id }}__account-wrap">
+
+        <a
+          class="kapisa-header-{{ ai_gen_id }}__action"
+          href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+          aria-label="{% if customer %}My account{% else %}Login or register{% endif %}"
+        >
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+
+            {% if customer %}
+
+              <circle cx="12" cy="8" r="3.2"></circle>
+              <path d="M5.5 20c.8-3.4 3-5.1 6.5-5.1s5.7 1.7 6.5 5.1"></path>
+
+            {% else %}
+
+              <circle cx="12" cy="8" r="3"></circle>
+              <path d="M5 20c.7-3.2 3-5 7-5s6.3 1.8 7 5"></path>
+
+            {% endif %}
+
+          </svg>
+
+        </a>
+
+
+        <!-- Account dropdown -->
+
+        <div class="kapisa-header-{{ ai_gen_id }}__account-menu">
+
+          {% if customer %}
+
+            <div class="kapisa-header-{{ ai_gen_id }}__account-heading">
+              {{ customer.first_name | default: 'My account' | escape }}
+            </div>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ routes.account_url }}"
+            >
+              My account
+            </a>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ routes.account_url }}#orders"
+            >
+              My orders
+            </a>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ routes.account_addresses_url }}"
+            >
+              Addresses
+            </a>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
+            >
+              Wishlist
+            </a>
+
+            <div class="kapisa-header-{{ ai_gen_id }}__account-divider"></div>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ routes.account_logout_url }}"
+            >
+              Log out
+            </a>
+
+          {% else %}
+
+            <div class="kapisa-header-{{ ai_gen_id }}__account-heading">
+              Welcome to Kapisa
+            </div>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ routes.account_login_url }}"
+            >
+              Log in
+            </a>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ routes.account_register_url }}"
+            >
+              Create account
+            </a>
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__account-link"
+              href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
+            >
+              Wishlist
+            </a>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+
+      <!-- CART -->
+
+      {% if block.settings.show_cart %}
+
+        <a
+          class="kapisa-header-{{ ai_gen_id }}__action"
+          href="{{ routes.cart_url }}"
+          aria-label="Cart with {{ cart.item_count }} items"
+        >
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5h2l1.6 10h9.9L20 8H7"></path>
+            <circle cx="9" cy="19" r="1"></circle>
+            <circle cx="17" cy="19" r="1"></circle>
+          </svg>
+
+          {% if block.settings.show_cart_count and cart.item_count > 0 %}
+
+            <span class="kapisa-header-{{ ai_gen_id }}__cart-badge">
+              {{ cart.item_count }}
+            </span>
+
+          {% endif %}
+
+        </a>
+
+      {% endif %}
+
+    </div>
+
+
+    <!-- =====================================================
+         MOBILE TOP CONTROLS
+         Hamburger + Search
+         ===================================================== -->
+
+    <div class="kapisa-header-{{ ai_gen_id }}__mobile-controls">
+
+      <div class="kapisa-header-{{ ai_gen_id }}__mobile-left">
+
+        <button
+          class="kapisa-header-{{ ai_gen_id }}__mobile-icon"
+          type="button"
+          aria-label="{{ block.settings.mobile_menu_label | escape }}"
+          aria-expanded="false"
+          data-mobile-menu-open="{{ ai_gen_id }}"
+        >
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16"></path>
+            <path d="M4 12h16"></path>
+            <path d="M4 17h16"></path>
+          </svg>
+
+        </button>
+
+      </div>
+
+
+      <div class="kapisa-header-{{ ai_gen_id }}__mobile-right">
+
+        {% if block.settings.enable_search %}
+
+          <button
+            class="kapisa-header-{{ ai_gen_id }}__mobile-icon"
+            type="button"
+            aria-label="{{ block.settings.search_button_label | escape }}"
+            aria-expanded="false"
+            data-mobile-search-open="{{ ai_gen_id }}"
+          >
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.3"></circle>
+              <path d="m15.5 15.5 5 5"></path>
+            </svg>
+
+          </button>
+
+        {% endif %}
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       MOBILE SEARCH
+       ======================================================= -->
+
+  {% if block.settings.enable_search %}
+
+    <div
+      class="kapisa-header-{{ ai_gen_id }}__mobile-search"
+      data-mobile-search="{{ ai_gen_id }}"
+    >
+
+      <input
+        class="kapisa-header-{{ ai_gen_id }}__mobile-search-input"
+        type="search"
+        placeholder="{{ block.settings.mobile_search_placeholder | escape }}"
+        autocomplete="off"
+        aria-label="{{ block.settings.search_aria_label | escape }}"
+        data-mobile-search-input
+      >
+
+      <div
+        class="kapisa-header-{{ ai_gen_id }}__mobile-results"
+        data-mobile-results
+      ></div>
+
+    </div>
+
+  {% endif %}
+
+</header>
+
+
+<!-- =========================================================
+     MOBILE DRAWER
+     ========================================================= -->
+
+<div
+  class="kapisa-header-{{ ai_gen_id }}__drawer"
+  data-mobile-drawer="{{ ai_gen_id }}"
+  aria-hidden="true"
+>
+
+  <div
+    class="kapisa-header-{{ ai_gen_id }}__drawer-panel"
+    data-mobile-drawer-panel
+  >
+
+    <div class="kapisa-header-{{ ai_gen_id }}__drawer-head">
+
+      <span class="kapisa-header-{{ ai_gen_id }}__drawer-brand">
+        {{ block.settings.brand_name | default: shop.name | escape }}
+      </span>
+
+      <button
+        class="kapisa-header-{{ ai_gen_id }}__drawer-close"
+        type="button"
+        aria-label="{{ block.settings.close_menu_label | escape }}"
+        data-mobile-menu-close="{{ ai_gen_id }}"
+      >
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6 6 12 12"></path>
+          <path d="m18 6-12 12"></path>
+        </svg>
+
+      </button>
+
+    </div>
+
+
+    <div class="kapisa-header-{{ ai_gen_id }}__drawer-label">
+      {{ block.settings.mobile_menu_heading | escape }}
+    </div>
+
+
+    <ul class="kapisa-header-{{ ai_gen_id }}__mobile-menu">
+
+      {% assign mobile_menu = block.settings.mobile_menu %}
+
+      {% if mobile_menu != blank %}
+
+        {% for link in mobile_menu.links %}
+
+          <li
+            class="kapisa-header-{{ ai_gen_id }}__mobile-item"
+            data-mobile-menu-item
+          >
+
+            <div class="kapisa-header-{{ ai_gen_id }}__mobile-row">
+
+              <a
+                class="kapisa-header-{{ ai_gen_id }}__mobile-link"
+                href="{{ link.url }}"
+              >
+                {{ link.title | escape }}
+              </a>
+
+              {% if link.links != blank %}
+
+                <button
+                  class="kapisa-header-{{ ai_gen_id }}__mobile-expand"
+                  type="button"
+                  aria-label="Expand {{ link.title | escape }}"
+                  aria-expanded="false"
+                  data-mobile-expand
+                >
+
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                  </svg>
+
+                </button>
+
+              {% endif %}
+
+            </div>
+
+
+            {% if link.links != blank %}
+
+              <ul class="kapisa-header-{{ ai_gen_id }}__mobile-submenu">
+
+                {% for child_link in link.links %}
+
+                  <li>
+
+                    <a href="{{ child_link.url }}">
+                      {{ child_link.title | escape }}
+                    </a>
+
+                    {% if child_link.links != blank %}
+
+                      <ul class="kapisa-header-{{ ai_gen_id }}__mobile-submenu">
+
+                        {% for grandchild_link in child_link.links %}
+
+                          <li>
+
+                            <a href="{{ grandchild_link.url }}">
+                              {{ grandchild_link.title | escape }}
+                            </a>
+
+                          </li>
+
+                        {% endfor %}
+
+                      </ul>
+
+                    {% endif %}
+
+                  </li>
+
+                {% endfor %}
+
+              </ul>
+
+            {% endif %}
+
+          </li>
+
+        {% endfor %}
+
+      {% else %}
+
+        <li class="kapisa-header-{{ ai_gen_id }}__mobile-item">
+
+          <div class="kapisa-header-{{ ai_gen_id }}__mobile-row">
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__mobile-link"
+              href="{{ routes.all_products_collection_url }}"
+            >
+              All Scrubs
+            </a>
+
+          </div>
+
+        </li>
+
+
+        <li class="kapisa-header-{{ ai_gen_id }}__mobile-item">
+
+          <div class="kapisa-header-{{ ai_gen_id }}__mobile-row">
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__mobile-link"
+              href="/collections/men"
+            >
+              Men
+            </a>
+
+          </div>
+
+        </li>
+
+
+        <li class="kapisa-header-{{ ai_gen_id }}__mobile-item">
+
+          <div class="kapisa-header-{{ ai_gen_id }}__mobile-row">
+
+            <a
+              class="kapisa-header-{{ ai_gen_id }}__mobile-link"
+              href="/collections/women"
+            >
+              Women
+            </a>
+
+          </div>
+
+        </li>
+
+      {% endif %}
+
+    </ul>
+
+
+    <!-- =====================================================
+         MOBILE ACCOUNT PANEL
+         ===================================================== -->
+
+    <div class="kapisa-header-{{ ai_gen_id }}__drawer-account">
+
+      {% if customer %}
+
+        <div class="kapisa-header-{{ ai_gen_id }}__drawer-account-title">
+
+          Hi,
+          {{ customer.first_name | default: 'there' | escape }}
+
+        </div>
+
+        <div class="kapisa-header-{{ ai_gen_id }}__drawer-account-links">
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ routes.account_url }}"
+          >
+            My account
+          </a>
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ routes.account_url }}#orders"
+          >
+            My orders
+          </a>
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ routes.account_addresses_url }}"
+          >
+            Addresses
+          </a>
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
+          >
+            Wishlist
+          </a>
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ routes.account_logout_url }}"
+          >
+            Log out
+          </a>
+
+        </div>
+
+      {% else %}
+
+        <div class="kapisa-header-{{ ai_gen_id }}__drawer-account-title">
+          Welcome to Kapisa
+        </div>
+
+        <div class="kapisa-header-{{ ai_gen_id }}__drawer-account-links">
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ routes.account_login_url }}"
+          >
+            Log in
+          </a>
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ routes.account_register_url }}"
+          >
+            Create account
+          </a>
+
+          <a
+            class="kapisa-header-{{ ai_gen_id }}__drawer-account-link"
+            href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
+          >
+            Wishlist
+          </a>
+
+        </div>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================================================
+     MOBILE BOTTOM NAVIGATION
+     Home / Shop / Wishlist / Cart / Account
+
+     Search intentionally removed from bottom.
+     Search exists only in top header.
+     ========================================================= -->
+
+{% if block.settings.enable_mobile_bottom_nav %}
+
+  <nav
+    class="kapisa-header-{{ ai_gen_id }}__bottom-nav"
+    aria-label="{{ block.settings.mobile_bottom_nav_label | escape }}"
+  >
+
+    <!-- HOME -->
+
+    <a
+      class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+      href="{{ routes.root_url }}"
+      data-bottom-home
+    >
+
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5"></path>
+        <path d="M5 9.5V21h14V9.5"></path>
+      </svg>
+
+      <span>
+        {{ block.settings.mobile_home_label | escape }}
+      </span>
+
+    </a>
+
+
+    <!-- SHOP -->
+
+    <a
+      class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+      href="{{ block.settings.mobile_shop_link | default: routes.all_products_collection_url }}"
+    >
+
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 5h16"></path>
+        <path d="M6 5v15h12V5"></path>
+        <path d="M9 3h6"></path>
+      </svg>
+
+      <span>
+        {{ block.settings.mobile_shop_label | escape }}
+      </span>
+
+    </a>
+
+
+    <!-- WISHLIST -->
+
+    {% if block.settings.enable_wishlist %}
+
+      <a
+        class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+        href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
+        data-bottom-wishlist
+      >
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.8 8.8c0 5.5-8.8 10.2-8.8 10.2S3.2 14.3 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"></path>
+        </svg>
+
+        <span>
+          {{ block.settings.mobile_wishlist_label | escape }}
+        </span>
+
+        <span
+          class="kapisa-header-{{ ai_gen_id }}__mobile-badge kapisa-header-{{ ai_gen_id }}__mobile-wishlist-badge"
+          data-mobile-wishlist-count
+          hidden
+        >
+          0
+        </span>
+
+      </a>
+
+    {% else %}
+
+      <!-- If wishlist is disabled, keep five useful destinations -->
+
+      <a
+        class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+        href="{{ block.settings.mobile_collections_link | default: routes.collections_url }}"
+      >
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="4" width="6" height="6" rx="1"></rect>
+          <rect x="14" y="4" width="6" height="6" rx="1"></rect>
+          <rect x="4" y="14" width="6" height="6" rx="1"></rect>
+          <rect x="14" y="14" width="6" height="6" rx="1"></rect>
+        </svg>
+
+        <span>
+          {{ block.settings.mobile_collections_label | escape }}
+        </span>
+
+      </a>
+
+    {% endif %}
+
+
+    <!-- CART -->
+
+    {% if block.settings.show_cart %}
+
+      <a
+        class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+        href="{{ routes.cart_url }}"
+        data-bottom-cart
+      >
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5h2l1.6 10h9.9L20 8H7"></path>
+          <circle cx="9" cy="19" r="1"></circle>
+          <circle cx="17" cy="19" r="1"></circle>
+        </svg>
+
+        <span>
+          {{ block.settings.mobile_cart_label | escape }}
+        </span>
+
+        {% if block.settings.show_cart_count and cart.item_count > 0 %}
+
+          <span class="kapisa-header-{{ ai_gen_id }}__mobile-badge">
+            {{ cart.item_count }}
+          </span>
+
+        {% endif %}
+
+      </a>
+
+    {% endif %}
+
+
+    <!-- ACCOUNT -->
+
+    <a
+      class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+      href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
+      data-bottom-account
+    >
+
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+
+        <circle cx="12" cy="8" r="3.2"></circle>
+
+        <path d="M5.5 20c.8-3.4 3-5.1 6.5-5.1s5.7 1.7 6.5 5.1"></path>
+
+      </svg>
+
+      <span>
+        {% if customer %}
+          {{ block.settings.mobile_account_label | escape }}
+        {% else %}
+          {{ block.settings.mobile_login_label | escape }}
+        {% endif %}
+      </span>
+
+    </a>
+
+  </nav>
+
+{% endif %}
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+(function () {
+
+  'use strict';
+
+
+  /* ========================================================
+     BASIC ELEMENTS
+     ======================================================== */
+
+  const header =
+    document.querySelector('[data-kapisa-header]');
+
+  if (!header) return;
+
+
+  const spacer =
+    document.querySelector(
+      '.kapisa-header-spacer-{{ ai_gen_id }}'
+    );
+
+
+  const root =
+    document.documentElement;
+
+
+  const headerIsFixed =
+    header.classList.contains(
+      'kapisa-header--fixed'
+    );
+
+
+  /* ========================================================
+     ANNOUNCEMENT BAR
+     ======================================================== */
+
+  function getAnnouncementElement() {
+
+    return document.querySelector(
+      '[data-kapisa-announcement]'
+    );
+
+  }
+
+
+  let announcementEl =
+    getAnnouncementElement();
+
+
+  function getAnnouncementBottom() {
+
+    if (!announcementEl) return 0;
+
+
+    const styles =
+      window.getComputedStyle(
+        announcementEl
+      );
+
+
+    if (
+      styles.display === 'none' ||
+      styles.visibility === 'hidden'
+    ) {
+      return 0;
+    }
+
+
+    const rect =
+      announcementEl.getBoundingClientRect();
+
+
+    return Math.max(
+      0,
+      Math.ceil(rect.bottom)
+    );
+
+  }
+
+
+  function getAnnouncementReservedHeight() {
+
+    if (!announcementEl) return 0;
+
+
+    const styles =
+      window.getComputedStyle(
+        announcementEl
+      );
+
+
+    if (
+      styles.display === 'none' ||
+      styles.visibility === 'hidden'
+    ) {
+      return 0;
+    }
+
+
+    if (styles.position !== 'fixed' && styles.position !== 'sticky') {
+      return 0;
+    }
+
+
+    const rect =
+      announcementEl.getBoundingClientRect();
+
+
+    return Math.max(
+      0,
+      Math.ceil(rect.height)
+    );
+
+  }
+
+
+  /* ========================================================
+     DYNAMIC HEADER HEIGHT
+     ======================================================== */
+
+  function getHeaderHeight() {
+
+    return Math.ceil(
+      header.getBoundingClientRect().height
+    );
+
+  }
+
+
+  function updateHeaderHeight() {
+
+    const headerHeight =
+      getHeaderHeight();
+
+
+    const announcementHeight =
+      getAnnouncementReservedHeight();
+
+
+    const spacerHeight =
+      announcementHeight +
+      (
+        headerIsFixed
+          ? headerHeight
+          : 0
+      );
+
+
+    root.style.setProperty(
+      '--kapisa-header-height',
+      headerHeight + 'px'
+    );
+
+
+    root.style.setProperty(
+      '--kapisa-header-spacer-height',
+      spacerHeight + 'px'
+    );
+
+
+    root.style.setProperty(
+      '--kapisa-header-total-height',
+      spacerHeight + 'px'
+    );
+
+
+    if (spacer) {
+
+      spacer.style.height =
+        spacerHeight + 'px';
+
+    }
+
+  }
+
+
+  function updateHeaderPosition() {
+
+    const announcementBottom =
+      getAnnouncementBottom();
+
+
+    root.style.setProperty(
+      '--kapisa-header-top',
+      announcementBottom + 'px'
+    );
+
+
+    /*
+      Scrolled state is intentionally based on page scroll,
+      not announcement presence.
+    */
+
+    if (window.scrollY > 8) {
+
+      header.classList.add(
+        'is-scrolled'
+      );
+
+    } else {
+
+      header.classList.remove(
+        'is-scrolled'
+      );
+
+    }
+
+  }
+
+
+  function updateLayout() {
+
+    announcementEl =
+      getAnnouncementElement();
+
+    updateHeaderHeight();
+
+    updateHeaderPosition();
+
+  }
+
+
+  updateLayout();
+
+
+  /* ========================================================
+     SCROLL
+     ======================================================== */
+
+  let scrollTicking = false;
+
+
+  window.addEventListener(
+    'scroll',
+    function () {
+
+      if (scrollTicking) return;
+
+
+      scrollTicking = true;
+
+
+      window.requestAnimationFrame(
+        function () {
+
+          updateHeaderPosition();
+
+          scrollTicking = false;
+
+        }
+      );
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  window.addEventListener(
+    'resize',
+    function () {
+
+      updateLayout();
+
+    }
+  );
+
+
+  if (
+    document.fonts &&
+    document.fonts.ready
+  ) {
+
+    document.fonts.ready.then(
+      updateLayout
+    );
+
+  }
+
+
+  if (
+    window.ResizeObserver &&
+    announcementEl
+  ) {
+
+    const observer =
+      new ResizeObserver(
+        function () {
+
+          updateLayout();
+
+        }
+      );
+
+
+    observer.observe(
+      announcementEl
+    );
+
+  }
+
+
+  /* ========================================================
+     SEARCH
+     ======================================================== */
+
+  const desktopSearch =
+    header.querySelector(
+      '[data-desktop-search]'
+    );
+
+
+  const desktopToggle =
+    header.querySelector(
+      '[data-desktop-search-toggle]'
+    );
+
+
+  const desktopInput =
+    header.querySelector(
+      '[data-desktop-search-input]'
+    );
+
+
+  const desktopResults =
+    header.querySelector(
+      '[data-desktop-results]'
+    );
+
+
+  const mobileSearch =
+    header.querySelector(
+      '[data-mobile-search="{{ ai_gen_id }}"]'
+    );
+
+
+  const mobileInput =
+    header.querySelector(
+      '[data-mobile-search-input]'
+    );
+
+
+  const mobileResults =
+    header.querySelector(
+      '[data-mobile-results]'
+    );
+
+
+  const mobileSearchOpen =
+    header.querySelector(
+      '[data-mobile-search-open="{{ ai_gen_id }}"]'
+    );
+
+
+  let searchTimer = null;
+
+  let searchRequestId = 0;
+
+
+  function escapeHtml(value) {
+
+    const div =
+      document.createElement('div');
+
+    div.textContent =
+      value || '';
+
+    return div.innerHTML;
+
+  }
+
+
+  function performSearch(
+    query,
+    resultsContainer
+  ) {
+
+    if (!resultsContainer) return;
+
+
+    const currentRequest =
+      ++searchRequestId;
+
+
+    if (query.length < 2) {
+
+      resultsContainer.classList.remove(
+        'is-visible'
+      );
+
+      resultsContainer.innerHTML = '';
+
+      return;
+
+    }
+
+
+    const url =
+      '/search/suggest.json' +
+      '?q=' +
+      encodeURIComponent(query) +
+      '&resources[type]=product' +
+      '&resources[limit]=5';
+
+
+    fetch(url, {
+      credentials: 'same-origin'
+    })
+
+      .then(function (response) {
+
+        if (!response.ok) {
+
+          throw new Error(
+            'Search failed'
+          );
+
+        }
+
+        return response.json();
+
+      })
+
+      .then(function (data) {
+
+        /*
+          Ignore an older response if the
+          user has already typed another query.
+        */
+
+        if (
+          currentRequest !==
+          searchRequestId
+        ) {
+          return;
+        }
+
+
+        const products =
+          data &&
+          data.resources &&
+          data.resources.results &&
+          data.resources.results.products
+            ? data.resources.results.products
+            : [];
+
+
+        resultsContainer.innerHTML = '';
+
+
+        products
+          .slice(0, 5)
+          .forEach(function (product) {
+
+            const link =
+              document.createElement('a');
+
+
+            link.className =
+              'kapisa-header-{{ ai_gen_id }}__result';
+
+
+            link.href =
+              product.url || '#';
+
+
+            if (product.image) {
+
+              const image =
+                document.createElement('img');
+
+
+              image.className =
+                'kapisa-header-{{ ai_gen_id }}__result-image';
+
+
+              image.src =
+                product.image;
+
+
+              image.alt =
+                product.title || '';
+
+
+              image.loading =
+                'lazy';
+
+
+              link.appendChild(
+                image
+              );
+
+            }
+
+
+            const info =
+              document.createElement('span');
+
+
+            info.className =
+              'kapisa-header-{{ ai_gen_id }}__result-info';
+
+
+            const title =
+              document.createElement('span');
+
+
+            title.className =
+              'kapisa-header-{{ ai_gen_id }}__result-title';
+
+
+            title.textContent =
+              product.title ||
+              'Product';
+
+
+            const price =
+              document.createElement('span');
+
+
+            price.className =
+              'kapisa-header-{{ ai_gen_id }}__result-price';
+
+
+            price.textContent =
+              product.price ||
+              '';
+
+
+            info.appendChild(title);
+
+            info.appendChild(price);
+
+            link.appendChild(info);
+
+
+            resultsContainer.appendChild(
+              link
+            );
+
+          });
+
+
+        if (products.length === 0) {
+
+          const empty =
+            document.createElement('div');
+
+
+          empty.style.padding =
+            '18px';
+
+
+          empty.style.textAlign =
+            'center';
+
+
+          empty.style.fontSize =
+            '12px';
+
+
+          empty.style.color =
+            '#747983';
+
+
+          empty.textContent =
+            'No products found';
+
+
+          resultsContainer.appendChild(
+            empty
+          );
+
+        }
+
+
+        const viewAll =
+          document.createElement('a');
+
+
+        viewAll.className =
+          'kapisa-header-{{ ai_gen_id }}__view-results';
+
+
+        viewAll.href =
+          '{{ routes.search_url }}?q=' +
+          encodeURIComponent(query);
+
+
+        viewAll.textContent =
+          '{{ block.settings.view_all_results_text | escape }}';
+
+
+        resultsContainer.appendChild(
+          viewAll
+        );
+
+
+        resultsContainer.classList.add(
+          'is-visible'
+        );
+
+      })
+
+      .catch(function () {
+
+        if (
+          currentRequest !==
+          searchRequestId
+        ) {
+          return;
+        }
+
+
+        resultsContainer.classList.remove(
+          'is-visible'
+        );
+
+      });
+
+  }
+
+
+  function queueSearch(
+    input,
+    results
+  ) {
+
+    if (!input || !results) return;
+
+
+    clearTimeout(
+      searchTimer
+    );
+
+
+    const query =
+      input.value.trim();
+
+
+    if (query.length < 2) {
+
+      results.classList.remove(
+        'is-visible'
+      );
+
+      results.innerHTML = '';
+
+      return;
+
+    }
+
+
+    searchTimer =
+      setTimeout(
+        function () {
+
+          performSearch(
+            query,
+            results
+          );
+
+        },
+        180
+      );
+
+  }
+
+
+  if (
+    desktopToggle &&
+    desktopSearch
+  ) {
+
+    desktopToggle.addEventListener(
+      'click',
+      function (event) {
+
+        event.stopPropagation();
+
+
+        const open =
+          desktopSearch.classList.toggle(
+            'is-open'
+          );
+
+
+        desktopToggle.setAttribute(
+          'aria-expanded',
+          open
+            ? 'true'
+            : 'false'
+        );
+
+
+        if (open) {
+
+          setTimeout(
+            function () {
+
+              if (desktopInput) {
+
+                desktopInput.focus();
+
+              }
+
+            },
+            100
+          );
+
+        } else if (
+          desktopResults
+        ) {
+
+          desktopResults.classList.remove(
+            'is-visible'
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (desktopInput) {
+
+    desktopInput.addEventListener(
+      'input',
+      function () {
+
+        queueSearch(
+          desktopInput,
+          desktopResults
+        );
+
+      }
+    );
+
+  }
+
+
+  function openMobileSearch() {
+
+    if (!mobileSearch) return;
+
+
+    mobileSearch.classList.add(
+      'is-open'
+    );
+
+
+    if (mobileSearchOpen) {
+
+      mobileSearchOpen.setAttribute(
+        'aria-expanded',
+        'true'
+      );
+
+    }
+
+
+    setTimeout(
+      function () {
+
+        if (mobileInput) {
+
+          mobileInput.focus();
+
+        }
+
+      },
+      100
+    );
+
+  }
+
+
+  function closeMobileSearch() {
+
+    if (!mobileSearch) return;
+
+
+    mobileSearch.classList.remove(
+      'is-open'
+    );
+
+
+    if (mobileSearchOpen) {
+
+      mobileSearchOpen.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+
+    }
+
+
+    if (mobileResults) {
+
+      mobileResults.classList.remove(
+        'is-visible'
+      );
+
+    }
+
+  }
+
+
+  if (mobileSearchOpen) {
+
+    mobileSearchOpen.addEventListener(
+      'click',
+      function (event) {
+
+        event.stopPropagation();
+
+        openMobileSearch();
+
+      }
+    );
+
+  }
+
+
+  if (mobileInput) {
+
+    mobileInput.addEventListener(
+      'input',
+      function () {
+
+        queueSearch(
+          mobileInput,
+          mobileResults
+        );
+
+      }
+    );
+
+  }
+
+
+  /* ========================================================
+     MOBILE DRAWER
+     ======================================================== */
+
+  const drawer =
+    document.querySelector(
+      '[data-mobile-drawer="{{ ai_gen_id }}"]'
+    );
+
+
+  const drawerOpen =
+    header.querySelector(
+      '[data-mobile-menu-open="{{ ai_gen_id }}"]'
+    );
+
+
+  const drawerClose =
+    document.querySelector(
+      '[data-mobile-menu-close="{{ ai_gen_id }}"]'
+    );
+
+
+  let previousBodyOverflow = '';
+
+
+  function openDrawer() {
+
+    if (!drawer) return;
+
+
+    drawer.classList.add(
+      'is-open'
+    );
+
+
+    drawer.setAttribute(
+      'aria-hidden',
+      'false'
+    );
+
+
+    if (drawerOpen) {
+
+      drawerOpen.setAttribute(
+        'aria-expanded',
+        'true'
+      );
+
+    }
+
+
+    previousBodyOverflow =
+      document.body.style.overflow;
+
+
+    document.body.style.overflow =
+      'hidden';
+
+
+    document.documentElement.style.overflow =
+      'hidden';
+
+  }
+
+
+  function closeDrawer() {
+
+    if (!drawer) return;
+
+
+    drawer.classList.remove(
+      'is-open'
+    );
+
+
+    drawer.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+
+
+    if (drawerOpen) {
+
+      drawerOpen.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+
+    }
+
+
+    document.body.style.overflow =
+      previousBodyOverflow;
+
+
+    document.documentElement.style.overflow =
+      '';
+
+  }
+
+
+  if (drawerOpen) {
+
+    drawerOpen.addEventListener(
+      'click',
+      function (event) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+        openDrawer();
+
+      }
+    );
+
+  }
+
+
+  if (drawerClose) {
+
+    drawerClose.addEventListener(
+      'click',
+      function (event) {
+
+        event.preventDefault();
+
+        event.stopPropagation();
+
+        closeDrawer();
+
+      }
+    );
+
+  }
+
+
+  if (drawer) {
+
+    drawer.addEventListener(
+      'click',
+      function (event) {
+
+        if (
+          event.target === drawer
+        ) {
+
+          closeDrawer();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  /* ========================================================
+     MOBILE MENU ACCORDIONS
+     ======================================================== */
+
+  const expandButtons =
+    document.querySelectorAll(
+      '[data-mobile-expand]'
+    );
+
+
+  expandButtons.forEach(
+    function (button) {
+
+      button.addEventListener(
+        'click',
+        function (event) {
+
+          event.preventDefault();
+
+          event.stopPropagation();
+
+
+          const item =
+            button.closest(
+              '[data-mobile-menu-item]'
+            );
+
+
+          if (!item) return;
+
+
+          const isExpanded =
+            item.classList.toggle(
+              'is-expanded'
+            );
+
+
+          button.setAttribute(
+            'aria-expanded',
+            isExpanded
+              ? 'true'
+              : 'false'
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  /* ========================================================
+     WISHLIST
+     ======================================================== */
+
+  const WISHLIST_KEY =
+    'kapisa_wishlist_v1';
+
+
+  function readWishlist() {
+
+    try {
+
+      const raw =
+        window.localStorage.getItem(
+          WISHLIST_KEY
+        );
+
+
+      if (!raw) return [];
+
+
+      const parsed =
+        JSON.parse(raw);
+
+
+      if (!Array.isArray(parsed)) {
+
+        return [];
+
+      }
+
+
+      return parsed.filter(
+        function (item) {
+
+          return (
+            typeof item === 'string' &&
+            item.length > 0
+          );
+
+        }
+      );
+
+    } catch (error) {
+
+      return [];
+
+    }
+
+  }
+
+
+  function writeWishlist(items) {
+
+    try {
+
+      window.localStorage.setItem(
+        WISHLIST_KEY,
+        JSON.stringify(items)
+      );
+
+    } catch (error) {
+
+      /*
+        localStorage can be disabled
+        by privacy settings.
+        Header continues working normally.
+      */
+
+    }
+
+  }
+
+
+  function updateWishlistUI() {
+
+    const wishlist =
+      readWishlist();
+
+
+    const count =
+      wishlist.length;
+
+
+    const desktopBadges =
+      document.querySelectorAll(
+        '[data-wishlist-count]'
+      );
+
+
+    desktopBadges.forEach(
+      function (badge) {
+
+        badge.textContent =
+          count;
+
+
+        badge.hidden =
+          count === 0;
+
+      }
+    );
+
+
+    const mobileBadges =
+      document.querySelectorAll(
+        '[data-mobile-wishlist-count]'
+      );
+
+
+    mobileBadges.forEach(
+      function (badge) {
+
+        badge.textContent =
+          count;
+
+
+        badge.hidden =
+          count === 0;
+
+      }
+    );
+
+  }
+
+
+  updateWishlistUI();
+
+
+  /*
+    Other theme sections can call:
+
+    window.KapisaWishlist.add(productHandle)
+
+    window.KapisaWishlist.remove(productHandle)
+
+    window.KapisaWishlist.toggle(productHandle)
+
+    window.KapisaWishlist.has(productHandle)
+
+    window.KapisaWishlist.getAll()
+  */
+
+  window.KapisaWishlist = {
+
+    getAll: function () {
+
+      return readWishlist();
+
+    },
+
+
+    has: function (handle) {
+
+      if (!handle) return false;
+
+
+      return readWishlist().indexOf(
+        String(handle)
+      ) !== -1;
+
+    },
+
+
+    add: function (handle) {
+
+      if (!handle) return;
+
+
+      const normalized =
+        String(handle);
+
+
+      const items =
+        readWishlist();
+
+
+      if (
+        items.indexOf(normalized) === -1
+      ) {
+
+        items.push(
+          normalized
+        );
+
+        writeWishlist(items);
+
+      }
+
+
+      updateWishlistUI();
+
+
+      window.dispatchEvent(
+        new CustomEvent(
+          'kapisa:wishlist:updated',
+          {
+            detail: {
+              items: items
+            }
+          }
+        )
+      );
+
+    },
+
+
+    remove: function (handle) {
+
+      if (!handle) return;
+
+
+      const normalized =
+        String(handle);
+
+
+      const items =
+        readWishlist().filter(
+          function (item) {
+
+            return item !== normalized;
+
+          }
+        );
+
+
+      writeWishlist(items);
+
+
+      updateWishlistUI();
+
+
+      window.dispatchEvent(
+        new CustomEvent(
+          'kapisa:wishlist:updated',
+          {
+            detail: {
+              items: items
+            }
+          }
+        )
+      );
+
+    },
+
+
+    toggle: function (handle) {
+
+      if (!handle) return;
+
+
+      if (
+        this.has(handle)
+      ) {
+
+        this.remove(handle);
+
+      } else {
+
+        this.add(handle);
+
+      }
+
+    }
+
+  };
+
+
+  /* ========================================================
+     SYNC WISHLIST BETWEEN TABS
+     ======================================================== */
+
+  window.addEventListener(
+    'storage',
+    function (event) {
+
+      if (
+        event.key === WISHLIST_KEY
+      ) {
+
+        updateWishlistUI();
+
+      }
+
+    }
+  );
+
+
+  /* ========================================================
+     ACTIVE BOTTOM NAV
+     ======================================================== */
+
+  function normalizePath(path) {
+
+    if (!path) return '/';
+
+
+    const clean =
+      path.split('?')[0]
+        .split('#')[0];
+
+
+    if (
+      clean.length > 1 &&
+      clean.endsWith('/')
+    ) {
+
+      return clean.slice(
+        0,
+        -1
+      );
+
+    }
+
+
+    return clean;
+
+  }
+
+
+  const currentPath =
+    normalizePath(
+      window.location.pathname
+    );
+
+
+  const bottomLinks =
+    document.querySelectorAll(
+      '.kapisa-header-{{ ai_gen_id }}__bottom-link'
+    );
+
+
+  bottomLinks.forEach(
+    function (link) {
+
+      try {
+
+        const linkUrl =
+          new URL(
+            link.href,
+            window.location.origin
+          );
+
+
+        const linkPath =
+          normalizePath(
+            linkUrl.pathname
+          );
+
+
+        if (
+          linkPath === currentPath
+        ) {
+
+          link.classList.add(
+            'is-active'
+          );
+
+        }
+
+      } catch (error) {}
+
+    }
+  );
+
+
+  /* ========================================================
+     GLOBAL ESCAPE
+     ======================================================== */
+
+  document.addEventListener(
+    'keydown',
+    function (event) {
+
+      if (
+        event.key !== 'Escape'
+      ) {
+        return;
+      }
+
+
+      closeDrawer();
+
+      closeMobileSearch();
+
+
+      if (desktopSearch) {
+
+        desktopSearch.classList.remove(
+          'is-open'
+        );
+
+      }
+
+
+      if (desktopToggle) {
+
+        desktopToggle.setAttribute(
+          'aria-expanded',
+          'false'
+        );
+
+      }
+
+
+      if (desktopResults) {
+
+        desktopResults.classList.remove(
+          'is-visible'
+        );
+
+      }
+
+    }
+  );
+
+
+  /* ========================================================
+     CLICK OUTSIDE
+     ======================================================== */
+
+  document.addEventListener(
+    'click',
+    function (event) {
+
+
+      /* Desktop search */
+
+      if (
+        desktopSearch &&
+        !desktopSearch.contains(
+          event.target
+        ) &&
+        desktopToggle &&
+        !desktopToggle.contains(
+          event.target
+        )
+      ) {
+
+        desktopSearch.classList.remove(
+          'is-open'
+        );
+
+
+        if (desktopToggle) {
+
+          desktopToggle.setAttribute(
+            'aria-expanded',
+            'false'
+          );
+
+        }
+
+
+        if (desktopResults) {
+
+          desktopResults.classList.remove(
+            'is-visible'
+          );
+
+        }
+
+      }
+
+
+      /* Mobile search */
+
+      if (
+        mobileSearch &&
+        !mobileSearch.contains(
+          event.target
+        ) &&
+        mobileSearchOpen &&
+        !mobileSearchOpen.contains(
+          event.target
+        )
+      ) {
+
+        closeMobileSearch();
+
+      }
+
+    }
+  );
+
+
+  /* ========================================================
+     SHOPIFY SECTION RELOAD
+     ======================================================== */
+
+  document.addEventListener(
+    'shopify:section:load',
+    function () {
+
+      announcementEl =
+        getAnnouncementElement();
+
+
+      setTimeout(
+        updateLayout,
+        80
+      );
+
+
+      setTimeout(
+        updateWishlistUI,
+        100
+      );
+
+    }
+  );
+
+
+})();
+
+</script>
+
+
+{% schema %}
+{
+  "name": "Kapisa Premium Header",
+
+  "settings": [
+
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Kapisa logo"
+    },
+
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Fallback brand name",
+      "default": "kapisa"
+    },
+
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Desktop logo width",
+      "min": 60,
+      "max": 280,
+      "step": 5,
+      "unit": "px",
+      "default": 120
+    },
+
+    {
+      "type": "range",
+      "id": "mobile_logo_width",
+      "label": "Mobile logo width",
+      "min": 90,
+      "max": 180,
+      "step": 5,
+      "unit": "px",
+      "default": 135
+    },
+
+    {
+      "type": "header",
+      "content": "Scroll behavior"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "always_visible",
+      "label": "Keep header always visible while scrolling",
+      "info": "The header stays pinned below the announcement bar.",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Desktop navigation"
+    },
+
+    {
+      "type": "link_list",
+      "id": "main_menu",
+      "label": "Desktop menu",
+      "default": "main-menu"
+    },
+
+    {
+      "type": "text",
+      "id": "menu_aria_label",
+      "label": "Menu accessibility label",
+      "default": "Main navigation"
+    },
+
+    {
+      "type": "header",
+      "content": "Search"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "enable_search",
+      "label": "Enable search",
+      "default": true
+    },
+
+    {
+      "type": "text",
+      "id": "search_placeholder",
+      "label": "Desktop search placeholder",
+      "default": "Search Kapisa products..."
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_search_placeholder",
+      "label": "Mobile search placeholder",
+      "default": "Search scrubs, colours, sizes..."
+    },
+
+    {
+      "type": "text",
+      "id": "search_aria_label",
+      "label": "Search accessibility label",
+      "default": "Search Kapisa products"
+    },
+
+    {
+      "type": "text",
+      "id": "search_button_label",
+      "label": "Search button label",
+      "default": "Open search"
+    },
+
+    {
+      "type": "text",
+      "id": "view_all_results_text",
+      "label": "View all results text",
+      "default": "View all search results →"
+    },
+
+    {
+      "type": "header",
+      "content": "Wishlist"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "enable_wishlist",
+      "label": "Enable wishlist",
+      "default": true
+    },
+
+    {
+      "type": "url",
+      "id": "wishlist_page_url",
+      "label": "Wishlist page"
+    },
+
+    {
+      "type": "header",
+      "content": "Customer account"
+    },
+
+    {
+      "type": "paragraph",
+      "content": "Customers automatically get Log in and Create account when logged out, and Account, Orders, Addresses and Log out when logged in."
+    },
+
+    {
+      "type": "header",
+      "content": "Cart"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
+    },
+
+    {
+      "type": "checkbox",
+      "id": "show_cart_count",
+      "label": "Show cart item count",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Mobile menu"
+    },
+
+    {
+      "type": "link_list",
+      "id": "mobile_menu",
+      "label": "Mobile menu",
+      "default": "main-menu"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_menu_heading",
+      "label": "Mobile menu heading",
+      "default": "Shop Kapisa"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_menu_label",
+      "label": "Menu button accessibility label",
+      "default": "Open menu"
+    },
+
+    {
+      "type": "text",
+      "id": "close_menu_label",
+      "label": "Close menu accessibility label",
+      "default": "Close menu"
+    },
+
+    {
+      "type": "header",
+      "content": "Mobile bottom navigation"
+    },
+
+    {
+      "type": "checkbox",
+      "id": "enable_mobile_bottom_nav",
+      "label": "Enable mobile bottom navigation",
+      "default": true
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_bottom_nav_label",
+      "label": "Bottom navigation accessibility label",
+      "default": "Mobile navigation"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_home_label",
+      "label": "Home label",
+      "default": "Home"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_shop_label",
+      "label": "Shop label",
+      "default": "Shop"
+    },
+
+    {
+      "type": "url",
+      "id": "mobile_shop_link",
+      "label": "Shop link"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_collections_label",
+      "label": "Collections label",
+      "default": "Collections"
+    },
+
+    {
+      "type": "url",
+      "id": "mobile_collections_link",
+      "label": "Collections link"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_wishlist_label",
+      "label": "Wishlist label",
+      "default": "Wishlist"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_cart_label",
+      "label": "Cart label",
+      "default": "Bag"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_account_label",
+      "label": "Logged-in account label",
+      "default": "Account"
+    },
+
+    {
+      "type": "text",
+      "id": "mobile_login_label",
+      "label": "Logged-out account label",
+      "default": "Login"
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name": "Kapisa Premium Header"
+    }
+  ],
+
+  
+
+  "class": "kapisa-premium-header"
+}
+{% endschema %}
+
+

@@ -1,0 +1,910 @@
+
+{% doc %}
+  @prompt
+    Create a premium modern customer reviews section for KAPISA. Use an off-white #FAF7F0 background and a clean editorial ecommerce design. Add a compact header with "Customer Reviews", average rating, gold stars, review count, and a refined outlined "Write a Review" button. Below, display reviews as elegant cards with reviewer name, verified badge, stars, review text and optional customer photo. Use a responsive 3-column card layout on desktop and horizontally scrollable cards on mobile. Keep the design minimal, spacious, premium and animated with subtle hover/reveal effects. Prevent long review text from overflowing or breaking the card layout.
+{% enddoc %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .kapisa-reviews-{{ ai_gen_id }} {
+    width: 100%;
+    margin: 0;
+    padding: 64px 20px;
+    background: {{ block.settings.background_color }};
+    color: {{ block.settings.body_color }};
+    overflow: hidden;
+  }
+
+  .kapisa-reviews__inner-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+
+  .kapisa-reviews__top-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 34px;
+  }
+
+  .kapisa-reviews__intro-{{ ai_gen_id }} {
+    min-width: 0;
+  }
+
+  .kapisa-reviews__eyebrow-{{ ai_gen_id }} {
+    margin: 0 0 8px;
+    color: {{ block.settings.star_color }};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .kapisa-reviews__heading-{{ ai_gen_id }} {
+    margin: 0;
+    color: {{ block.settings.heading_color }};
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  .kapisa-reviews__summary-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .kapisa-reviews__rating-box-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+  }
+
+  .kapisa-reviews__average-{{ ai_gen_id }} {
+    color: {{ block.settings.average_color }};
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .kapisa-reviews__rating-info-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .kapisa-reviews__stars-{{ ai_gen_id }} {
+    color: {{ block.settings.star_color }};
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: 2px;
+    white-space: nowrap;
+  }
+
+  .kapisa-reviews__count-{{ ai_gen_id }} {
+    color: {{ block.settings.muted_color }};
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .kapisa-reviews__write-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 18px;
+    border: 1px solid {{ block.settings.star_color }};
+    border-radius: 3px;
+    background: transparent;
+    color: {{ block.settings.button_color }};
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      background 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .kapisa-reviews__write-{{ ai_gen_id }}:hover,
+  .kapisa-reviews__write-{{ ai_gen_id }}:focus-visible {
+    background: {{ block.settings.star_color }};
+    color: {{ block.settings.button_hover_color }};
+    transform: translateY(-2px);
+  }
+
+  /* RATING BREAKDOWN */
+
+  .kapisa-reviews__breakdown-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    max-width: 700px;
+    margin-bottom: 36px;
+    padding: 16px 18px;
+    border-top: 1px solid rgba(43, 43, 46, 0.10);
+    border-bottom: 1px solid rgba(43, 43, 46, 0.10);
+  }
+
+  .kapisa-reviews__breakdown-item-{{ ai_gen_id }} {
+    display: grid;
+    gap: 5px;
+  }
+
+  .kapisa-reviews__breakdown-label-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    color: {{ block.settings.muted_color }};
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .kapisa-reviews__bar-{{ ai_gen_id }} {
+    width: 100%;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(143, 163, 184, 0.20);
+  }
+
+  .kapisa-reviews__bar-fill-{{ ai_gen_id }} {
+    width: var(--rating-width);
+    height: 100%;
+    border-radius: inherit;
+    background: {{ block.settings.bar_color }};
+  }
+
+  /* REVIEW CARDS */
+
+  .kapisa-reviews__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .kapisa-reviews__card-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 285px;
+    padding: 24px;
+    border: 1px solid rgba(43, 43, 46, 0.10);
+    border-radius: 10px;
+    background: {{ block.settings.card_background }};
+    box-shadow: 0 2px 12px rgba(20, 30, 45, 0.025);
+    overflow: hidden;
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease;
+  }
+
+  .kapisa-reviews__card-{{ ai_gen_id }}:hover {
+    transform: translateY(-4px);
+    border-color: rgba(201, 162, 39, 0.35);
+    box-shadow: 0 12px 30px rgba(20, 30, 45, 0.07);
+  }
+
+  .kapisa-reviews__card-top-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .kapisa-reviews__reviewer-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  .kapisa-reviews__avatar-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #EEF1F3;
+    color: {{ block.settings.average_color }};
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .kapisa-reviews__name-wrap-{{ ai_gen_id }} {
+    min-width: 0;
+  }
+
+  .kapisa-reviews__name-{{ ai_gen_id }} {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    color: {{ block.settings.reviewer_color }};
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .kapisa-reviews__verified-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 2px;
+    color: {{ block.settings.star_color }};
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .kapisa-reviews__verified-{{ ai_gen_id }}::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: {{ block.settings.star_color }};
+    color: #fff;
+    font-size: 8px;
+  }
+
+  .kapisa-reviews__review-stars-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    color: {{ block.settings.star_color }};
+    font-size: 13px;
+    letter-spacing: 1px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .kapisa-reviews__text-{{ ai_gen_id }} {
+    margin: 22px 0 0;
+    color: {{ block.settings.body_color }};
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .kapisa-reviews__text-{{ ai_gen_id }} p {
+    margin: 0;
+  }
+
+  .kapisa-reviews__text-{{ ai_gen_id }} p + p {
+    margin-top: 10px;
+  }
+
+  .kapisa-reviews__photo-{{ ai_gen_id }} {
+    display: block;
+    width: 64px;
+    height: 64px;
+    margin-top: auto;
+    padding-top: 18px;
+    box-sizing: content-box;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+
+  .kapisa-reviews__empty-{{ ai_gen_id }} {
+    grid-column: 1 / -1;
+    padding: 40px 20px;
+    border: 1px dashed rgba(43, 43, 46, 0.16);
+    border-radius: 10px;
+    color: {{ block.settings.muted_color }};
+    text-align: center;
+    font-size: 14px;
+  }
+
+  /* MOBILE */
+
+  @media screen and (max-width: 749px) {
+    .kapisa-reviews-{{ ai_gen_id }} {
+      padding: 46px 16px;
+    }
+
+    .kapisa-reviews__top-{{ ai_gen_id }} {
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    .kapisa-reviews__heading-{{ ai_gen_id }} {
+      font-size: 26px;
+    }
+
+    .kapisa-reviews__summary-{{ ai_gen_id }} {
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .kapisa-reviews__average-{{ ai_gen_id }} {
+      font-size: 27px;
+    }
+
+    .kapisa-reviews__breakdown-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 28px;
+      padding: 15px 0;
+      border-top: 1px solid rgba(43, 43, 46, 0.10);
+      border-bottom: 1px solid rgba(43, 43, 46, 0.10);
+    }
+
+    .kapisa-reviews__breakdown-item-{{ ai_gen_id }} {
+      grid-template-columns: 42px 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .kapisa-reviews__breakdown-label-{{ ai_gen_id }} {
+      display: block;
+    }
+
+    .kapisa-reviews__breakdown-label-{{ ai_gen_id }} span:last-child {
+      display: none;
+    }
+
+    .kapisa-reviews__grid-{{ ai_gen_id }} {
+      display: flex;
+      gap: 12px;
+      width: calc(100% + 16px);
+      margin-right: -16px;
+      padding-right: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .kapisa-reviews__grid-{{ ai_gen_id }}::-webkit-scrollbar {
+      display: none;
+    }
+
+    .kapisa-reviews__card-{{ ai_gen_id }} {
+      flex: 0 0 calc(88% - 8px);
+      min-height: 270px;
+      padding: 21px;
+      scroll-snap-align: start;
+    }
+
+    .kapisa-reviews__card-{{ ai_gen_id }}:hover {
+      transform: none;
+    }
+
+    .kapisa-reviews__text-{{ ai_gen_id }} {
+      font-size: 13px;
+      line-height: 1.65;
+    }
+  }
+
+  @media screen and (min-width: 750px) and (max-width: 990px) {
+    .kapisa-reviews__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kapisa-reviews__card-{{ ai_gen_id }}:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kapisa-reviews__card-{{ ai_gen_id }},
+    .kapisa-reviews__write-{{ ai_gen_id }} {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+<section
+  class="kapisa-reviews-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="kapisa-reviews__inner-{{ ai_gen_id }}">
+
+    <div class="kapisa-reviews__top-{{ ai_gen_id }}">
+      <div class="kapisa-reviews__intro-{{ ai_gen_id }}">
+        <p class="kapisa-reviews__eyebrow-{{ ai_gen_id }}">
+          {{ block.settings.eyebrow }}
+        </p>
+
+        <h2 class="kapisa-reviews__heading-{{ ai_gen_id }}">
+          {{ block.settings.heading }}
+        </h2>
+      </div>
+
+      <div class="kapisa-reviews__summary-{{ ai_gen_id }}">
+
+        <div class="kapisa-reviews__rating-box-{{ ai_gen_id }}">
+          <span class="kapisa-reviews__average-{{ ai_gen_id }}">
+            {{ block.settings.average_rating }}
+          </span>
+
+          <div class="kapisa-reviews__rating-info-{{ ai_gen_id }}">
+            <div
+              class="kapisa-reviews__stars-{{ ai_gen_id }}"
+              aria-label="{{ block.settings.average_rating }} out of 5 stars"
+            >
+              ★★★★★
+            </div>
+
+            <span class="kapisa-reviews__count-{{ ai_gen_id }}">
+              {{ block.settings.review_count }}
+              {{ block.settings.review_count_label }}
+            </span>
+          </div>
+        </div>
+
+        {% if block.settings.review_link != blank %}
+          <a
+            class="kapisa-reviews__write-{{ ai_gen_id }}"
+            href="{{ block.settings.review_link }}"
+          >
+            {{ block.settings.button_label }}
+          </a>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <div
+      class="kapisa-reviews__breakdown-{{ ai_gen_id }}"
+      aria-label="Rating breakdown"
+    >
+      {% for rating in (5..1) %}
+
+        {% assign percentage_key = 'rating_' | append: rating | append: '_percentage' %}
+        {% assign count_key = 'rating_' | append: rating | append: '_count' %}
+
+        <div class="kapisa-reviews__breakdown-item-{{ ai_gen_id }}">
+
+          <div class="kapisa-reviews__breakdown-label-{{ ai_gen_id }}">
+            <span>{{ rating }} star</span>
+            <span>{{ block.settings[count_key] }}</span>
+          </div>
+
+          <div class="kapisa-reviews__bar-{{ ai_gen_id }}">
+            <div
+              class="kapisa-reviews__bar-fill-{{ ai_gen_id }}"
+              style="--rating-width: {{ block.settings[percentage_key] }}%;"
+            ></div>
+          </div>
+
+        </div>
+
+      {% endfor %}
+    </div>
+
+    <div class="kapisa-reviews__grid-{{ ai_gen_id }}">
+
+      {% assign review_count = 0 %}
+
+      {% for i in (1..3) %}
+
+        {% assign name_key = 'review_' | append: i | append: '_name' %}
+        {% assign stars_key = 'review_' | append: i | append: '_stars' %}
+        {% assign text_key = 'review_' | append: i | append: '_text' %}
+        {% assign verified_key = 'review_' | append: i | append: '_verified' %}
+        {% assign photo_key = 'review_' | append: i | append: '_photo' %}
+
+        {% if block.settings[name_key] != blank or block.settings[text_key] != blank %}
+
+          {% assign review_count = review_count | plus: 1 %}
+
+          {% assign reviewer_name = block.settings[name_key] | strip %}
+
+          <article class="kapisa-reviews__card-{{ ai_gen_id }}">
+
+            <div class="kapisa-reviews__card-top-{{ ai_gen_id }}">
+
+              <div class="kapisa-reviews__reviewer-{{ ai_gen_id }}">
+
+                <div class="kapisa-reviews__avatar-{{ ai_gen_id }}">
+                  {% if reviewer_name != blank %}
+                    {{ reviewer_name | slice: 0 }}
+                  {% else %}
+                    K
+                  {% endif %}
+                </div>
+
+                <div class="kapisa-reviews__name-wrap-{{ ai_gen_id }}">
+
+                  {% if reviewer_name != blank %}
+                    <span class="kapisa-reviews__name-{{ ai_gen_id }}">
+                      {{ reviewer_name }}
+                    </span>
+                  {% endif %}
+
+                  {% if block.settings[verified_key] %}
+                    <span class="kapisa-reviews__verified-{{ ai_gen_id }}">
+                      Verified buyer
+                    </span>
+                  {% endif %}
+
+                </div>
+
+              </div>
+
+              <div
+                class="kapisa-reviews__review-stars-{{ ai_gen_id }}"
+                aria-label="{{ block.settings[stars_key] }} out of 5 stars"
+              >
+                {% for star in (1..5) %}
+                  {% if star <= block.settings[stars_key] %}
+                    ★
+                  {% else %}
+                    ☆
+                  {% endif %}
+                {% endfor %}
+              </div>
+
+            </div>
+
+            {% if block.settings[text_key] != blank %}
+              <div class="kapisa-reviews__text-{{ ai_gen_id }}">
+                {{ block.settings[text_key] }}
+              </div>
+            {% endif %}
+
+            {% if block.settings[photo_key] %}
+              <img
+                class="kapisa-reviews__photo-{{ ai_gen_id }}"
+                src="{{ block.settings[photo_key] | image_url: width: 160 }}"
+                alt="{{ block.settings[photo_key].alt | default: 'Customer review photo' | escape }}"
+                loading="lazy"
+                width="64"
+                height="64"
+              >
+            {% endif %}
+
+          </article>
+
+        {% endif %}
+
+      {% endfor %}
+
+      {% if review_count == 0 %}
+        <div class="kapisa-reviews__empty-{{ ai_gen_id }}">
+          Add review details to display customer reviews.
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Customer reviews",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Review summary"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "The Kapisa community"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Customer Reviews"
+    },
+    {
+      "type": "text",
+      "id": "average_rating",
+      "label": "Average rating",
+      "default": "5.0"
+    },
+    {
+      "type": "text",
+      "id": "review_count",
+      "label": "Review count",
+      "default": "0"
+    },
+    {
+      "type": "text",
+      "id": "review_count_label",
+      "label": "Count label",
+      "default": "reviews"
+    },
+
+    {
+      "type": "range",
+      "id": "rating_5_percentage",
+      "label": "5 star percentage",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "rating_5_count",
+      "label": "5 star count",
+      "default": "0"
+    },
+
+    {
+      "type": "range",
+      "id": "rating_4_percentage",
+      "label": "4 star percentage",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "rating_4_count",
+      "label": "4 star count",
+      "default": "0"
+    },
+
+    {
+      "type": "range",
+      "id": "rating_3_percentage",
+      "label": "3 star percentage",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "rating_3_count",
+      "label": "3 star count",
+      "default": "0"
+    },
+
+    {
+      "type": "range",
+      "id": "rating_2_percentage",
+      "label": "2 star percentage",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "rating_2_count",
+      "label": "2 star count",
+      "default": "0"
+    },
+
+    {
+      "type": "range",
+      "id": "rating_1_percentage",
+      "label": "1 star percentage",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "rating_1_count",
+      "label": "1 star count",
+      "default": "0"
+    },
+
+    {
+      "type": "url",
+      "id": "review_link",
+      "label": "Review link"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Write a Review"
+    },
+
+    {
+      "type": "header",
+      "content": "Review 1"
+    },
+    {
+      "type": "text",
+      "id": "review_1_name",
+      "label": "Name"
+    },
+    {
+      "type": "range",
+      "id": "review_1_stars",
+      "label": "Stars",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "richtext",
+      "id": "review_1_text",
+      "label": "Review text"
+    },
+    {
+      "type": "checkbox",
+      "id": "review_1_verified",
+      "label": "Verified buyer",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "review_1_photo",
+      "label": "Review photo"
+    },
+
+    {
+      "type": "header",
+      "content": "Review 2"
+    },
+    {
+      "type": "text",
+      "id": "review_2_name",
+      "label": "Name"
+    },
+    {
+      "type": "range",
+      "id": "review_2_stars",
+      "label": "Stars",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "richtext",
+      "id": "review_2_text",
+      "label": "Review text"
+    },
+    {
+      "type": "checkbox",
+      "id": "review_2_verified",
+      "label": "Verified buyer",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "review_2_photo",
+      "label": "Review photo"
+    },
+
+    {
+      "type": "header",
+      "content": "Review 3"
+    },
+    {
+      "type": "text",
+      "id": "review_3_name",
+      "label": "Name"
+    },
+    {
+      "type": "range",
+      "id": "review_3_stars",
+      "label": "Stars",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "richtext",
+      "id": "review_3_text",
+      "label": "Review text"
+    },
+    {
+      "type": "checkbox",
+      "id": "review_3_verified",
+      "label": "Verified buyer",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "review_3_photo",
+      "label": "Review photo"
+    },
+
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#FAF7F0"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#2B2B2E"
+    },
+    {
+      "type": "color",
+      "id": "average_color",
+      "label": "Average rating",
+      "default": "#0E1F3C"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Gold accent",
+      "default": "#C9A227"
+    },
+    {
+      "type": "color",
+      "id": "bar_color",
+      "label": "Rating bars",
+      "default": "#8FA3B8"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Body text",
+      "default": "#2B2B2E"
+    },
+    {
+      "type": "color",
+      "id": "reviewer_color",
+      "label": "Reviewer name",
+      "default": "#2B2B2E"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted text",
+      "default": "#5F6368"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button text",
+      "default": "#0E1F3C"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button hover text",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer reviews"
+    }
+  ]
+}
+{% endschema %}

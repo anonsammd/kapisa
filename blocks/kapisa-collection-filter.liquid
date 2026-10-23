@@ -1,0 +1,1246 @@
+{% comment %}
+  KAPISA — Inline Collection Filter & Sort
+
+  - No sidebar
+  - No drawer
+  - Native Shopify collection.filters
+  - Multiple filters persist together
+  - Active filters can be removed individually
+  - Sorting preserves existing filters
+{% endcomment %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+
+  .kapisa-filter-{{ ai_gen_id }} {
+    width: 100%;
+    background: #FAF7F0;
+    color: #2B2B2E;
+    border-bottom: 1px solid rgba(143, 163, 184, 0.45);
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__inner {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 18px 28px;
+    box-sizing: border-box;
+  }
+
+  /* MAIN STRIP */
+
+  .kapisa-filter-{{ ai_gen_id }}__bar {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__left {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    min-width: 0;
+  }
+
+  /* FILTER BUTTON */
+
+  .kapisa-filter-{{ ai_gen_id }}__filter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 11px 16px;
+
+    border: 1px solid #8FA3B8;
+    background: transparent;
+
+    color: #2B2B2E;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+      background .2s ease,
+      border-color .2s ease;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__filter-button:hover,
+  .kapisa-filter-{{ ai_gen_id }}__filter-button.is-active {
+    background: #F0EEE9;
+    border-color: #C9A227;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__filter-button svg {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__active-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+
+    border-radius: 50%;
+
+    background: #C9A227;
+    color: #fff;
+
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__count {
+    color: #8FA3B8;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* SORT */
+
+  .kapisa-filter-{{ ai_gen_id }}__sort {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex: 0 0 auto;
+
+    color: #8FA3B8;
+    font-size: 13px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__sort select {
+    appearance: none;
+
+    border: 0;
+    border-bottom: 1px solid #8FA3B8;
+
+    background-color: transparent;
+
+    color: #2B2B2E;
+
+    padding: 8px 26px 8px 2px;
+
+    font: inherit;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    background-image:
+      linear-gradient(45deg, transparent 50%, #2B2B2E 50%),
+      linear-gradient(135deg, #2B2B2E 50%, transparent 50%);
+
+    background-position:
+      calc(100% - 11px) 55%,
+      calc(100% - 6px) 55%;
+
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+  }
+
+  /* INLINE FILTER AREA */
+
+  .kapisa-filter-{{ ai_gen_id }}__panel {
+    display: none;
+
+    margin-top: 16px;
+    padding-top: 16px;
+
+    border-top: 1px solid rgba(143,163,184,.35);
+
+    animation: kapisaFilterOpen-{{ ai_gen_id }} .18s ease;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__panel.is-open {
+    display: block;
+  }
+
+  @keyframes kapisaFilterOpen-{{ ai_gen_id }} {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__filter-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* INDIVIDUAL FILTER */
+
+  .kapisa-filter-{{ ai_gen_id }}__group {
+    position: relative;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__group-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 40px;
+
+    padding: 9px 13px;
+
+    border: 1px solid rgba(143,163,184,.7);
+    background: #FAF7F0;
+
+    color: #2B2B2E;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    cursor: pointer;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__group-button:hover,
+  .kapisa-filter-{{ ai_gen_id }}__group-button.is-active {
+    border-color: #C9A227;
+    background: #F0EEE9;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__group-arrow {
+    width: 7px;
+    height: 7px;
+
+    border-right: 1px solid #2B2B2E;
+    border-bottom: 1px solid #2B2B2E;
+
+    transform: rotate(45deg) translateY(-2px);
+  }
+
+  /* FILTER DROPDOWN */
+
+  .kapisa-filter-{{ ai_gen_id }}__dropdown {
+    position: absolute;
+
+    top: calc(100% + 7px);
+    left: 0;
+
+    z-index: 50;
+
+    width: 270px;
+    max-height: 360px;
+
+    padding: 14px;
+
+    overflow-y: auto;
+
+    background: #FAF7F0;
+
+    border: 1px solid rgba(143,163,184,.55);
+
+    box-shadow: 0 10px 28px rgba(43,43,46,.10);
+
+    display: none;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__dropdown.is-open {
+    display: block;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__options {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 25px;
+
+    color: #2B2B2E;
+
+    font-size: 13px;
+
+    cursor: pointer;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option.is-disabled {
+    opacity: .35;
+    cursor: default;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__checkbox {
+    width: 17px;
+    height: 17px;
+
+    flex: 0 0 17px;
+
+    border: 1px solid #8FA3B8;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option input:checked
+  + .kapisa-filter-{{ ai_gen_id }}__checkbox {
+    background: #C9A227;
+    border-color: #C9A227;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option input:checked
+  + .kapisa-filter-{{ ai_gen_id }}__checkbox::after {
+    content: '✓';
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option-count {
+    margin-left: auto;
+    color: #8FA3B8;
+    font-size: 11px;
+  }
+
+  /* COLOR */
+
+  .kapisa-filter-{{ ai_gen_id }}__color-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__color-swatch {
+    width: 21px;
+    height: 21px;
+
+    flex: 0 0 21px;
+
+    border-radius: 50%;
+
+    border: 1px solid #8FA3B8;
+    background: #F0EEE9;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__option input:checked
+  + .kapisa-filter-{{ ai_gen_id }}__color-swatch {
+    outline: 2px solid #C9A227;
+    outline-offset: 2px;
+  }
+
+  /* PRICE */
+
+  .kapisa-filter-{{ ai_gen_id }}__price {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price input {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 10px;
+
+    border: 1px solid #8FA3B8;
+    background: transparent;
+
+    color: #2B2B2E;
+
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-apply {
+    width: 100%;
+    margin-top: 10px;
+
+    padding: 10px;
+
+    border: 0;
+
+    background: #C9A227;
+    color: #fff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+  }
+
+  /* ACTIVE FILTER CHIPS */
+
+  .kapisa-filter-{{ ai_gen_id }}__active {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 13px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 9px;
+
+    background: #F0EEE9;
+
+    color: #2B2B2E;
+
+    font-size: 12px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 17px;
+    height: 17px;
+
+    border: 0;
+    padding: 0;
+
+    background: transparent;
+
+    color: #8FA3B8;
+
+    text-decoration: none;
+
+    font-size: 16px;
+    line-height: 1;
+
+    cursor: pointer;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__chip-remove:hover {
+    color: #C9A227;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__clear {
+    padding: 6px 4px;
+
+    border: 0;
+    background: transparent;
+
+    color: #C9A227;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+  }
+
+  /* MOBILE */
+
+  @media (max-width: 749px) {
+
+    .kapisa-filter-{{ ai_gen_id }}__inner {
+      padding: 14px 16px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__bar {
+      min-height: 46px;
+      gap: 12px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__left {
+      gap: 10px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__filter-button {
+      padding: 10px 13px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__count {
+      display: none;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__sort label {
+      display: none;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__sort select {
+      max-width: 125px;
+      font-size: 12px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__filter-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__group-button {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__dropdown {
+      position: fixed;
+
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      top: auto;
+
+      width: auto;
+      max-height: 55vh;
+
+      border-radius: 4px;
+    }
+
+  }
+
+{% endstyle %}
+
+
+<collection-filterbar-{{ ai_gen_id }}
+  class="kapisa-filter-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+
+  <div class="kapisa-filter-{{ ai_gen_id }}__inner">
+
+    <!-- MAIN STRIP -->
+
+    <div class="kapisa-filter-{{ ai_gen_id }}__bar">
+
+      <div class="kapisa-filter-{{ ai_gen_id }}__left">
+
+        {% assign active_count = 0 %}
+
+        {% for filter in collection.filters %}
+
+          {% assign active_count = active_count | plus: filter.active_values.size %}
+
+          {% if filter.type == 'price_range' %}
+
+            {% if filter.min_value.value != blank or filter.max_value.value != blank %}
+              {% assign active_count = active_count | plus: 1 %}
+            {% endif %}
+
+          {% endif %}
+
+        {% endfor %}
+
+
+        <button
+          type="button"
+          class="kapisa-filter-{{ ai_gen_id }}__filter-button"
+          data-filter-toggle
+          aria-expanded="false"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+          >
+            <path d="M4 6h16M7 12h10M10 18h4"/>
+          </svg>
+
+          <span>Filter</span>
+
+          {% if active_count > 0 %}
+
+            <span class="kapisa-filter-{{ ai_gen_id }}__active-count">
+              {{ active_count }}
+            </span>
+
+          {% endif %}
+
+        </button>
+
+
+        <span class="kapisa-filter-{{ ai_gen_id }}__count">
+          {{ collection.products_count }} products
+        </span>
+
+      </div>
+
+
+      <!-- SORT -->
+
+      <form
+        class="kapisa-filter-{{ ai_gen_id }}__sort"
+        method="get"
+      >
+
+        {% comment %}
+          Preserve every existing query parameter except sort_by.
+          This prevents sorting from removing active filters.
+        {% endcomment %}
+
+        {% for param in request.query_parameters %}
+
+          {% unless param[0] == 'sort_by' %}
+
+            {% for value in param[1] %}
+
+              <input
+                type="hidden"
+                name="{{ param[0] | escape }}"
+                value="{{ value | escape }}"
+              >
+
+            {% endfor %}
+
+          {% endunless %}
+
+        {% endfor %}
+
+
+        <label for="kapisa-sort-{{ ai_gen_id }}">
+          Sort
+        </label>
+
+        <select
+          id="kapisa-sort-{{ ai_gen_id }}"
+          name="sort_by"
+          data-sort
+        >
+
+          {% assign current_sort = collection.sort_by | default: collection.default_sort_by %}
+
+          <option
+            value="best-selling"
+            {% if current_sort == 'best-selling' %}
+              selected
+            {% endif %}
+          >
+            Best Selling
+          </option>
+
+          <option
+            value="price-ascending"
+            {% if current_sort == 'price-ascending' %}
+              selected
+            {% endif %}
+          >
+            Price: Low to High
+          </option>
+
+          <option
+            value="price-descending"
+            {% if current_sort == 'price-descending' %}
+              selected
+            {% endif %}
+          >
+            Price: High to Low
+          </option>
+
+          <option
+            value="created-descending"
+            {% if current_sort == 'created-descending' %}
+              selected
+            {% endif %}
+          >
+            Newest
+          </option>
+
+        </select>
+
+      </form>
+
+    </div>
+
+
+    <!-- INLINE FILTER PANEL -->
+
+    <div
+      class="kapisa-filter-{{ ai_gen_id }}__panel"
+      data-filter-panel
+    >
+
+      <div class="kapisa-filter-{{ ai_gen_id }}__filter-list">
+
+        {% for filter in collection.filters %}
+
+          {% assign filter_active = false %}
+
+          {% if filter.active_values.size > 0 %}
+            {% assign filter_active = true %}
+          {% endif %}
+
+          {% if filter.type == 'price_range' %}
+
+            {% if filter.min_value.value != blank or filter.max_value.value != blank %}
+              {% assign filter_active = true %}
+            {% endif %}
+
+          {% endif %}
+
+
+          <div
+            class="kapisa-filter-{{ ai_gen_id }}__group"
+            data-filter-group
+          >
+
+            <button
+              type="button"
+              class="
+                kapisa-filter-{{ ai_gen_id }}__group-button
+                {% if filter_active %}is-active{% endif %}
+              "
+              data-group-toggle
+            >
+
+              {{ filter.label }}
+
+              {% if filter_active %}
+                <span class="kapisa-filter-{{ ai_gen_id }}__active-count">
+                  {{ filter.active_values.size }}
+                </span>
+              {% endif %}
+
+              <span class="kapisa-filter-{{ ai_gen_id }}__group-arrow"></span>
+
+            </button>
+
+
+            <div
+              class="kapisa-filter-{{ ai_gen_id }}__dropdown"
+              data-filter-dropdown
+            >
+
+              {% if filter.type == 'price_range' %}
+
+                <form
+                  method="get"
+                  data-price-form
+                >
+
+                  {% comment %}
+                    Preserve all existing filters and sorting.
+                  {% endcomment %}
+
+                  {% for param in request.query_parameters %}
+
+                    {% unless param[0] == filter.min_value.param_name
+                      or param[0] == filter.max_value.param_name
+                    %}
+
+                      {% for value in param[1] %}
+
+                        <input
+                          type="hidden"
+                          name="{{ param[0] | escape }}"
+                          value="{{ value | escape }}"
+                        >
+
+                      {% endfor %}
+
+                    {% endunless %}
+
+                  {% endfor %}
+
+
+                  <div class="kapisa-filter-{{ ai_gen_id }}__price">
+
+                    <input
+                      type="number"
+                      name="{{ filter.min_value.param_name }}"
+                      placeholder="Min"
+                      min="0"
+                      {% if filter.min_value.value %}
+                        value="{{ filter.min_value.value }}"
+                      {% endif %}
+                    >
+
+                    <input
+                      type="number"
+                      name="{{ filter.max_value.param_name }}"
+                      placeholder="Max"
+                      min="0"
+                      {% if filter.max_value.value %}
+                        value="{{ filter.max_value.value }}"
+                      {% endif %}
+                    >
+
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="kapisa-filter-{{ ai_gen_id }}__price-apply"
+                  >
+                    Apply
+                  </button>
+
+                </form>
+
+
+              {% else %}
+
+                <div class="kapisa-filter-{{ ai_gen_id }}__options">
+
+                  {% for value in filter.values %}
+
+                    {% assign is_disabled = false %}
+
+                    {% if value.count == 0 and value.active == false %}
+                      {% assign is_disabled = true %}
+                    {% endif %}
+
+
+                    {% assign is_color = false %}
+
+                    {% if filter.label contains 'Color'
+                      or filter.label contains 'Colour'
+                    %}
+                      {% assign is_color = true %}
+                    {% endif %}
+
+
+                    <label
+                      class="
+                        kapisa-filter-{{ ai_gen_id }}__option
+                        {% if is_disabled %}is-disabled{% endif %}
+                      "
+                    >
+
+                      <input
+                        type="checkbox"
+
+                        name="{{ value.param_name }}"
+
+                        value="{{ value.value }}"
+
+                        {% if value.active %}
+                          checked
+                        {% endif %}
+
+                        {% if is_disabled %}
+                          disabled
+                        {% endif %}
+                      >
+
+
+                      {% if is_color %}
+
+                        <span
+                          class="kapisa-filter-{{ ai_gen_id }}__color-swatch"
+                          style="background-color: {{ value.label | downcase | escape }};"
+                        ></span>
+
+                      {% else %}
+
+                        <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
+
+                      {% endif %}
+
+
+                      <span>
+                        {{ value.label }}
+                      </span>
+
+
+                      <span class="kapisa-filter-{{ ai_gen_id }}__option-count">
+                        {{ value.count }}
+                      </span>
+
+                    </label>
+
+                  {% endfor %}
+
+                </div>
+
+              {% endif %}
+
+            </div>
+
+          </div>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+
+    <!-- ACTIVE FILTER CHIPS -->
+
+    {% if active_count > 0 %}
+
+      <div class="kapisa-filter-{{ ai_gen_id }}__active">
+
+        {% for filter in collection.filters %}
+
+          {% for value in filter.active_values %}
+
+            <span class="kapisa-filter-{{ ai_gen_id }}__chip">
+
+              {{ value.label }}
+
+              <a
+                href="{{ value.url_to_remove }}"
+                class="kapisa-filter-{{ ai_gen_id }}__chip-remove"
+                aria-label="Remove {{ value.label | escape }}"
+              >
+                ×
+              </a>
+
+            </span>
+
+          {% endfor %}
+
+
+          {% if filter.type == 'price_range' %}
+
+            {% if filter.min_value.value != blank or filter.max_value.value != blank %}
+
+              <span class="kapisa-filter-{{ ai_gen_id }}__chip">
+
+                {% if filter.min_value.value != blank %}
+                  {{ filter.min_value.value | money }}
+                {% else %}
+                  ₹0
+                {% endif %}
+
+                –
+
+                {% if filter.max_value.value != blank %}
+                  {{ filter.max_value.value | money }}
+                {% else %}
+                  {{ filter.range_max | money }}
+                {% endif %}
+
+                <a
+                  href="{{ filter.url_to_remove }}"
+                  class="kapisa-filter-{{ ai_gen_id }}__chip-remove"
+                  aria-label="Remove price filter"
+                >
+                  ×
+                </a>
+
+              </span>
+
+            {% endif %}
+
+          {% endif %}
+
+        {% endfor %}
+
+
+        <a
+          href="{{ collection.url }}"
+          class="kapisa-filter-{{ ai_gen_id }}__clear"
+        >
+          Clear all
+        </a>
+
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</collection-filterbar-{{ ai_gen_id }}>
+
+
+<script>
+
+(function() {
+
+  class KapisaInlineFilter extends HTMLElement {
+
+    connectedCallback() {
+
+      this.panel =
+        this.querySelector('[data-filter-panel]');
+
+      this.toggle =
+        this.querySelector('[data-filter-toggle]');
+
+      this.groups =
+        this.querySelectorAll('[data-filter-group]');
+
+      this.sort =
+        this.querySelector('[data-sort]');
+
+
+      /* OPEN / CLOSE MAIN FILTER PANEL */
+
+      this.toggle?.addEventListener('click', () => {
+
+        const isOpen =
+          this.panel.classList.contains('is-open');
+
+        this.panel.classList.toggle(
+          'is-open',
+          !isOpen
+        );
+
+        this.toggle.classList.toggle(
+          'is-active',
+          !isOpen
+        );
+
+        this.toggle.setAttribute(
+          'aria-expanded',
+          String(!isOpen)
+        );
+
+      });
+
+
+      /* INDIVIDUAL FILTER DROPDOWNS */
+
+      this.groups.forEach(group => {
+
+        const button =
+          group.querySelector('[data-group-toggle]');
+
+        const dropdown =
+          group.querySelector('[data-filter-dropdown]');
+
+
+        button?.addEventListener('click', event => {
+
+          event.stopPropagation();
+
+          const currentlyOpen =
+            dropdown.classList.contains('is-open');
+
+
+          /* Close all other filter dropdowns */
+
+          this.querySelectorAll(
+            '[data-filter-dropdown].is-open'
+          ).forEach(other => {
+
+            if (other !== dropdown) {
+              other.classList.remove('is-open');
+            }
+
+          });
+
+
+          dropdown.classList.toggle(
+            'is-open',
+            !currentlyOpen
+          );
+
+        });
+
+
+        /* Apply normal Shopify filters */
+
+        group.querySelectorAll(
+          'input[type="checkbox"]'
+        ).forEach(input => {
+
+          input.addEventListener(
+            'change',
+            () => this.applyFilters()
+          );
+
+        });
+
+      });
+
+
+      /* SORT */
+
+      this.sort?.addEventListener(
+        'change',
+        () => this.applySort()
+      );
+
+
+      /* Click outside */
+
+      document.addEventListener(
+        'click',
+        event => {
+
+          if (!this.contains(event.target)) {
+
+            this.querySelectorAll(
+              '[data-filter-dropdown].is-open'
+            ).forEach(dropdown => {
+
+              dropdown.classList.remove(
+                'is-open'
+              );
+
+            });
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /*
+      IMPORTANT:
+      Build the new URL from the CURRENT URL.
+
+      Existing filters are preserved.
+      Only filter parameters are replaced.
+    */
+
+    applyFilters() {
+
+      const url =
+        new URL(window.location.href);
+
+      const params =
+        new URLSearchParams(url.search);
+
+
+      /*
+        Shopify filter parameters start with:
+
+        filter.
+
+        Remove existing filter parameters first.
+        Keep sort_by and everything else.
+      */
+
+      const filterKeys = [];
+
+      for (const [key] of params.entries()) {
+
+        if (key.startsWith('filter.')) {
+          filterKeys.push(key);
+        }
+
+      }
+
+      filterKeys.forEach(key => {
+        params.delete(key);
+      });
+
+
+      /*
+        Add every currently selected filter.
+        This allows:
+
+        Price + Color
+        Size + Color
+        Availability + Price
+        etc.
+
+        to coexist.
+      */
+
+      this.querySelectorAll(
+        'input[type="checkbox"]:checked'
+      ).forEach(input => {
+
+        params.append(
+          input.name,
+          input.value
+        );
+
+      });
+
+
+      /*
+        Navigate while preserving sort.
+      */
+
+      url.search =
+        params.toString();
+
+      window.location.href =
+        url.toString();
+
+    }
+
+
+    /*
+      Sorting also preserves all filters.
+    */
+
+    applySort() {
+
+      if (!this.sort) return;
+
+      const url =
+        new URL(window.location.href);
+
+      const params =
+        new URLSearchParams(url.search);
+
+
+      params.set(
+        'sort_by',
+        this.sort.value
+      );
+
+
+      url.search =
+        params.toString();
+
+      window.location.href =
+        url.toString();
+
+    }
+
+  }
+
+
+  if (
+    !customElements.get(
+      'collection-filterbar-{{ ai_gen_id }}'
+    )
+  ) {
+
+    customElements.define(
+      'collection-filterbar-{{ ai_gen_id }}',
+      KapisaInlineFilter
+    );
+
+  }
+
+})();
+
+</script>
+
+
+{% schema %}
+
+{
+  "name": "KAPISA Collection Filter",
+  "settings": [],
+  "presets": [
+    {
+      "name": "KAPISA Collection Filter"
+    }
+  ],
+  
+  "class": "collection-filter-bar"
+}
+
+{% endschema %}
+
+
+

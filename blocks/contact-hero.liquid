@@ -1,0 +1,52 @@
+{% doc %}
+  @prompt
+    Create a premium Contact Us hero section for Kapisa Healthcare.
+    
+    Use warm cream #FAF7F0 as the background, deep navy #0E1F3C for the heading, charcoal #2B2B2E for the description, and gold #C9A227 only for a small decorative accent.
+    
+    Desktop: create a centered layout with a maximum width of 900px. Add a small gold uppercase label “CONTACT KAPISA”, an elegant serif heading “We’re Here to Help”, and a short description explaining that customers can reach Kapisa through the contact options below. Use a 52px heading.
+    
+    Mobile: use 20px horizontal padding. Make the heading 36px and description 16px. Keep the section compact with approximately 56px vertical padding. Make it feel like the opening screen of a premium mobile app.
+    
+    Add a subtle fade-up animation to the text and gold decorative line. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Make the label, heading, and description editable.
+    
+    Return complete Shopify Liquid, responsive CSS, accessible HTML, and valid schema. Do not modify the header or footer.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% style %}
+  .ai-contact-hero-{{ ai_gen_id }} { display: block; width: {{ block.settings.desktop_width_percent }}%; max-width: 100%; margin: 0 auto; padding: 88px 24px; background: #FAF7F0; box-sizing: border-box; }
+  .ai-contact-hero__content-{{ ai_gen_id }} { max-width: 900px; margin: 0 auto; text-align: center; }
+  .ai-contact-hero__label-{{ ai_gen_id }} { margin: 0 0 18px; color: #C9A227; font-size: 12px; font-weight: 700; letter-spacing: .18em; line-height: 1.4; text-transform: uppercase; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms ease-out both; }
+  .ai-contact-hero__heading-{{ ai_gen_id }} { margin: 0; color: #0E1F3C; font-family: Georgia, 'Times New Roman', serif; font-size: 52px; font-weight: 400; letter-spacing: -.025em; line-height: 1.08; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms 100ms ease-out both; }
+  .ai-contact-hero__description-{{ ai_gen_id }} { max-width: 590px; margin: 24px auto 0; color: #2B2B2E; font-size: 18px; line-height: 1.65; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms 200ms ease-out both; }
+  .ai-contact-hero__accent-{{ ai_gen_id }} { width: 52px; height: 2px; margin: 30px auto 0; background: #C9A227; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms 300ms ease-out both; }
+  @keyframes ai-contact-hero-fade-up-{{ ai_gen_id }} { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @media screen and (max-width: 749px) { .ai-contact-hero-{{ ai_gen_id }} { padding: 56px 20px; } .ai-contact-hero__heading-{{ ai_gen_id }} { font-size: 36px; } .ai-contact-hero__description-{{ ai_gen_id }} { margin-top: 18px; font-size: 16px; line-height: 1.55; } .ai-contact-hero__accent-{{ ai_gen_id }} { margin-top: 24px; } }
+  @media (prefers-reduced-motion: reduce) { .ai-contact-hero__label-{{ ai_gen_id }}, .ai-contact-hero__heading-{{ ai_gen_id }}, .ai-contact-hero__description-{{ ai_gen_id }}, .ai-contact-hero__accent-{{ ai_gen_id }} { animation: none; } }
+{% endstyle %}
+<section class="ai-contact-hero-{{ ai_gen_id }}" aria-labelledby="ai-contact-heading-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-contact-hero__content-{{ ai_gen_id }}">
+    <p class="ai-contact-hero__label-{{ ai_gen_id }}">{{ block.settings.label | escape }}</p>
+    <h1 id="ai-contact-heading-{{ ai_gen_id }}" class="ai-contact-hero__heading-{{ ai_gen_id }}">{{ block.settings.heading | escape }}</h1>
+    <p class="ai-contact-hero__description-{{ ai_gen_id }}">{{ block.settings.description | escape }}</p>
+    <div class="ai-contact-hero__accent-{{ ai_gen_id }}" aria-hidden="true"></div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Contact hero",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Label", "default": "CONTACT KAPISA" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "We’re Here to Help" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Reach Kapisa through the contact options below. Our team is here to answer your questions and support your healthcare journey." },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 }
+  ],
+  "presets": [{ "name": "Contact hero" }],
+  "tag": null,
+  "class": "contact-hero-block"
+}
+{% endschema %}

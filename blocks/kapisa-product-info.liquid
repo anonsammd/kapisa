@@ -1,0 +1,1746 @@
+  {% comment %}
+  KAPISA — Premium Product Information
+  Custom embroidery is implemented by sections/kapisa-custom-embroidery.liquid.
+{% endcomment %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% assign color_name = product.metafields.custom.color_name.value | default: 'Current color' %}
+{% assign color_products = product.metafields.custom.color_family_products.value %}
+
+{% style %}
+  /* =========================================================
+     KAPISA PRODUCT INFORMATION
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    margin: 0 auto;
+    background: #FAF7F0;
+    color: #2B2B2E;
+    font-family: {{ block.settings.body_font.family }};
+  }
+
+  .ai-pdp-{{ ai_gen_id }} *,
+  .ai-pdp-{{ ai_gen_id }} *::before,
+  .ai-pdp-{{ ai_gen_id }} *::after {
+    box-sizing: border-box;
+  }
+
+  /* =========================================================
+     MAIN GRID
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__grid {
+    width: 100%;
+    max-width: {{ block.settings.content_width }}px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+    gap: 64px;
+  }
+
+  /* =========================================================
+     MEDIA
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__media {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__thumbs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__thumb {
+    display: block;
+    width: 76px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+      border-color .2s ease,
+      opacity .2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__thumb:hover {
+    opacity: .8;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__thumb.is-active {
+    border-color: #C9A227;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__main {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #F0EEE9;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__slide {
+    display: none;
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__slide.is-active {
+    display: block;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__slide img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    transition: transform .2s ease;
+    transform-origin: var(--x, 50%) var(--y, 50%);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__main:hover
+  .ai-pdp-{{ ai_gen_id }}__slide.is-active img {
+    transform: scale(1.08);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__dots {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 0 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #8FA3B8;
+    cursor: pointer;
+    transition:
+      transform .2s ease,
+      background .2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__dot.is-active {
+    background: #C9A227;
+    transform: scale(1.25);
+  }
+
+  /* =========================================================
+     INFORMATION
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__info {
+    min-width: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__vendor {
+    margin: 0 0 12px;
+    color: #60758B;
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__title {
+    margin: 0 0 16px;
+    color: #2B2B2E;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -.025em;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 30px;
+    color: #0E1F3C;
+    font-size: 25px;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__compare {
+    color: #8FA3B8;
+    font-size: 15px;
+    font-weight: 400;
+    text-decoration: line-through;
+  }
+
+  /* =========================================================
+     COLOR
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__color-picker {
+    margin-bottom: 30px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__label {
+    display: block;
+    margin-bottom: 12px;
+    color: #2B2B2E;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatches {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    flex-wrap: wrap;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatch {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    padding: 0;
+    border: 1px solid #8FA3B8;
+    border-radius: 50%;
+    cursor: pointer;
+    text-decoration: none;
+    transition:
+      transform .18s ease,
+      box-shadow .18s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatch > span {
+    position: absolute;
+    inset: 3px;
+    display: block;
+    border-radius: 50%;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatch.is-current {
+    border: 2px solid #C9A227;
+    box-shadow:
+      0 0 0 2px #FAF7F0,
+      0 0 0 4px #C9A227;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatch:hover {
+    transform: scale(1.08);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatch:focus-visible {
+    outline: 2px solid #C9A227;
+    outline-offset: 4px;
+  }
+
+  /* =========================================================
+     SIZE
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__size-section {
+    margin-bottom: 30px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size-head .ai-pdp-{{ ai_gen_id }}__label {
+    margin-bottom: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__guide {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #C9A227;
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size {
+    min-width: 52px;
+    padding: 10px 17px;
+    border: 1px solid #2B2B2E;
+    border-radius: 22px;
+    background: transparent;
+    color: #2B2B2E;
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+      background .18s ease,
+      color .18s ease,
+      border-color .18s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size:hover:not(:disabled) {
+    border-color: #0E1F3C;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size.is-selected {
+    border-color: #0E1F3C;
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size:disabled {
+    border-color: #8FA3B8;
+    color: #8FA3B8;
+    text-decoration: line-through;
+    opacity: .55;
+    cursor: not-allowed;
+  }
+
+  /* =========================================================
+     QUANTITY
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__quantity {
+    margin-bottom: 30px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__qty {
+    display: flex;
+    align-items: center;
+    width: 126px;
+    height: 42px;
+    border: 1px solid #8FA3B8;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__qty button {
+    width: 42px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #2B2B2E;
+    font-size: 19px;
+    cursor: pointer;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__qty button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__qty input {
+    width: 42px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: #2B2B2E;
+    text-align: center;
+    font-size: 14px;
+    appearance: textfield;
+    -moz-appearance: textfield;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__qty input::-webkit-inner-spin-button,
+  .ai-pdp-{{ ai_gen_id }}__qty input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+  }
+
+  /* =========================================================
+     BUY BUTTONS
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__buy {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__buy button {
+    width: 100%;
+    min-height: 54px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      transform .2s ease,
+      box-shadow .2s ease,
+      opacity .2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__buy button:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__buy button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__add {
+    border: 1px solid #C9A227;
+    background: #C9A227;
+    color: #0E1F3C;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__now {
+    border: 1px solid #0E1F3C;
+    background: transparent;
+    color: #0E1F3C;
+  }
+
+  /* =========================================================
+     TRUST
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__trust {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+    color: #2B2B2E;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__trust-icon {
+    color: #C9A227;
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  /* =========================================================
+     DESCRIPTION
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__description {
+    margin-bottom: 30px;
+    color: #2B2B2E;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__description p {
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__description p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* =========================================================
+     SHARE
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__share {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__share a {
+    color: #8FA3B8;
+    text-decoration: none;
+    transition: color .18s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__share a:hover {
+    color: #C9A227;
+  }
+
+  /* =========================================================
+     SIZE GUIDE
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(14,31,60,.62);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__modal.is-open {
+    display: flex;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__modal-box {
+    position: relative;
+    width: min(420px,100%);
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 28px;
+    background: #FAF7F0;
+    color: #2B2B2E;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__modal-box h2 {
+    margin: 0 0 18px;
+    color: #0E1F3C;
+    font-size: 24px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__modal-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    color: #2B2B2E;
+    font-size: 24px;
+    cursor: pointer;
+  }
+
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+
+  @media (max-width: 749px) {
+
+    .ai-pdp-{{ ai_gen_id }}__grid {
+      display: block;
+      padding: 24px 16px 48px;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__media {
+      display: block;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__thumbs {
+      display: none;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__main {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__main::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__slide {
+      display: block;
+      min-width: 100%;
+      scroll-snap-align: start;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__main:hover
+    .ai-pdp-{{ ai_gen_id }}__slide img {
+      transform: none;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__dots {
+      display: flex;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__info {
+      margin-top: 34px;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__title {
+      font-size: 30px;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__trust {
+      grid-template-columns: repeat(2,1fr);
+      gap: 16px 12px;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__share {
+      justify-content: flex-start;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__buy button {
+      min-height: 52px;
+    }
+
+  }
+{% endstyle %}
+
+<product-information-{{ ai_gen_id }}
+  class="ai-pdp-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+
+  data-product-id="{{ product.id }}"
+  data-current-variant="{{ current_variant.id }}"
+
+>
+  <div class="ai-pdp-{{ ai_gen_id }}__grid">
+    <!--
+      =====================================================
+      PRODUCT MEDIA
+      =====================================================
+    -->
+
+    <div class="ai-pdp-{{ ai_gen_id }}__media">
+      <div class="ai-pdp-{{ ai_gen_id }}__thumbs">
+        {% assign image_index = 0 %}
+
+        {% for media in product.media %}
+          {% if media.media_type == 'image' %}
+            <button
+              type="button"
+              class="ai-pdp-{{ ai_gen_id }}__thumb{% if image_index == 0 %} is-active{% endif %}"
+              data-gallery-index="{{ image_index }}"
+              aria-label="View image {{ image_index | plus: 1 }}"
+            >
+              <img
+                src="{{ media | image_url: width: 180 }}"
+                alt="{{ media.alt | default: product.title | escape }}"
+                loading="lazy"
+                width="180"
+                height="240"
+              >
+            </button>
+
+            {% assign image_index = image_index | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div>
+        <div
+          class="ai-pdp-{{ ai_gen_id }}__main"
+          data-gallery
+        >
+          {% assign image_index = 0 %}
+
+          {% for media in product.media %}
+            {% if media.media_type == 'image' %}
+              <div
+                class="ai-pdp-{{ ai_gen_id }}__slide{% if image_index == 0 %} is-active{% endif %}"
+                data-slide-index="{{ image_index }}"
+              >
+                <img
+                  src="{{ media | image_url: width: 1400 }}"
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  loading="{% if image_index == 0 %}eager{% else %}lazy{% endif %}"
+                  width="{{ media.width }}"
+                  height="{{ media.height }}"
+                >
+              </div>
+
+              {% assign image_index = image_index | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__dots">
+          {% assign dot_index = 0 %}
+
+          {% for media in product.media %}
+            {% if media.media_type == 'image' %}
+              <button
+                type="button"
+                class="ai-pdp-{{ ai_gen_id }}__dot{% if dot_index == 0 %} is-active{% endif %}"
+                data-gallery-index="{{ dot_index }}"
+                aria-label="Go to image {{ dot_index | plus: 1 }}"
+              ></button>
+
+              {% assign dot_index = dot_index | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!--
+      =====================================================
+      PRODUCT INFORMATION
+      =====================================================
+    -->
+
+    <div class="ai-pdp-{{ ai_gen_id }}__info">
+      <div class="ai-pdp-{{ ai_gen_id }}__vendor">KAPISA HEALTHCARE</div>
+
+      <h1 class="ai-pdp-{{ ai_gen_id }}__title">
+        {{ product.title }}
+      </h1>
+
+      <div
+        class="ai-pdp-{{ ai_gen_id }}__price"
+        data-product-price
+      >
+        <span data-price>
+          {{ current_variant.price | money }}
+        </span>
+
+        <span
+          class="ai-pdp-{{ ai_gen_id }}__compare"
+          data-compare-price
+          {% unless current_variant.compare_at_price > current_variant.price %}
+            hidden
+          {% endunless %}
+        >
+          {% if current_variant.compare_at_price > current_variant.price %}
+            {{ current_variant.compare_at_price | money }}
+          {% endif %}
+        </span>
+      </div>
+
+      <!--
+        ===================================================
+        COLOR
+        ===================================================
+      -->
+
+      <div class="ai-pdp-{{ ai_gen_id }}__color-picker">
+        <span class="ai-pdp-{{ ai_gen_id }}__label"> Color: {{ color_name }} </span>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__swatches">
+          {% if color_products != blank %}
+            {% for related in color_products %}
+              {% assign related_color_name = related.metafields.custom.color_name.value %}
+              {% assign related_color = related.metafields.custom.color_swatch.value %}
+
+              {% if related_color_name != blank and related_color != blank %}
+                <a
+                  href="{{ related.url }}"
+                  class="ai-pdp-{{ ai_gen_id }}__swatch{% if related.id == product.id %} is-current{% endif %}"
+                  style="background-color: {{ related_color }};"
+                  title="{{ related_color_name }}"
+                  aria-label="{{ related_color_name }}"
+                >
+                  <span></span>
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <!--
+        ===================================================
+        SHOPIFY PRODUCT FORM
+        ===================================================
+      -->
+
+      <form
+        method="post"
+        action="/cart/add"
+        enctype="multipart/form-data"
+        data-product-form
+      >
+        <input
+          type="hidden"
+          name="id"
+          value="{{ current_variant.id }}"
+          data-variant-title="{{ current_variant.title | escape }}"
+          data-variant-id
+        >
+
+        <!-- SIZE -->
+
+        <div class="ai-pdp-{{ ai_gen_id }}__size-section">
+          <div class="ai-pdp-{{ ai_gen_id }}__size-head">
+            <span class="ai-pdp-{{ ai_gen_id }}__label"> Size </span>
+
+            <button
+              type="button"
+              class="ai-pdp-{{ ai_gen_id }}__guide"
+              data-size-guide
+            >
+              Size Guide
+            </button>
+          </div>
+
+          <div class="ai-pdp-{{ ai_gen_id }}__sizes">
+            {% assign rendered_sizes = '' %}
+
+            {% for variant in product.variants %}
+              {% assign variant_size = variant.option1 %}
+
+              {% if variant_size != blank %}
+                {% assign size_marker = '|' | append: variant_size | append: '|' %}
+
+                {% unless rendered_sizes contains size_marker %}
+                  {% assign rendered_sizes = rendered_sizes | append: size_marker %}
+
+                  <button
+                    type="button"
+                    class="ai-pdp-{{ ai_gen_id }}__size{% if variant.id == current_variant.id %} is-selected{% endif %}"
+                    data-variant-option
+                    data-variant-id="{{ variant.id }}"
+                  >
+                    {{ variant_size }}
+                  </button>
+                {% endunless %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <!--
+          =================================================
+          QUANTITY
+          =================================================
+        -->
+
+        <div class="ai-pdp-{{ ai_gen_id }}__quantity">
+          <span class="ai-pdp-{{ ai_gen_id }}__label"> Quantity </span>
+
+          <div class="ai-pdp-{{ ai_gen_id }}__qty">
+            <button
+              type="button"
+              data-minus
+              aria-label="Decrease quantity"
+            >
+              −
+            </button>
+
+            <input
+              type="number"
+              name="quantity"
+              value="1"
+              min="1"
+              inputmode="numeric"
+              aria-label="Quantity"
+              data-quantity
+            >
+
+            <button
+              type="button"
+              data-plus
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <!--
+          =================================================
+          CUSTOM EMBROIDERY HOOK
+          =================================================
+        -->
+        <div class="kapisa-embroidery-hook" data-kapisa-embroidery-hook>
+          {%- comment -%}
+            Custom embroidery feature is provided by sections/kapisa-custom-embroidery.liquid
+          {%- endcomment -%}
+        </div>
+
+        <!--
+          =================================================
+          BUY BUTTONS
+          =================================================
+        -->
+
+        <div class="ai-pdp-{{ ai_gen_id }}__buy">
+          <button
+            type="submit"
+            class="ai-pdp-{{ ai_gen_id }}__add"
+            data-add
+          >
+            Add to Cart
+          </button>
+
+          <button
+            type="button"
+            class="ai-pdp-{{ ai_gen_id }}__now"
+            data-buy
+          >
+            Buy it Now
+          </button>
+        </div>
+      </form>
+
+      <!--
+        ===================================================
+        TRUST
+        ===================================================
+      -->
+
+      <div class="ai-pdp-{{ ai_gen_id }}__trust">
+        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
+          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">✓</span>
+          <span>Cash on Delivery</span>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
+          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">↠</span>
+          <span>1–3 Day Delivery</span>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
+          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">↻</span>
+          <span>Easy Exchange</span>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
+          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">✓</span>
+          <span>Secure Payment</span>
+        </div>
+      </div>
+
+      <!--
+        ===================================================
+        DESCRIPTION
+        ===================================================
+      -->
+
+      <div class="ai-pdp-{{ ai_gen_id }}__description">
+        {{ product.description }}
+      </div>
+
+      <!--
+        ===================================================
+        SHARE
+        ===================================================
+      -->
+
+      <div class="ai-pdp-{{ ai_gen_id }}__share">
+        <a
+          href="https://wa.me/?text={{ product.title | append: ' ' | append: shop.url | append: product.url | url_encode }}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp
+        </a>
+
+        <a
+          href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: product.url | url_encode }}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Facebook
+        </a>
+
+        <a
+          href="{{ shop.url }}{{ product.url }}"
+          data-copy
+        >
+          Copy link
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!--
+    =======================================================
+    SIZE GUIDE
+    =======================================================
+  -->
+
+  <div
+    class="ai-pdp-{{ ai_gen_id }}__modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Size guide"
+    data-modal
+  >
+    <div class="ai-pdp-{{ ai_gen_id }}__modal-box">
+      <button
+        type="button"
+        class="ai-pdp-{{ ai_gen_id }}__modal-close"
+        data-modal-close
+        aria-label="Close size guide"
+      >
+        ×
+      </button>
+
+      <h2>Size Guide</h2>
+
+      {{ block.settings.size_guide }}
+    </div>
+  </div>
+</product-information-{{ ai_gen_id }}>
+
+<script>
+  (function () {
+
+    class ProductInformation{{ ai_gen_id }} extends HTMLElement {
+
+      connectedCallback() {
+
+        this.form = this.querySelector('[data-product-form]');
+        this.variantInput = this.querySelector('[data-variant-id]');
+        this.quantityInput = this.querySelector('[data-quantity]');
+        this.gallery = this.querySelector('[data-gallery]');
+        this.slides = [...this.querySelectorAll('[data-slide-index]')];
+
+        this.addButton = this.querySelector('[data-add]');
+        this.buyButton = this.querySelector('[data-buy]');
+
+        this.variants = {{ product.variants | json }};
+
+        this.bindGallery();
+        this.bindQuantity();
+        this.bindVariants();
+        this.bindCart();
+        this.bindSizeGuide();
+        this.bindCopyLink();
+        this.bindZoom();
+        this.bindMobileGallery();
+
+        this.updateQuantityState();
+
+      }
+
+
+      /* =====================================================
+         GALLERY
+         ===================================================== */
+
+      bindGallery() {
+
+        this.querySelectorAll('[data-gallery-index]').forEach(button => {
+
+          button.addEventListener('click', () => {
+
+            const index = Number(button.dataset.galleryIndex);
+
+            this.showSlide(index);
+
+          });
+
+        });
+
+      }
+
+
+      showSlide(index) {
+
+        this.slides.forEach((slide, i) => {
+
+          slide.classList.toggle(
+            'is-active',
+            i === index
+          );
+
+        });
+
+
+        this.querySelectorAll(
+          '[data-gallery-index]'
+        ).forEach(item => {
+
+          item.classList.toggle(
+            'is-active',
+            Number(item.dataset.galleryIndex) === index
+          );
+
+        });
+
+
+        if (window.innerWidth <= 749 && this.gallery) {
+
+          const slide = this.slides[index];
+
+          if (slide) {
+
+            this.gallery.scrollTo({
+              left: slide.offsetLeft,
+              behavior: 'smooth'
+            });
+
+          }
+
+        }
+
+      }
+
+
+      /* =====================================================
+         QUANTITY
+         ===================================================== */
+
+      bindQuantity() {
+
+        const minus = this.querySelector('[data-minus]');
+        const plus = this.querySelector('[data-plus]');
+
+        if (!minus || !plus || !this.quantityInput) {
+          return;
+        }
+
+
+        minus.addEventListener('click', () => {
+
+          const current = Number(
+            this.quantityInput.value || 1
+          );
+
+          this.quantityInput.value = Math.max(
+            1,
+            current - 1
+          );
+
+          this.updateQuantityState();
+
+        });
+
+
+        plus.addEventListener('click', () => {
+
+          const current = Number(
+            this.quantityInput.value || 1
+          );
+
+          this.quantityInput.value =
+            Math.max(1, current + 1);
+
+          this.updateQuantityState();
+
+        });
+
+
+        this.quantityInput.addEventListener('change', () => {
+
+          let value =
+            Number(this.quantityInput.value || 1);
+
+          value = Math.max(1, Math.floor(value));
+
+          this.quantityInput.value = value;
+
+          this.updateQuantityState();
+
+        });
+
+      }
+
+
+      updateQuantityState() {
+
+        const minus = this.querySelector('[data-minus]');
+        const plus = this.querySelector('[data-plus]');
+
+        if (!minus || !plus) {
+          return;
+        }
+
+
+        minus.disabled = false;
+        plus.disabled = false;
+
+      }
+
+
+      /* =====================================================
+         VARIANTS
+         ===================================================== */
+
+      bindVariants() {
+
+        this.querySelectorAll(
+          '[data-variant-option]'
+        ).forEach(button => {
+
+          button.addEventListener('click', () => {
+
+            if (button.disabled) {
+              return;
+            }
+
+
+            const variantId =
+              Number(button.dataset.variantId);
+
+            const variant =
+              this.variants.find(
+                item => Number(item.id) === variantId
+              );
+
+            if (!variant) {
+              return;
+            }
+
+
+            this.variantInput.value = variantId;
+
+
+            this.querySelectorAll(
+              '[data-variant-option]'
+            ).forEach(item => {
+              item.classList.remove('is-selected');
+            });
+
+
+            button.classList.add('is-selected');
+
+
+            this.updateVariantDisplay(variant);
+
+          });
+
+        });
+
+      }
+
+
+      updateVariantDisplay(variant) {
+        this.variantInput.dataset.variantTitle = variant.title;
+
+        const price =
+          this.querySelector('[data-price]');
+
+        const compare =
+          this.querySelector('[data-compare-price]');
+
+
+        if (price) {
+
+          price.textContent =
+            this.formatMoney(variant.price);
+
+        }
+
+
+        if (compare) {
+
+          if (
+            variant.compare_at_price &&
+            Number(variant.compare_at_price) >
+            Number(variant.price)
+          ) {
+
+            compare.hidden = false;
+
+            compare.textContent =
+              this.formatMoney(
+                variant.compare_at_price
+              );
+
+          } else {
+
+            compare.hidden = true;
+
+            compare.textContent = '';
+
+          }
+
+        }
+
+
+        if (this.addButton) {
+          this.addButton.disabled = false;
+          this.addButton.textContent = 'Add to Cart';
+        }
+
+        if (this.buyButton) {
+          this.buyButton.disabled = false;
+        }
+      }
+
+      formatMoney(cents) {
+        const amount = Number(cents) / 100;
+        try {
+          return new Intl.NumberFormat(
+            '{{ localization.language.iso_code }}',
+            {
+              style: 'currency',
+              currency: '{{ cart.currency.iso_code }}'
+            }
+          ).format(amount);
+        } catch (error) {
+          const formatString = '{{ shop.money_format | escape }}';
+          return formatString.replace(/\{\{\s*amount\s*\}\}/, amount.toFixed(2));
+        }
+      }
+
+      /* =====================================================
+         CART
+         ===================================================== */
+
+      bindCart() {
+        if (!this.form) {
+          return;
+        }
+
+        this.form.addEventListener(
+          'submit',
+          event => {
+            event.preventDefault();
+            this.handleAddToCart(false);
+          }
+        );
+
+        if (this.buyButton) {
+          this.buyButton.addEventListener(
+            'click',
+            event => {
+              event.preventDefault();
+              this.handleAddToCart(true);
+            }
+          );
+        }
+      }
+
+      async handleAddToCart(goToCheckout) {
+        if (!this.form) return;
+
+        const variantId = Number(this.variantInput.value);
+        const quantity = Number(this.quantityInput.value || 1);
+
+        const variant = this.variants.find(
+          item => Number(item.id) === variantId
+        );
+
+        if (!variantId) {
+          this.showError('Please select a size to continue.');
+          return;
+        }
+
+        this.setLoading(true);
+
+        try {
+          let items = [{ id: variantId, quantity: quantity }];
+
+          if (window.KapisaPurchase && typeof window.KapisaPurchase.getActiveEmbroideryItems === 'function') {
+            const embroideryItems = window.KapisaPurchase.getActiveEmbroideryItems({
+              variantId: variantId,
+              quantity: quantity,
+              productTitle: {{ product.title | json }},
+              variantTitle: variant?.title || ''
+            });
+            if (embroideryItems && Array.isArray(embroideryItems) && embroideryItems.length > 0) {
+              items = embroideryItems;
+            }
+          }
+
+          await window.KapisaPurchase.addToCart(items, { openCart: false });
+
+          if (goToCheckout) {
+            window.location.href = '/checkout';
+          } else {
+            window.location.href = window.routes?.cart_url || '/cart';
+          }
+        } catch (error) {
+          console.error('Kapisa cart error:', error);
+          this.showError(error.message || 'Sorry, something went wrong. Please try again.');
+        } finally {
+          this.setLoading(false);
+        }
+      }
+
+      showError(message) {
+        window.alert(message);
+      }
+
+
+      /* =====================================================
+         LOADING
+         ===================================================== */
+
+      setLoading(loading) {
+
+        if (this.addButton) {
+
+          this.addButton.disabled =
+            loading;
+
+          this.addButton.textContent =
+            loading
+              ? 'Adding…'
+              : 'Add to Cart';
+
+        }
+
+
+        if (this.buyButton) {
+
+          this.buyButton.disabled =
+            loading;
+
+          this.buyButton.textContent =
+            loading
+              ? 'Processing…'
+              : 'Buy it Now';
+
+        }
+
+      }
+
+
+      /* =====================================================
+         SIZE GUIDE
+         ===================================================== */
+
+      bindSizeGuide() {
+
+        const open =
+          this.querySelector(
+            '[data-size-guide]'
+          );
+
+        const modal =
+          this.querySelector(
+            '[data-modal]'
+          );
+
+        const close =
+          this.querySelector(
+            '[data-modal-close]'
+          );
+
+
+        if (!open || !modal || !close) {
+          return;
+        }
+
+
+        open.addEventListener(
+          'click',
+          () => {
+
+            modal.classList.add(
+              'is-open'
+            );
+
+            document.body.style.overflow =
+              'hidden';
+
+          }
+        );
+
+
+        const closeModal = () => {
+
+          modal.classList.remove(
+            'is-open'
+          );
+
+          document.body.style.overflow =
+            '';
+
+        };
+
+
+        close.addEventListener(
+          'click',
+          closeModal
+        );
+
+
+        modal.addEventListener(
+          'click',
+          event => {
+
+            if (
+              event.target === modal
+            ) {
+
+              closeModal();
+
+            }
+
+          }
+        );
+
+
+        document.addEventListener(
+          'keydown',
+          event => {
+
+            if (
+              event.key === 'Escape' &&
+              modal.classList.contains(
+                'is-open'
+              )
+            ) {
+
+              closeModal();
+
+            }
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         COPY LINK
+         ===================================================== */
+
+      bindCopyLink() {
+
+        const copy =
+          this.querySelector(
+            '[data-copy]'
+          );
+
+
+        if (!copy) {
+          return;
+        }
+
+
+        copy.addEventListener(
+          'click',
+          event => {
+
+            event.preventDefault();
+
+
+            const url =
+              copy.href;
+
+
+            if (
+              navigator.clipboard &&
+              navigator.clipboard.writeText
+            ) {
+
+              navigator.clipboard
+                .writeText(url)
+                .then(() => {
+
+                  const original =
+                    copy.textContent;
+
+                  copy.textContent =
+                    'Copied';
+
+                  setTimeout(() => {
+
+                    copy.textContent =
+                      original;
+
+                  }, 1500);
+
+                });
+
+            }
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         DESKTOP ZOOM
+         ===================================================== */
+
+      bindZoom() {
+
+        if (!this.gallery) {
+          return;
+        }
+
+
+        this.gallery.addEventListener(
+          'mousemove',
+          event => {
+
+            if (
+              window.innerWidth <= 749
+            ) {
+              return;
+            }
+
+
+            const rect =
+              this.gallery.getBoundingClientRect();
+
+
+            const x =
+              (
+                (event.clientX - rect.left) /
+                rect.width
+              ) * 100;
+
+
+            const y =
+              (
+                (event.clientY - rect.top) /
+                rect.height
+              ) * 100;
+
+
+            this.gallery.style.setProperty(
+              '--x',
+              x + '%'
+            );
+
+
+            this.gallery.style.setProperty(
+              '--y',
+              y + '%'
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =====================================================
+         MOBILE GALLERY
+         ===================================================== */
+
+      bindMobileGallery() {
+
+        if (!this.gallery) {
+          return;
+        }
+
+
+        this.gallery.addEventListener(
+          'scroll',
+          () => {
+
+            if (
+              window.innerWidth > 749
+            ) {
+              return;
+            }
+
+
+            const width =
+              this.gallery.clientWidth;
+
+
+            if (!width) {
+              return;
+            }
+
+
+            const index =
+              Math.round(
+                this.gallery.scrollLeft /
+                width
+              );
+
+
+            this.querySelectorAll(
+              '[data-gallery-index]'
+            ).forEach(item => {
+
+              item.classList.toggle(
+                'is-active',
+                Number(
+                  item.dataset.galleryIndex
+                ) === index
+              );
+
+            });
+
+          },
+          {
+            passive: true
+          }
+        );
+
+      }
+
+    }
+
+
+    if (
+      !customElements.get(
+        'product-information-{{ ai_gen_id }}'
+      )
+    ) {
+
+      customElements.define(
+        'product-information-{{ ai_gen_id }}',
+        ProductInformation{{ ai_gen_id }}
+      );
+
+    }
+
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product information",
+  "settings": [
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content width",
+      "min": 900,
+      "max": 1600,
+      "step": 100,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "font_picker",
+      "id": "body_font",
+      "label": "Body font",
+      "default": "assistant_n4"
+    },
+    {
+      "type": "richtext",
+      "id": "size_guide",
+      "label": "Size guide",
+      "default": "<p>Choose your usual size. For a relaxed fit, select one size up.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product information"
+    }
+  ],
+  
+  "class": "product-information-block"
+}
+{% endschema %}

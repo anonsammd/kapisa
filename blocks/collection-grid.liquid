@@ -1,0 +1,133 @@
+{% doc %}
+  @prompt
+    Build a premium, responsive **Shopify collection product grid** for KAPISA.
+    
+    This is the **actual collection product grid**. Do NOT create a featured-products section, product picker, filter section, sorting toolbar, sidebar, or manually selected products.
+    
+    ### Core Requirement
+    
+    Automatically render products from the **current Shopify collection using `collection.products`**.
+    
+    Every Kapisa collection should automatically display its own products. Do not hardcode product names, handles, prices, images, colors, or product data.
+    
+    The grid must work with Shopify's native collection data and pagination.
+    
+    ### Product Grid
+    
+    * 4 columns desktop
+    * 3 columns tablet
+    * 2 columns mobile
+    * ~20px desktop gap
+    * ~12px mobile gap
+    * Full-width spacious editorial layout
+    * Off-white background `#FAF7F0`
+    
+    ### Product Cards
+    
+    Use the existing KAPISA product-card styling consistently.
+    
+    * 4:5 product image area
+    * Background `#F0EEE9`
+    * `object-fit: cover`
+    * Never stretch or distort images
+    * Use the first product image automatically
+    * Use the second product image for desktop hover when available
+    * Smooth, subtle image crossfade
+    * Small refined gold `Bestseller` / `New` badge when applicable
+    * Minimal charcoal wishlist/heart button
+    * Wishlist active state becomes gold
+    * Desktop hover: subtle gold `Quick Add` control sliding upward from the bottom of the image
+    * Disable or simplify hover interactions on touch devices
+    
+    ### Product Information
+    
+    Below each image:
+    
+    * Product title: charcoal `#2B2B2E`, 14px, medium/bold
+    * Maximum 2 lines with clean text clamping
+    * Price: navy `#0E1F3C`
+    * Compare-at price: slate `#8FA3B8`, struck through
+    * Dynamically display real Shopify product colors/swatches when available
+    * Maximum 5 visible swatches with `+N` for additional colors
+    * Use the existing KAPISA swatch styling
+    * Use flexbox for consistent alignment
+    * Never allow text or content to overflow
+    
+    Do not use awkward fixed card heights. Keep the image ratio consistent and let the product information align naturally.
+    
+    ### Loading More Products
+    
+    At the bottom of the grid, add a simple **Load More** button.
+    
+    * Use Shopify's native collection pagination/data
+    * Initially display the normal collection page size
+    * Clicking **Load More** progressively loads the next products
+    * No numbered pagination
+    * No filter or sorting controls
+    * No extra collection controls
+    * Keep the interaction lightweight and fast
+    * If there are no more products, hide the button
+    * Preserve the current collection and Shopify pagination state correctly
+    
+    ### Visual Direction
+    
+    Make it feel like a premium medical-fashion ecommerce store, not a generic Shopify/Dawn collection page.
+    
+    Use:
+    
+    * Off-white `#FAF7F0`
+    * Charcoal `#2B2B2E`
+    * Navy `#0E1F3C`
+    * Gold `#C9A227`
+    * Slate `#8FA3B8`
+    
+    Use generous whitespace, clean typography, subtle borders and restrained gold accents.
+    
+    Avoid:
+    
+    * Filter sections
+    * Sort dropdowns
+    * Filter sidebars
+    * Product pickers
+    * Featured-product logic
+    * Manually selected products
+    * Heavy shadows
+    * Excessive rounded cards
+    * Gradients
+    * Bulky UI
+    * Generic Dawn styling
+    
+    **Most important:** this must be a simple, real Shopify collection grid powered by `collection.products`. Automatically show the products belonging to whichever collection/page the customer is viewing, followed only by a clean **Load More** button.
+    , remove the wishlist button from the card and on hover white background is showing in the card fix it either make it little zoom on hover , Create an empty-state message that displays inside the product grid area when no products match the selected filters, off-white 
+    #FAF7F0 background, centered content. A simple line-icon (e.g. a search or empty-box icon) in slate 
+    #8FA3B8, 48px, centered. Below it, text 'No products match your filters' in bold charcoal 
+    #2B2B2E, and a smaller line below in slate suggesting 'Try adjusting your filters.' A gold 
+    #C9A227 outline 'Clear All Filters' button centered below the text. Keep generous vertical padding (80px top and bottom) so this state doesn't look cramped when it replaces the grid.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% style %}
+.kapisa-collection-{{ ai_gen_id }}{display:block;width:100%;background:#FAF7F0;color:#2B2B2E;padding:32px 20px 56px}.kapisa-collection-{{ ai_gen_id }}__grid{width:{{ block.settings.desktop_width_percent }}%;max-width:1600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:42px 20px}.kapisa-product-{{ ai_gen_id }}{min-width:0}.kapisa-product-{{ ai_gen_id }}__media{position:relative;aspect-ratio:4/5;overflow:hidden;background:#F0EEE9}.kapisa-product-{{ ai_gen_id }}__image,.kapisa-product-{{ ai_gen_id }}__hover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 320ms ease,opacity 280ms ease}.kapisa-product-{{ ai_gen_id }}__hover-image{opacity:0}.kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__image{transform:scale(1.035)}.kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__hover-image{opacity:0;transform:scale(1.035)}.kapisa-product-{{ ai_gen_id }}__image svg{width:100%;height:100%;object-fit:cover}.kapisa-product-{{ ai_gen_id }}__badge{position:absolute;top:12px;left:12px;z-index:2;padding:5px 8px;background:#C9A227;color:#2B2B2E;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.kapisa-product-{{ ai_gen_id }}__quick-add{position:absolute;right:12px;bottom:12px;left:12px;z-index:2;padding:11px 14px;border:0;background:#0E1F3C;color:#fff;font:inherit;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;opacity:0;transform:translateY(12px);transition:opacity 220ms ease,transform 220ms ease}.kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__quick-add{opacity:1;transform:translateY(0)}.kapisa-product-{{ ai_gen_id }}__info{padding-top:13px}.kapisa-product-{{ ai_gen_id }}__title{display:-webkit-box;overflow:hidden;margin:0 0 6px;color:#2B2B2E;font-size:14px;font-weight:600;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:2}.kapisa-product-{{ ai_gen_id }}__title a{color:inherit;text-decoration:none}.kapisa-product-{{ ai_gen_id }}__price{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;color:#0E1F3C;font-size:14px}.kapisa-product-{{ ai_gen_id }}__compare{color:#8FA3B8;text-decoration:line-through}.kapisa-product-{{ ai_gen_id }}__swatches{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.kapisa-product-{{ ai_gen_id }}__swatch{width:13px;height:13px;border:1px solid rgba(43,43,46,.35);border-radius:50%}.kapisa-product-{{ ai_gen_id }}__more{color:#8FA3B8;font-size:11px;line-height:13px}.kapisa-collection-{{ ai_gen_id }}__more-wrap{display:flex;justify-content:center;padding-top:52px}.kapisa-collection-{{ ai_gen_id }}__more{padding:13px 28px;border:1px solid #0E1F3C;background:transparent;color:#0E1F3C;font:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}.kapisa-collection-{{ ai_gen_id }}__more[hidden]{display:none}.kapisa-collection-{{ ai_gen_id }}__empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;padding:80px 20px;text-align:center}.kapisa-collection-{{ ai_gen_id }}__empty-icon{width:48px;height:48px;margin-bottom:24px;color:#8FA3B8}.kapisa-collection-{{ ai_gen_id }}__empty-icon svg{display:block;width:48px;height:48px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5}.kapisa-collection-{{ ai_gen_id }}__empty-title{margin:0;color:#2B2B2E;font-size:18px;font-weight:700;line-height:1.4}.kapisa-collection-{{ ai_gen_id }}__empty-text{margin:8px 0 24px;color:#8FA3B8;font-size:14px;line-height:1.5}.kapisa-collection-{{ ai_gen_id }}__clear{padding:12px 22px;border:1px solid #C9A227;background:transparent;color:#2B2B2E;font:inherit;font-size:12px;font-weight:600;letter-spacing:.06em;cursor:pointer}.kapisa-collection-{{ ai_gen_id }}__clear:hover{background:#C9A227}@media(max-width:989px){.kapisa-collection-{{ ai_gen_id }}__grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:749px){.kapisa-collection-{{ ai_gen_id }}{padding:24px 12px 44px}.kapisa-collection-{{ ai_gen_id }}__grid{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 12px}.kapisa-product-{{ ai_gen_id }}__quick-add{display:none}.kapisa-product-{{ ai_gen_id }}__badge{top:8px;left:8px}.kapisa-collection-{{ ai_gen_id }}__empty{min-height:300px;padding:80px 12px}.kapisa-collection-{{ ai_gen_id }}__empty-title{font-size:17px}}@media(prefers-reduced-motion:reduce){.kapisa-product-{{ ai_gen_id }}__image,.kapisa-product-{{ ai_gen_id }}__hover-image,.kapisa-product-{{ ai_gen_id }}__quick-add{transition:none}}
+{% endstyle %}
+<kapisa-collection-grid-{{ ai_gen_id }} class="kapisa-collection-{{ ai_gen_id }}" {{ block.shopify_attributes }} data-section-id="{{ section.id }}">
+  {% paginate collection.products by block.settings.products_per_page %}
+    {% if collection.products_count == 0 %}
+      <div class="kapisa-collection-{{ ai_gen_id }}__empty" data-empty-state>
+        <div class="kapisa-collection-{{ ai_gen_id }}__empty-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="21" cy="21" r="12"></circle><path d="m30 30 9 9M16 21h10"></path></svg></div>
+        <h2 class="kapisa-collection-{{ ai_gen_id }}__empty-title">No products match your filters</h2>
+        <p class="kapisa-collection-{{ ai_gen_id }}__empty-text">Try adjusting your filters.</p>
+        <a class="kapisa-collection-{{ ai_gen_id }}__clear" href="{{ collection.url }}">Clear All Filters</a>
+      </div>
+    {% else %}
+      <div class="kapisa-collection-{{ ai_gen_id }}__grid" data-grid>
+        {% for product in collection.products %}
+          {% assign first_image=product.images | first %}{% assign second_image=product.images[1] %}{% assign badge=blank %}{% if product.tags contains 'Bestseller' or product.tags contains 'bestseller' %}{% assign badge='Bestseller' %}{% elsif product.tags contains 'New' or product.tags contains 'new' %}{% assign badge='New' %}{% endif %}
+          <article class="kapisa-product-{{ ai_gen_id }}"><div class="kapisa-product-{{ ai_gen_id }}__media"><a href="{{ product.url }}" aria-label="{{ product.title | escape }}">{% if first_image %}<img class="kapisa-product-{{ ai_gen_id }}__image" src="{{ first_image | image_url: width:900 }}" alt="{{ first_image.alt | default:product.title | escape }}" loading="lazy" width="900" height="1125">{% else %}<div class="kapisa-product-{{ ai_gen_id }}__image">{{ 'product-apparel-1' | placeholder_svg_tag }}</div>{% endif %}{% if second_image %}<img class="kapisa-product-{{ ai_gen_id }}__hover-image" src="{{ second_image | image_url: width:900 }}" alt="{{ second_image.alt | default:product.title | escape }}" loading="lazy" width="900" height="1125">{% endif %}</a>{% if badge != blank %}<span class="kapisa-product-{{ ai_gen_id }}__badge">{{ badge }}</span>{% endif %}{% if product.available %}<form method="post" action="{{ routes.cart_add_url }}"><input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"><input type="hidden" name="quantity" value="1"><button class="kapisa-product-{{ ai_gen_id }}__quick-add" type="submit">Quick add</button></form>{% endif %}</div><div class="kapisa-product-{{ ai_gen_id }}__info"><h2 class="kapisa-product-{{ ai_gen_id }}__title"><a href="{{ product.url }}">{{ product.title }}</a></h2><div class="kapisa-product-{{ ai_gen_id }}__price"><span>{{ product.price | money }}</span>{% if product.compare_at_price > product.price %}<span class="kapisa-product-{{ ai_gen_id }}__compare">{{ product.compare_at_price | money }}</span>{% endif %}</div>{% for option in product.options_with_values %}{% assign option_name=option.name | downcase %}{% if option_name contains 'color' or option_name contains 'colour' %}<div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">{% for value in option.values limit:5 %}<span class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ value | escape }}" style="background-color:{{ value | escape }};"></span>{% endfor %}{% if option.values.size > 5 %}<span class="kapisa-product-{{ ai_gen_id }}__more">+{{ option.values.size | minus:5 }}</span>{% endif %}</div>{% endif %}{% endfor %}</div></article>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% assign has_next=paginate.next %}
+  {% endpaginate %}
+  <div class="kapisa-collection-{{ ai_gen_id }}__more-wrap"><button class="kapisa-collection-{{ ai_gen_id }}__more" type="button" data-load-more {% unless has_next %}hidden{% endunless %}>Load more</button></div>
+</kapisa-collection-grid-{{ ai_gen_id }}>
+<script>(function(){class KapisaCollectionGrid{{ ai_gen_id }} extends HTMLElement{connectedCallback(){this.grid=this.querySelector('[data-grid]');this.button=this.querySelector('[data-load-more]');this.page=1;if(this.button)this.button.addEventListener('click',()=>this.loadMore())}async loadMore(){if(!this.grid||this.button.disabled)return;this.button.disabled=true;const url=new URL(window.location.href);url.searchParams.set('page',this.page+1);url.searchParams.set('section_id',this.dataset.sectionId);try{const response=await fetch(url);const parsed=new DOMParser().parseFromString(await response.text(),'text/html');const nextGrid=parsed.querySelector('[data-grid]');if(!nextGrid||!nextGrid.children.length){this.button.hidden=true;return}Array.from(nextGrid.children).forEach(card=>this.grid.appendChild(card));this.page++;const nextButton=parsed.querySelector('[data-load-more]');if(!nextButton||nextButton.hasAttribute('hidden'))this.button.hidden=true}catch(error){}finally{this.button.disabled=false}}}if(!customElements.get('kapisa-collection-grid-{{ ai_gen_id }}'))customElements.define('kapisa-collection-grid-{{ ai_gen_id }}',KapisaCollectionGrid{{ ai_gen_id }})})();</script>
+{% schema %}{"name":"Kapisa collection grid","settings":[{"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},{"type":"range","id":"products_per_page","label":"Products per page","min":4,"max":40,"step":4,"default":16},{"type":"paragraph","content":"Products are loaded automatically from the current collection."}],"presets":[{"name":"Kapisa collection grid"}],"tag":null,"class":"kapisa-collection-grid-block"}{% endschema %}

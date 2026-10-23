@@ -1,0 +1,38 @@
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+<div class="off-white-strip-{{ ai_gen_id }}" style="width: {{ block.settings.desktop_width_percent }}%; height: {{ block.settings.strip_height }}px; background-color: {{ block.settings.background_color }};"></div>
+{% schema %}
+{
+  "name": "Off-white strip",
+  "settings": [
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width percent",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "strip_height",
+      "label": "Strip height",
+      "min": 10,
+      "max": 100,
+      "step": 2,
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f3f3f3"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Off-white strip"
+    }
+  ]
+}
+{% endschema %}

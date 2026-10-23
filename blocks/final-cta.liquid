@@ -1,0 +1,194 @@
+{% doc %}
+  @prompt
+    Create a premium final CTA for the Kapisa Healthcare Contact Us page.
+    
+    Use deep navy #0E1F3C as the background. Use warm cream #FAF7F0 for the heading and description. Use gold #C9A227 for a thin decorative accent.
+    
+    Desktop: center everything inside 850px. Use a 42px elegant serif heading “Explore Kapisa”. Add a short description and a cream button labeled “Shop All Scrubs”. Use approximately 90px vertical padding.
+    
+    Mobile: use 20px horizontal padding, 30px heading, 16px description, and a full-width 52px-high button. Use approximately 60px vertical padding.
+    
+    Add subtle fade-up animation and a gentle button press effect. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Make heading, description, button text, and button link editable. Default link should be `/collections/all`.
+    
+    Return complete Shopify Liquid, responsive CSS, accessible HTML, and valid schema.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-final-cta-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 90px 24px;
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  .ai-final-cta__content-{{ ai_gen_id }} {
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: ai-final-cta-fade-up-{{ ai_gen_id }} 700ms ease-out 100ms forwards;
+  }
+
+  .ai-final-cta__accent-{{ ai_gen_id }} {
+    width: 56px;
+    height: 2px;
+    margin: 0 auto 26px;
+    background: #C9A227;
+  }
+
+  .ai-final-cta__heading-{{ ai_gen_id }} {
+    margin: 0;
+    color: #FAF7F0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 42px;
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .ai-final-cta__description-{{ ai_gen_id }} {
+    max-width: 620px;
+    margin: 18px auto 32px;
+    color: #FAF7F0;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .ai-final-cta__button-{{ ai_gen_id }} {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 30px;
+    border: 1px solid #FAF7F0;
+    border-radius: {{ block.settings.button_radius }}px;
+    background: #FAF7F0;
+    color: #0E1F3C;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+  }
+
+  .ai-final-cta__button-{{ ai_gen_id }}:hover {
+    background: #C9A227;
+    border-color: #C9A227;
+    color: #0E1F3C;
+  }
+
+  .ai-final-cta__button-{{ ai_gen_id }}:active {
+    transform: translateY(2px);
+  }
+
+  .ai-final-cta__button-{{ ai_gen_id }}:focus-visible {
+    outline: 3px solid #C9A227;
+    outline-offset: 4px;
+  }
+
+  @keyframes ai-final-cta-fade-up-{{ ai_gen_id }} {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-final-cta-{{ ai_gen_id }} { padding: 60px 20px; }
+    .ai-final-cta__heading-{{ ai_gen_id }} { font-size: 30px; }
+    .ai-final-cta__description-{{ ai_gen_id }} {
+      margin: 16px auto 26px;
+      font-size: 16px;
+    }
+    .ai-final-cta__button-{{ ai_gen_id }} {
+      width: 100%;
+      min-height: 52px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-final-cta__content-{{ ai_gen_id }} {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .ai-final-cta__button-{{ ai_gen_id }} { transition: none; }
+  }
+{% endstyle %}
+
+<div class="ai-final-cta-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-final-cta__content-{{ ai_gen_id }}">
+    <div class="ai-final-cta__accent-{{ ai_gen_id }}" aria-hidden="true"></div>
+    <h2 class="ai-final-cta__heading-{{ ai_gen_id }}">{{ block.settings.heading | escape }}</h2>
+    <p class="ai-final-cta__description-{{ ai_gen_id }}">{{ block.settings.description | escape | newline_to_br }}</p>
+    {% if block.settings.button_link != blank %}
+      <a class="ai-final-cta__button-{{ ai_gen_id }}" href="{{ block.settings.button_link }}">
+        {{ block.settings.button_text | escape }}
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Final CTA",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Explore Kapisa"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Discover thoughtfully designed healthcare apparel made to support your everyday work."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Shop All Scrubs"
+    },
+    {
+      "type": "text",
+      "id": "button_link",
+      "label": "Button link",
+      "default": "/collections/all"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "label": "Button radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [{ "name": "Final CTA" }],
+  "tag": null,
+  "class": "final-cta-block"
+}
+{% endschema %}

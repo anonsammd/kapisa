@@ -1,0 +1,100 @@
+{% doc %}
+  @prompt
+    Build a modern, high-trust 'Bestsellers' product carousel section with a clean aesthetic and optimal visual hierarchy.
+    
+    Section Layout & Colors:
+    
+    Background: Off-white.
+    
+    Header Row: Section title 'Bestsellers' in bold charcoal text, left-aligned. Right-aligned 'View All' text link in gold (#C9A227).
+    
+    Navigation: Left and right scroll arrows in circular, semi-transparent gold controls that appear smoothly on hover.
+    
+    Carousel Behavior: Horizontally scrollable row with a partial peek of the next card on mobile viewports.
+    
+    Product Card Design:
+    
+    Card Frame: Soft rounded corners, clean off-white card face with no heavy borders. Elevate card with a subtle soft shadow on hover.
+    
+    Image Area: Clean portrait product image over a light gray placeholder background (#F4F4F4). Include a top-right overlay badge labeled 'Bestseller' in gold with crisp charcoal or white text.
+    
+    Trust & Rating Signals: Positioned directly below the image, feature a 5-star rating graphic in gold (#C9A227), followed by the numeric rating and review count in charcoal text (e.g., '4.8 (212 Reviews)').
+    
+    Product Information: Product title rendered in charcoal with a clean sans-serif typeface, followed immediately by the price in bold charcoal text.
+    
+    Color Swatches: Display a neat horizontal row of circular color swatch dots (pulled from the color_swatch metafield) directly under the price, with an adjacent subtle count indicator (e.g., '+8 options') in light charcoal text.
+    
+    Key Features: Include a subtle 3-icon feature bar showing key product trust highlights (e.g., Soft & Breathable, Anti-Static, Easy Care) using small light gray/charcoal line icons with brief labels beneath.
+    
+    Interactive Elements: On card hover, reveal a prominent 'Quick Add' button sliding up smoothly near the bottom of the card, designed with a sleek gold-outlined (#C9A227) border, gold text, and a mini shopping cart icon."
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-best-{{ ai_gen_id }} { display:block; width:100%; background:{{ block.settings.background_color }}; padding:{{ block.settings.vertical_padding }}px 0; }
+  .ai-best-{{ ai_gen_id }}__inner { width:{{ block.settings.desktop_width_percent }}%; max-width:1200px; margin:0 auto; }
+  .ai-best-{{ ai_gen_id }}__header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; }
+  .ai-best-{{ ai_gen_id }}__title { margin:0; color:{{ block.settings.text_color }}; font-size:clamp(24px,3vw,34px); font-weight:700; letter-spacing:-.02em; }
+  .ai-best-{{ ai_gen_id }}__view { color:{{ block.settings.gold_color }}; font-weight:600; text-decoration:none; white-space:nowrap; }
+  .ai-best-{{ ai_gen_id }}__tools { display:flex; align-items:center; gap:8px; }
+  .ai-best-{{ ai_gen_id }}__arrow { width:40px; height:40px; border:1px solid {{ block.settings.gold_color }}; border-radius:50%; background:rgba(201,162,39,.14); color:{{ block.settings.text_color }}; cursor:pointer; display:grid; place-items:center; transition:opacity .2s ease, background .2s ease; }
+  .ai-best-{{ ai_gen_id }}__arrow:hover { background:rgba(201,162,39,.3); }
+  .ai-best-{{ ai_gen_id }}__track { display:flex; gap:18px; overflow-x:auto; scroll-behavior:smooth; scrollbar-width:none; padding:4px 2px 14px; }
+  .ai-best-{{ ai_gen_id }}__track::-webkit-scrollbar { display:none; }
+  .ai-best-{{ ai_gen_id }}__card { flex:0 0 calc((100% - 54px)/4); min-width:230px; background:{{ block.settings.card_color }}; border-radius:16px; overflow:hidden; position:relative; box-shadow:0 4px 18px rgba(18,18,18,.06); transition:box-shadow .2s ease, transform .2s ease; }
+  .ai-best-{{ ai_gen_id }}__card:hover { box-shadow:0 10px 26px rgba(18,18,18,.13); transform:translateY(-2px); }
+  .ai-best-{{ ai_gen_id }}__media { aspect-ratio:4/5; background:#F4F4F4; position:relative; overflow:hidden; }
+  .ai-best-{{ ai_gen_id }}__media img { width:100%; height:100%; object-fit:cover; display:block; }
+  .ai-best-{{ ai_gen_id }}__placeholder { width:100%; height:100%; display:grid; place-items:center; }
+  .ai-best-{{ ai_gen_id }}__placeholder svg { width:70%; height:70%; color:#c9c9c9; }
+  .ai-best-{{ ai_gen_id }}__badge { position:absolute; top:12px; right:12px; background:{{ block.settings.gold_color }}; color:#121212; padding:6px 10px; border-radius:4px; font-size:11px; font-weight:700; }
+  .ai-best-{{ ai_gen_id }}__body { padding:16px; position:relative; }
+  .ai-best-{{ ai_gen_id }}__rating { color:{{ block.settings.gold_color }}; font-size:13px; letter-spacing:1px; }
+  .ai-best-{{ ai_gen_id }}__rating span { color:{{ block.settings.text_color }}; letter-spacing:0; margin-left:5px; }
+  .ai-best-{{ ai_gen_id }}__name { color:{{ block.settings.text_color }}; font-size:16px; line-height:1.35; margin:8px 0 5px; font-weight:600; }
+  .ai-best-{{ ai_gen_id }}__price { color:{{ block.settings.text_color }}; font-weight:700; }
+  .ai-best-{{ ai_gen_id }}__swatches { display:flex; align-items:center; gap:6px; margin-top:12px; min-height:18px; }
+  .ai-best-{{ ai_gen_id }}__swatch { width:14px; height:14px; border-radius:50%; border:1px solid rgba(18,18,18,.2); }
+  .ai-best-{{ ai_gen_id }}__count { color:#646464; font-size:11px; margin-left:2px; }
+  .ai-best-{{ ai_gen_id }}__features { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:16px; padding-top:13px; border-top:1px solid #e7e7e7; }
+  .ai-best-{{ ai_gen_id }}__feature { text-align:center; color:#555; font-size:10px; line-height:1.2; }
+  .ai-best-{{ ai_gen_id }}__feature svg { width:17px; height:17px; display:block; margin:0 auto 5px; }
+  .ai-best-{{ ai_gen_id }}__quick { position:absolute; left:16px; right:16px; bottom:16px; padding:11px; background:{{ block.settings.card_color }}; border:1px solid {{ block.settings.gold_color }}; color:#8b7015; border-radius:6px; font-weight:700; opacity:0; transform:translateY(8px); pointer-events:none; transition:opacity .2s ease, transform .2s ease; cursor:pointer; }
+  .ai-best-{{ ai_gen_id }}__card:hover .ai-best-{{ ai_gen_id }}__quick, .ai-best-{{ ai_gen_id }}__quick:focus { opacity:1; transform:translateY(0); pointer-events:auto; }
+  @media (max-width:749px) { .ai-best-{{ ai_gen_id }}__inner { width:100%; padding:0 16px; } .ai-best-{{ ai_gen_id }}__card { flex-basis:78%; min-width:0; } .ai-best-{{ ai_gen_id }}__tools { display:none; } }
+{% endstyle %}
+
+<bestsellers-{{ ai_gen_id }} class="ai-best-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-best-{{ ai_gen_id }}__inner">
+    <div class="ai-best-{{ ai_gen_id }}__header">
+      <h2 class="ai-best-{{ ai_gen_id }}__title">{{ block.settings.heading }}</h2>
+      <div class="ai-best-{{ ai_gen_id }}__tools"><button class="ai-best-{{ ai_gen_id }}__arrow" data-direction="prev" aria-label="Previous products">&#8592;</button><button class="ai-best-{{ ai_gen_id }}__arrow" data-direction="next" aria-label="Next products">&#8594;</button></div>
+      {% if block.settings.view_all_link != blank %}<a class="ai-best-{{ ai_gen_id }}__view" href="{{ block.settings.view_all_link }}">View all</a>{% endif %}
+    </div>
+    <div class="ai-best-{{ ai_gen_id }}__track">
+      {% assign target_collection = block.settings.collection | default: collections.all %}
+      {% for product in target_collection.products limit: block.settings.product_limit %}
+        <article class="ai-best-{{ ai_gen_id }}__card">
+          <a href="{{ product.url }}" aria-label="View {{ product.title | escape }}">
+            <div class="ai-best-{{ ai_gen_id }}__media">{% if product.featured_image %}<img src="{{ product.featured_image | image_url: width:700 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" loading="lazy" width="700" height="875">{% else %}<div class="ai-best-{{ ai_gen_id }}__placeholder">{{ 'product-apparel-1' | placeholder_svg_tag }}</div>{% endif %}<span class="ai-best-{{ ai_gen_id }}__badge">Bestseller</span></div>
+          </a>
+          <div class="ai-best-{{ ai_gen_id }}__body">
+            <div class="ai-best-{{ ai_gen_id }}__rating">★★★★★<span>{{ product.metafields.reviews.rating.value | default: '—' }}{% if product.metafields.reviews.rating_count %} ({{ product.metafields.reviews.rating_count }} reviews){% endif %}</span></div>
+            <div class="ai-best-{{ ai_gen_id }}__name">{{ product.title }}</div><div class="ai-best-{{ ai_gen_id }}__price">{{ product.price | money }}</div>
+            {% assign swatches = product.metafields.custom.color_swatch.value %}<div class="ai-best-{{ ai_gen_id }}__swatches">{% if swatches %}{% for swatch in swatches limit:6 %}<span class="ai-best-{{ ai_gen_id }}__swatch" style="background:{{ swatch }}" aria-label="Color option"></span>{% endfor %}{% endif %}{% if swatches.size > 6 %}<span class="ai-best-{{ ai_gen_id }}__count">+{{ swatches.size | minus:6 }} options</span>{% endif %}</div>
+            <div class="ai-best-{{ ai_gen_id }}__features"><div class="ai-best-{{ ai_gen_id }}__feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M6 8h12M8 16h8"/></svg>{{ block.settings.feature_one }}</div><div class="ai-best-{{ ai_gen_id }}__feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>{{ block.settings.feature_two }}</div><div class="ai-best-{{ ai_gen_id }}__feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 5h14v14H5zM8 9h8M8 13h5"/></svg>{{ block.settings.feature_three }}</div></div>
+            {% form 'product', product %}<input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"><button class="ai-best-{{ ai_gen_id }}__quick" type="submit">&#128722;&nbsp; Quick add</button>{% endform %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</bestsellers-{{ ai_gen_id }}>
+
+<script>
+(function(){class Bestsellers{{ ai_gen_id }} extends HTMLElement{connectedCallback(){this.track=this.querySelector('.ai-best-{{ ai_gen_id }}__track');this.querySelectorAll('[data-direction]').forEach(b=>b.addEventListener('click',()=>this.track.scrollBy({left:(b.dataset.direction==='next'?1:-1)*this.track.clientWidth*.82,behavior:'smooth'})));}}customElements.define('bestsellers-{{ ai_gen_id }}',Bestsellers{{ ai_gen_id }});})();
+</script>
+
+{% schema %}
+{"name":"Bestsellers carousel","tag":null,"class":"bestsellers-block","settings":[{"type":"collection","id":"collection","label":"Collection"},{"type":"url","id":"view_all_link","label":"View all link"},{"type":"text","id":"heading","label":"Heading","default":"Bestsellers"},{"type":"range","id":"product_limit","label":"Products","min":4,"max":20,"step":1,"default":8},{"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},{"type":"text","id":"feature_one","label":"Feature one","default":"Soft & breathable"},{"type":"text","id":"feature_two","label":"Feature two","default":"Anti-static"},{"type":"text","id":"feature_three","label":"Feature three","default":"Easy care"},{"type":"color","id":"background_color","label":"Background","default":"#FAF9F6"},{"type":"color","id":"card_color","label":"Card","default":"#FFFFFF"},{"type":"color","id":"text_color","label":"Text","default":"#242424"},{"type":"color","id":"gold_color","label":"Gold","default":"#C9A227"},{"type":"range","id":"vertical_padding","label":"Vertical padding","min":16,"max":80,"step":8,"unit":"px","default":40}],"presets":[{"name":"Bestsellers carousel"}]}
+{% endschema %}

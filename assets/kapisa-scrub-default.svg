@@ -1,0 +1,44 @@
+<svg viewBox="0 0 600 640" width="600" height="640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="scrubNavyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#182E56"/>
+      <stop offset="50%" stop-color="#122343"/>
+      <stop offset="100%" stop-color="#0A152A"/>
+    </linearGradient>
+    <linearGradient id="foldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#24447D" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#0C1930" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="pocketShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Garment Body -->
+  <path d="M0 640V140L140 0h320l140 140v500H0z" fill="url(#scrubNavyGrad)"/>
+
+  <!-- Neckline opening (inner neck) -->
+  <path d="M220 0c0 40 35 75 80 75s80-35 80-75z" fill="#0A111F"/>
+  <rect x="250" y="25" width="100" height="40" rx="3" fill="#FFFFFF"/>
+  <text x="300" y="50" font-family="'Montserrat', sans-serif" font-size="14" font-weight="900" fill="#122343" text-anchor="middle" letter-spacing="2">KAPISA</text>
+  <text x="300" y="60" font-family="'Montserrat', sans-serif" font-size="7" font-weight="600" fill="#64748B" text-anchor="middle" letter-spacing="1">SIZE M</text>
+
+  <!-- V-Neck Collar Bands -->
+  <path d="M190 0l110 200 110-200h-35L300 140 225 0h-35z" fill="url(#foldGrad)" stroke="#1F3A6D" stroke-width="1.5"/>
+  <path d="M220 0l80 140-15 28-95-168h30z" fill="#1D3663"/>
+
+  <!-- Left Chest Pocket (Viewer's right side) -->
+  <g filter="url(#pocketShadow)">
+    <path d="M410 320h110v120l-20 25h-70l-20-25V320z" fill="#15274B" stroke="#223E73" stroke-width="2"/>
+    <path d="M410 320h110v18H410z" fill="#192F59"/>
+    <!-- Pocket tag -->
+    <rect x="424" y="322" width="28" height="12" rx="1.5" fill="#FFFFFF"/>
+    <text x="438" y="331" font-family="sans-serif" font-size="6" font-weight="bold" fill="#122343" text-anchor="middle">kapisa</text>
+  </g>
+
+  <!-- Fabric Texture Overlays & Stitching lines -->
+  <path d="M410 316h110" stroke="#0D1A32" stroke-width="1" stroke-dasharray="3,2"/>
+  <path d="M140 0L0 140" stroke="#0D1A32" stroke-width="2"/>
+  <path d="M460 0L600 140" stroke="#0D1A32" stroke-width="2"/>
+</svg>
+

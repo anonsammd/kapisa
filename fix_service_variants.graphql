@@ -1,0 +1,22 @@
+mutation {
+  productVariantsBulkUpdate(
+    productId: "gid://shopify/Product/15439815442534"
+    variants: [
+      { id: "gid://shopify/ProductVariant/67809514258534", inventoryPolicy: CONTINUE }
+      { id: "gid://shopify/ProductVariant/67809514291302", inventoryPolicy: CONTINUE }
+      { id: "gid://shopify/ProductVariant/67809514324070", inventoryPolicy: CONTINUE }
+    ]
+  ) {
+    productVariants {
+      id
+      title
+      availableForSale
+      inventoryPolicy
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}
+

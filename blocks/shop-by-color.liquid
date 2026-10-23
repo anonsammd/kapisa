@@ -1,0 +1,125 @@
+{% doc %}
+  @prompt
+    Design a modern, high-converting, and tactile 'Shop by Color' interactive discovery section for an e-commerce platform.
+    
+    1. Layout & Typography:
+    Background: Clean off-white background with subtle vertical breathing room (padding top/bottom).
+    
+    Section Heading: Centered, bold charcoal title 'Shop by Color' with modern sans-serif typography. Include a short, sleek secondary subtitle below in subtle charcoal text: 'Find your perfect shade in our classic collection'.
+    
+    2. Swatch Container & Responsive Behavior:
+    Desktop Layout: A beautifully centered, evenly spaced horizontal flex row of interactive color swatches.
+    
+    Mobile Layout: A smooth, touch-optimized horizontal carousel/scrollable container with hidden scrollbars, featuring subtle peek indicators at the edges to signal swipeability.
+    
+    3. Swatch Item Design:
+    Circle Specs: Large, high-precision circular color swatches (75px diameter) displaying rich color fills pulled directly from the custom.color_swatch metafield.
+    
+    Borders & Framing: Each swatch is encircled by a crisp, ultrathin 1px border in subtle slate (#8FA3B8), offering clean contrast against the off-white background.
+    
+    Labeling: Directly below each circular swatch, render the color name (pulled from custom.color_name) in neat, small charcoal typography (font-weight: 500, letter-spacing: subtle).
+    
+    4. Motion & Micro-Interactions (Canvas Animations):
+    Hover State: Upon hover, the swatch smoothly scales up by 108% (scale(1.08)) with a buttery-smooth cubic-bezier transition (approx. 250ms).
+    
+    Focus Ring / Outline: During hover or active state, the subtle slate border dynamically transforms into a glowing, crisp gold ring (#C9A227). A soft, elevated drop shadow gently appears underneath the hovered circle to create floating depth.
+    
+    Click/Selection State: Clicking any swatch visually activates a smooth click-down feedback animation and instantly filters/navigates to the collection URL parameterized by the corresponding color_family value."
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-shop-color-{{ ai_gen_id }} { display:block; width:{{ block.settings.desktop_width_percent }}%; max-width:100%; margin:0 auto; padding:{{ block.settings.vertical_padding }}px 20px; background:{{ block.settings.background_color }}; color:{{ block.settings.text_color }}; font-family:{{ block.settings.body_font.family }}; }
+  .ai-shop-color-{{ ai_gen_id }}__heading { margin:0; color:{{ block.settings.text_color }}; font-family:{{ block.settings.heading_font.family }}; font-size:{{ block.settings.heading_size }}px; font-weight:700; line-height:1.2; text-align:center; }
+  .ai-shop-color-{{ ai_gen_id }}__subtitle { max-width:520px; margin:10px auto 28px; color:{{ block.settings.subtitle_color }}; font-size:{{ block.settings.subtitle_size }}px; line-height:1.5; text-align:center; }
+  .ai-shop-color-{{ ai_gen_id }}__track-wrap { position:relative; max-width:940px; margin:0 auto; }
+  .ai-shop-color-{{ ai_gen_id }}__track { display:flex; align-items:flex-start; justify-content:center; gap:34px; padding:8px 6px 12px; }
+  .ai-shop-color-{{ ai_gen_id }}__item { flex:0 0 auto; width:105px; color:inherit; text-align:center; text-decoration:none; }
+  .ai-shop-color-{{ ai_gen_id }}__swatch { display:block; width:75px; height:75px; margin:0 auto 12px; border:1px solid #8FA3B8; border-radius:50%; box-shadow:0 0 0 0 transparent; transition:transform 250ms cubic-bezier(.22,1,.36,1), border-color 250ms ease, box-shadow 250ms ease; }
+  .ai-shop-color-{{ ai_gen_id }}__item:hover .ai-shop-color-{{ ai_gen_id }}__swatch, .ai-shop-color-{{ ai_gen_id }}__item:focus-visible .ai-shop-color-{{ ai_gen_id }}__swatch, .ai-shop-color-{{ ai_gen_id }}__item.is-active .ai-shop-color-{{ ai_gen_id }}__swatch { transform:scale(1.08); border-color:#C9A227; box-shadow:0 8px 18px rgba(38,43,51,.18), 0 0 0 3px rgba(201,162,39,.22); }
+  .ai-shop-color-{{ ai_gen_id }}__item:active .ai-shop-color-{{ ai_gen_id }}__swatch { transform:scale(1.02); }
+  .ai-shop-color-{{ ai_gen_id }}__label { display:block; color:{{ block.settings.text_color }}; font-size:{{ block.settings.label_size }}px; font-weight:500; letter-spacing:.03em; line-height:1.3; }
+  .ai-shop-color-{{ ai_gen_id }}__empty { color:#596574; text-align:center; }
+  @media screen and (max-width:749px) {
+    .ai-shop-color-{{ ai_gen_id }} { padding-right:0; padding-left:0; }
+    .ai-shop-color-{{ ai_gen_id }}__heading, .ai-shop-color-{{ ai_gen_id }}__subtitle { padding-right:20px; padding-left:20px; }
+    .ai-shop-color-{{ ai_gen_id }}__track-wrap:before, .ai-shop-color-{{ ai_gen_id }}__track-wrap:after { position:absolute; top:0; bottom:0; z-index:1; width:22px; content:''; pointer-events:none; }
+    .ai-shop-color-{{ ai_gen_id }}__track-wrap:before { left:0; background:linear-gradient(90deg,{{ block.settings.background_color }},transparent); }
+    .ai-shop-color-{{ ai_gen_id }}__track-wrap:after { right:0; background:linear-gradient(270deg,{{ block.settings.background_color }},transparent); }
+    .ai-shop-color-{{ ai_gen_id }}__track { justify-content:flex-start; gap:22px; overflow-x:auto; scroll-snap-type:x proximity; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding-right:42px; padding-left:42px; }
+    .ai-shop-color-{{ ai_gen_id }}__track::-webkit-scrollbar { display:none; }
+    .ai-shop-color-{{ ai_gen_id }}__item { scroll-snap-align:center; }
+  }
+{% endstyle %}
+
+<shop-by-color-{{ ai_gen_id }} class="ai-shop-color-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <h2 class="ai-shop-color-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
+  <p class="ai-shop-color-{{ ai_gen_id }}__subtitle">{{ block.settings.subtitle | escape }}</p>
+  <div class="ai-shop-color-{{ ai_gen_id }}__track-wrap">
+    <div class="ai-shop-color-{{ ai_gen_id }}__track" role="list" aria-label="{{ block.settings.heading | escape }}">
+      {% assign color_products = block.settings.products | default: collections.all.products %}
+      {% if color_products != blank %}
+        {% for product in color_products limit: 12 %}
+          {% assign color_swatch = product.metafields.custom.color_swatch.value | default: '#D9D9D9' %}
+          {% assign color_name = product.metafields.custom.color_name.value | default: product.title %}
+          {% assign color_family = product.metafields.custom.color_family.value | default: color_name %}
+          {% assign color_url = product.url %}
+          {% if block.settings.collection != blank %}
+            {% assign color_url = block.settings.collection.url | append: '?filter.p.m.custom.color_family=' | append: color_family %}
+          {% endif %}
+          <a class="ai-shop-color-{{ ai_gen_id }}__item" href="{{ color_url }}" role="listitem" aria-label="Shop {{ color_name | escape }}">
+            <span class="ai-shop-color-{{ ai_gen_id }}__swatch" style="background-color:{{ color_swatch }};"></span>
+            <span class="ai-shop-color-{{ ai_gen_id }}__label">{{ color_name | escape }}</span>
+          </a>
+        {% endfor %}
+      {% else %}
+        <p class="ai-shop-color-{{ ai_gen_id }}__empty">Choose products to display your color collection.</p>
+      {% endif %}
+    </div>
+  </div>
+</shop-by-color-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class ShopByColor{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        this.querySelectorAll('.ai-shop-color-{{ ai_gen_id }}__item').forEach((item) => {
+          item.addEventListener('click', () => {
+            this.querySelectorAll('.ai-shop-color-{{ ai_gen_id }}__item').forEach((other) => other.classList.remove('is-active'));
+            item.classList.add('is-active');
+          });
+        });
+      }
+    }
+    if (!customElements.get('shop-by-color-{{ ai_gen_id }}')) customElements.define('shop-by-color-{{ ai_gen_id }}', ShopByColor{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name":"Shop by color",
+  "settings":[
+    {"type":"header","content":"Content"},
+    {"type":"text","id":"heading","label":"Heading","default":"Shop by Color"},
+    {"type":"text","id":"subtitle","label":"Subtitle","default":"Find your perfect shade in our classic collection"},
+    {"type":"product_list","id":"products","label":"Color products","limit":12},
+    {"type":"collection","id":"collection","label":"Color collection"},
+    {"type":"header","content":"Layout"},
+    {"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},
+    {"type":"range","id":"vertical_padding","label":"Vertical spacing","min":20,"max":100,"step":5,"unit":"px","default":55},
+    {"type":"header","content":"Typography"},
+    {"type":"font_picker","id":"heading_font","label":"Heading font","default":"assistant_n4"},
+    {"type":"font_picker","id":"body_font","label":"Body font","default":"assistant_n4"},
+    {"type":"range","id":"heading_size","label":"Heading size","min":20,"max":48,"step":2,"unit":"px","default":32},
+    {"type":"range","id":"subtitle_size","label":"Subtitle size","min":12,"max":22,"step":1,"unit":"px","default":15},
+    {"type":"range","id":"label_size","label":"Label size","min":11,"max":18,"step":1,"unit":"px","default":14},
+    {"type":"header","content":"Colors"},
+    {"type":"color","id":"background_color","label":"Background","default":"#F8F7F3"},
+    {"type":"color","id":"text_color","label":"Text","default":"#292D33"},
+    {"type":"color","id":"subtitle_color","label":"Subtitle","default":"#596574"}
+  ],
+  "presets":[{"name":"Shop by color"}],
+  "tag":null,
+  "class":"shop-by-color-block"
+}
+{% endschema %}

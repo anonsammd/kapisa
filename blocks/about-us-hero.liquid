@@ -1,0 +1,78 @@
+{% doc %}
+  @prompt
+    Create a premium, modern, responsive About Us hero section for Kapisa Healthcare.
+    
+    Design a luxury healthcare apparel brand aesthetic with an editorial fashion feel. Use a warm cream background #FAF7F0 for the entire section. Use deep navy #0E1F3C for the main heading. Use charcoal #2B2B2E for the description. Use gold #C9A227 only for a small decorative line and subtle accent details.
+    
+    Desktop layout:
+    Create a two-column layout inside a maximum width of 1200px. The left column contains a small gold eyebrow text “ABOUT KAPISA”, a large elegant serif heading “Designed for Those Who Care”, a short paragraph, and one navy CTA button labeled “Discover Our Story”. The right column contains a large premium healthcare apparel image with 18px rounded corners. Make the image approximately 560px tall.
+    
+    Mobile layout:
+    Use a single-column layout with 20px horizontal padding. Display the eyebrow, heading, paragraph, and button first, followed by the image. Make the heading 38px, paragraph 16px, and image approximately 340px tall. Make the button full width with a 52px height. The layout must feel like a polished native shopping app.
+    
+    Add subtle fade-up animation to the text and a gentle scale reveal to the image. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Add image picker, eyebrow text, heading, description, button label, and button link. Use the selected image dynamically.
+    
+    Return the complete Shopify Liquid section with responsive CSS, valid schema, and accessible HTML. Do not modify the header or footer.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% style %}
+  .kapisa-about-{{ ai_gen_id }} { display: block; width: 100%; background: #FAF7F0; color: #2B2B2E; }
+  .kapisa-about-{{ ai_gen_id }}__inner { width: {{ block.settings.desktop_width_percent }}%; max-width: 1200px; margin: 0 auto; padding: 96px 0; display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 76px; align-items: center; }
+  .kapisa-about-{{ ai_gen_id }}__content { opacity: 0; transform: translateY(22px); animation: kapisa-about-fade-{{ ai_gen_id }} 700ms ease-out 120ms forwards; }
+  .kapisa-about-{{ ai_gen_id }}__eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 24px; color: #C9A227; font-size: 12px; font-weight: 700; letter-spacing: .2em; line-height: 1.4; }
+  .kapisa-about-{{ ai_gen_id }}__eyebrow::before { content: ''; width: 34px; height: 1px; background: #C9A227; flex: 0 0 auto; }
+  .kapisa-about-{{ ai_gen_id }}__heading { margin: 0 0 24px; color: #0E1F3C; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(42px, 5vw, 68px); font-weight: 400; letter-spacing: -.045em; line-height: .98; }
+  .kapisa-about-{{ ai_gen_id }}__description { max-width: 460px; margin: 0 0 34px; color: #2B2B2E; font-size: 17px; line-height: 1.7; }
+  .kapisa-about-{{ ai_gen_id }}__button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding: 0 28px; border: 1px solid #0E1F3C; border-radius: 2px; background: #0E1F3C; color: #FFF; font-size: 14px; font-weight: 700; letter-spacing: .04em; text-decoration: none; transition: background-color 180ms ease, color 180ms ease; }
+  .kapisa-about-{{ ai_gen_id }}__button:hover, .kapisa-about-{{ ai_gen_id }}__button:focus-visible { background: #C9A227; border-color: #C9A227; color: #0E1F3C; }
+  .kapisa-about-{{ ai_gen_id }}__media { height: 560px; overflow: hidden; border-radius: 18px; background: #E9E3D8; opacity: 0; transform: scale(.97); animation: kapisa-about-image-{{ ai_gen_id }} 900ms ease-out 220ms forwards; }
+  .kapisa-about-{{ ai_gen_id }}__media img, .kapisa-about-{{ ai_gen_id }}__placeholder svg { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .kapisa-about-{{ ai_gen_id }}__placeholder { position: relative; width: 100%; height: 100%; }
+  .kapisa-about-{{ ai_gen_id }}__placeholder svg { color: #8B806E; }
+  .kapisa-about-{{ ai_gen_id }}__empty { position: absolute; right: 20px; bottom: 20px; left: 20px; margin: 0; color: #5E574D; font-size: 13px; text-align: center; }
+  @keyframes kapisa-about-fade-{{ ai_gen_id }} { to { opacity: 1; transform: translateY(0); } }
+  @keyframes kapisa-about-image-{{ ai_gen_id }} { to { opacity: 1; transform: scale(1); } }
+  @media screen and (max-width: 749px) {
+    .kapisa-about-{{ ai_gen_id }}__inner { width: 100%; padding: 64px 20px; display: flex; flex-direction: column; gap: 42px; align-items: stretch; }
+    .kapisa-about-{{ ai_gen_id }}__eyebrow { margin-bottom: 18px; }
+    .kapisa-about-{{ ai_gen_id }}__heading { font-size: 38px; line-height: 1.02; }
+    .kapisa-about-{{ ai_gen_id }}__description { margin-bottom: 28px; font-size: 16px; line-height: 1.65; }
+    .kapisa-about-{{ ai_gen_id }}__button { width: 100%; }
+    .kapisa-about-{{ ai_gen_id }}__media { height: 340px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .kapisa-about-{{ ai_gen_id }}__content, .kapisa-about-{{ ai_gen_id }}__media { opacity: 1; transform: none; animation: none; } .kapisa-about-{{ ai_gen_id }}__button { transition: none; } }
+{% endstyle %}
+<section class="kapisa-about-{{ ai_gen_id }}" {{ block.shopify_attributes }} aria-labelledby="kapisa-about-heading-{{ ai_gen_id }}">
+  <div class="kapisa-about-{{ ai_gen_id }}__inner">
+    <div class="kapisa-about-{{ ai_gen_id }}__content">
+      {% if block.settings.eyebrow != blank %}<p class="kapisa-about-{{ ai_gen_id }}__eyebrow">{{ block.settings.eyebrow | escape }}</p>{% endif %}
+      <h1 id="kapisa-about-heading-{{ ai_gen_id }}" class="kapisa-about-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h1>
+      {% if block.settings.description != blank %}<p class="kapisa-about-{{ ai_gen_id }}__description">{{ block.settings.description | escape }}</p>{% endif %}
+      {% if block.settings.button_label != blank and block.settings.button_link != blank %}<a class="kapisa-about-{{ ai_gen_id }}__button" href="{{ block.settings.button_link }}">{{ block.settings.button_label | escape }}</a>{% endif %}
+    </div>
+    <div class="kapisa-about-{{ ai_gen_id }}__media">
+      {% if block.settings.image != blank %}<img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}">{% else %}<div class="kapisa-about-{{ ai_gen_id }}__placeholder">{{ 'image' | placeholder_svg_tag }}<p class="kapisa-about-{{ ai_gen_id }}__empty">Add a premium healthcare apparel image</p></div>{% endif %}
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "About us hero",
+  "settings": [
+    { "type": "image_picker", "id": "image", "label": "Hero image" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "ABOUT KAPISA" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Designed for Those Who Care" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Thoughtfully designed healthcare apparel that brings comfort, confidence, and refined style to every moment of care." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Discover Our Story" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 }
+  ],
+  "presets": [{ "name": "About us hero" }],
+  "tag": null,
+  "class": "kapisa-about-block"
+}
+{% endschema %}

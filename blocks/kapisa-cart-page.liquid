@@ -1,0 +1,2143 @@
+{% comment %}
+  @prompt
+    Build a premium, production-ready Shopify cart page for Kapisa Healthcare.
+
+    The cart must use Shopify's native cart AJAX endpoints.
+
+    Kapisa palette:
+    Background #FAF7F0
+    Text #2B2B2E
+    Navy #0E1F3C
+    Gold #C9A227
+    Border #8FA3B8
+    Muted #F0EEE9
+
+    Requirements:
+    - Centered max-width container with comfortable horizontal spacing.
+    - Never allow the cart to touch the left or right edge of the viewport.
+    - Desktop two-column cart with sticky summary.
+    - Mobile single-column cart.
+    - Empty and populated states.
+    - Native Shopify cart AJAX quantity changes/removal.
+    - Real custom embroidery service line handling.
+    - Group embroidery service with its parent garment using Personalization ID.
+    - Do not display the embroidery service as an independent product row.
+    - Display embroidery details under the garment.
+    - Calculate actual embroidery add-on total from the service product line.
+    - Removing a personalized garment also removes its linked embroidery service.
+    - Removing embroidery removes only the service line and its embroidery metadata.
+    - Personalized garments cannot be increased above quantity 1.
+    - Upsells use Shopify AJAX add-to-cart.
+    - Coupon field redirects through Shopify discount URL.
+    - Accessible controls, keyboard focus, responsive touch targets.
+    - Premium editorial Kapisa styling.
+{% endcomment %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign upsell_collection = block.settings.upsell_collection %}
+
+{% style %}
+  .ai-cart-{{ ai_gen_id }} {
+    --cart-bg: #FAF7F0;
+    --cart-text: #2B2B2E;
+    --cart-navy: #0E1F3C;
+    --cart-gold: #C9A227;
+    --cart-border: #8FA3B8;
+    --cart-muted: #F0EEE9;
+
+    display: block;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 42px clamp(18px, 4vw, 64px) 90px;
+    background: var(--cart-bg);
+    color: var(--cart-text);
+    font-family: var(--font-body-family, sans-serif);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .ai-cart-{{ ai_gen_id }} *,
+  .ai-cart-{{ ai_gen_id }} *::before,
+  .ai-cart-{{ ai_gen_id }} *::after {
+    box-sizing: border-box;
+  }
+
+  .ai-cart-{{ ai_gen_id }} button,
+  .ai-cart-{{ ai_gen_id }} input {
+    font: inherit;
+  }
+
+  .ai-cart-{{ ai_gen_id }} a {
+    color: inherit;
+  }
+
+  /* ---------------------------------------------------------
+     HEADER
+  --------------------------------------------------------- */
+
+  .ai-cart__top-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(143, 163, 184, .6);
+  }
+
+  .ai-cart__eyebrow-{{ ai_gen_id }} {
+    margin: 0 0 8px;
+    color: var(--cart-gold);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+
+  .ai-cart__title-{{ ai_gen_id }} {
+    margin: 0;
+    color: var(--cart-text);
+    font-size: clamp(30px, 3.2vw, 44px);
+    font-weight: 700;
+    letter-spacing: -.05em;
+    line-height: 1.05;
+  }
+
+  .ai-cart__count-{{ ai_gen_id }} {
+    display: inline-block;
+    margin-left: 7px;
+    color: var(--cart-border);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0;
+    vertical-align: middle;
+  }
+
+  .ai-cart__continue-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--cart-gold);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: gap .2s ease;
+  }
+
+  .ai-cart__continue-{{ ai_gen_id }}:hover {
+    gap: 13px;
+  }
+
+  .ai-cart__continue-{{ ai_gen_id }} svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ---------------------------------------------------------
+     LAYOUT
+  --------------------------------------------------------- */
+
+  .ai-cart__layout-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: start;
+    padding-top: 34px;
+  }
+
+  .ai-cart__items-{{ ai_gen_id }} {
+    min-width: 0;
+  }
+
+  .ai-cart__items-head-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 21px;
+  }
+
+  .ai-cart__items-head-{{ ai_gen_id }} h2 {
+    margin: 0;
+    color: var(--cart-text);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+
+  .ai-cart__items-head-{{ ai_gen_id }} span {
+    color: var(--cart-border);
+    font-size: 11px;
+  }
+
+  /* ---------------------------------------------------------
+     CART ROW
+  --------------------------------------------------------- */
+
+  .ai-cart__row-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 118px minmax(0, 1fr);
+    gap: 21px;
+    position: relative;
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(143, 163, 184, .5);
+  }
+
+  .ai-cart__row:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-cart__image-wrap-{{ ai_gen_id }} {
+    width: 118px;
+    height: 148px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--cart-muted);
+  }
+
+  .ai-cart__image-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+
+  .ai-cart__image-wrap-{{ ai_gen_id }}:hover .ai-cart__image-{{ ai_gen_id }} {
+    transform: scale(1.035);
+  }
+
+  .ai-cart__placeholder-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: var(--cart-muted);
+    color: var(--cart-border);
+  }
+
+  .ai-cart__placeholder-{{ ai_gen_id }} svg {
+    width: 46px;
+    height: 46px;
+  }
+
+  .ai-cart__product-{{ ai_gen_id }} {
+    min-width: 0;
+    padding-right: 5px;
+  }
+
+  .ai-cart__product-top-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .ai-cart__name-{{ ai_gen_id }} {
+    margin: 0 0 7px;
+    color: var(--cart-text);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .ai-cart__variant-{{ ai_gen_id }} {
+    margin: 0;
+    color: var(--cart-border);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .ai-cart__price-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    color: var(--cart-navy);
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ---------------------------------------------------------
+     EMBROIDERY
+  --------------------------------------------------------- */
+
+  .ai-cart__embroidery-{{ ai_gen_id }} {
+    margin-top: 15px;
+    padding: 13px 15px;
+    border-left: 3px solid var(--cart-gold);
+    border-radius: 0 7px 7px 0;
+    background: rgba(240, 238, 233, .72);
+  }
+
+  .ai-cart__embroidery-head-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 9px;
+  }
+
+  .ai-cart__embroidery-title-{{ ai_gen_id }} {
+    color: var(--cart-gold);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+
+  .ai-cart__embroidery-price-{{ ai_gen_id }} {
+    color: var(--cart-navy);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .ai-cart__embroidery-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 18px;
+  }
+
+  .ai-cart__embroidery-detail-{{ ai_gen_id }} {
+    min-width: 0;
+    color: var(--cart-text);
+    font-size: 11px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .ai-cart__embroidery-detail-{{ ai_gen_id }} span {
+    color: var(--cart-border);
+  }
+
+  .ai-cart__embroidery-remove-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--cart-border);
+    font-size: 10px;
+    cursor: pointer;
+  }
+
+  .ai-cart__embroidery-remove-{{ ai_gen_id }}:hover {
+    color: #B42318;
+  }
+
+  /* ---------------------------------------------------------
+     PRODUCT BOTTOM
+  --------------------------------------------------------- */
+
+  .ai-cart__product-bottom-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 21px;
+  }
+
+  .ai-cart__qty-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    border: 1px solid var(--cart-border);
+    border-radius: 6px;
+    background: transparent;
+  }
+
+  .ai-cart__qty-{{ ai_gen_id }} button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--cart-text);
+    cursor: pointer;
+    font-size: 17px;
+  }
+
+  .ai-cart__qty-{{ ai_gen_id }} button:hover {
+    background: var(--cart-muted);
+  }
+
+  .ai-cart__qty-{{ ai_gen_id }} button:disabled {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+
+  .ai-cart__qty-{{ ai_gen_id }} span {
+    min-width: 28px;
+    color: var(--cart-text);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .ai-cart__line-total-{{ ai_gen_id }} {
+    margin-left: auto;
+    color: var(--cart-navy);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .ai-cart__remove-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 0;
+    border: 0;
+    background: transparent;
+    color: var(--cart-border);
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .ai-cart__remove-{{ ai_gen_id }}:hover {
+    color: #B42318;
+  }
+
+  .ai-cart__remove-{{ ai_gen_id }} svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ---------------------------------------------------------
+     SUMMARY
+  --------------------------------------------------------- */
+
+  .ai-cart__summary-{{ ai_gen_id }} {
+    position: sticky;
+    top: 24px;
+    padding: 27px;
+    border: 1px solid rgba(143, 163, 184, .65);
+    border-radius: 14px;
+    background: var(--cart-muted);
+  }
+
+  .ai-cart__summary-head-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(143, 163, 184, .65);
+  }
+
+  .ai-cart__summary-head-{{ ai_gen_id }} h2 {
+    margin: 0;
+    color: var(--cart-text);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -.035em;
+  }
+
+  .ai-cart__summary-head-{{ ai_gen_id }} span {
+    color: var(--cart-gold);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .ai-cart__summary-lines-{{ ai_gen_id }} {
+    padding: 21px 0;
+  }
+
+  .ai-cart__summary-line-{{ ai_gen_id }} {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 14px;
+    color: var(--cart-text);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .ai-cart__summary-line-{{ ai_gen_id }} strong {
+    flex-shrink: 0;
+    color: var(--cart-navy);
+    font-weight: 700;
+    text-align: right;
+  }
+
+  .ai-cart__shipping-{{ ai_gen_id }} {
+    margin-top: 5px;
+    color: var(--cart-border);
+    font-size: 11px;
+    line-height: 1.6;
+  }
+
+  .ai-cart__divider-{{ ai_gen_id }} {
+    height: 1px;
+    margin: 0;
+    border: 0;
+    background: var(--cart-border);
+  }
+
+  .ai-cart__total-{{ ai_gen_id }} {
+    align-items: center;
+    margin: 20px 0 0;
+  }
+
+  .ai-cart__total-{{ ai_gen_id }} span {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .ai-cart__total-{{ ai_gen_id }} strong {
+    font-size: 24px;
+    letter-spacing: -.04em;
+  }
+
+  /* ---------------------------------------------------------
+     COUPON
+  --------------------------------------------------------- */
+
+  .ai-cart__coupon-{{ ai_gen_id }} {
+    display: flex;
+    width: 100%;
+    margin: 23px 0 14px;
+  }
+
+  .ai-cart__coupon-{{ ai_gen_id }} input {
+    min-width: 0;
+    width: 100%;
+    height: 44px;
+    padding: 0 13px;
+    border: 1px solid var(--cart-border);
+    border-right: 0;
+    border-radius: 7px 0 0 7px;
+    outline: none;
+    background: var(--cart-bg);
+    color: var(--cart-text);
+    font-size: 12px;
+  }
+
+  .ai-cart__coupon-{{ ai_gen_id }} button {
+    flex-shrink: 0;
+    height: 44px;
+    padding: 0 17px;
+    border: 1px solid var(--cart-navy);
+    border-radius: 0 7px 7px 0;
+    background: transparent;
+    color: var(--cart-navy);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .ai-cart__coupon-{{ ai_gen_id }} button:hover {
+    background: var(--cart-navy);
+    color: var(--cart-bg);
+  }
+
+  /* ---------------------------------------------------------
+     CHECKOUT
+  --------------------------------------------------------- */
+
+  .ai-cart__button-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    width: 100%;
+    min-height: 52px;
+    padding: 15px 20px;
+    border: 0;
+    border-radius: 7px;
+    background: var(--cart-gold);
+    color: var(--cart-navy);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+
+  .ai-cart__button-{{ ai_gen_id }}:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 162, 39, .18);
+  }
+
+  .ai-cart__button-{{ ai_gen_id }} svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  /* ---------------------------------------------------------
+     TRUST
+  --------------------------------------------------------- */
+
+  .ai-cart__trust-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(143, 163, 184, .65);
+  }
+
+  .ai-cart__trust-item-{{ ai_gen_id }} {
+    color: var(--cart-text);
+    font-size: 10px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .ai-cart__trust-item-{{ ai_gen_id }} svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto 8px;
+    color: var(--cart-gold);
+  }
+
+  /* ---------------------------------------------------------
+     UPSELL
+  --------------------------------------------------------- */
+
+  .ai-cart__upsell-{{ ai_gen_id }} {
+    margin-top: 43px;
+  }
+
+  .ai-cart__upsell-head-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 18px;
+  }
+
+  .ai-cart__upsell-head h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.035em;
+  }
+
+  .ai-cart__upsell-head span {
+    color: var(--cart-border);
+    font-size: 11px;
+  }
+
+  .ai-cart__upsell-row-{{ ai_gen_id }} {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 2px 0 12px;
+    scrollbar-width: thin;
+  }
+
+  .ai-cart__card-{{ ai_gen_id }} {
+    flex: 0 0 160px;
+    min-width: 0;
+  }
+
+  .ai-cart__card-image-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1.15;
+    overflow: hidden;
+    border-radius: 9px;
+    background: var(--cart-muted);
+  }
+
+  .ai-cart__card-image-{{ ai_gen_id }} img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-cart__card-name-{{ ai_gen_id }} {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin: 11px 0 5px;
+    color: var(--cart-text);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .ai-cart__card-price-{{ ai_gen_id }} {
+    color: var(--cart-navy);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .ai-cart__add-{{ ai_gen_id }} {
+    width: 100%;
+    min-height: 35px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--cart-gold);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--cart-navy);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .ai-cart__add-{{ ai_gen_id }}:hover {
+    background: var(--cart-gold);
+  }
+
+  /* ---------------------------------------------------------
+     EMPTY
+  --------------------------------------------------------- */
+
+  .ai-cart__empty-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 470px;
+    padding: 70px 20px;
+    text-align: center;
+  }
+
+  .ai-cart__empty-icon-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 78px;
+    height: 78px;
+    margin-bottom: 24px;
+    border: 1px solid var(--cart-border);
+    border-radius: 50%;
+    color: var(--cart-border);
+  }
+
+  .ai-cart__empty-icon-{{ ai_gen_id }} svg {
+    width: 34px;
+    height: 34px;
+  }
+
+  .ai-cart__empty-{{ ai_gen_id }} h2 {
+    margin: 0 0 10px;
+    font-size: clamp(25px, 3vw, 34px);
+    font-weight: 700;
+    letter-spacing: -.045em;
+  }
+
+  .ai-cart__empty-{{ ai_gen_id }} p {
+    max-width: 320px;
+    margin: 0 0 28px;
+    color: var(--cart-border);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .ai-cart__empty-link-{{ ai_gen_id }} {
+    width: auto;
+    min-width: 190px;
+  }
+
+  /* ---------------------------------------------------------
+     STATUS / ACCESSIBILITY
+  --------------------------------------------------------- */
+
+  .ai-cart__status-{{ ai_gen_id }} {
+    min-height: 18px;
+    margin-top: 12px;
+    color: var(--cart-border);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .ai-cart-{{ ai_gen_id }} [hidden] {
+    display: none !important;
+  }
+
+  .ai-cart-{{ ai_gen_id }} a:focus-visible,
+  .ai-cart-{{ ai_gen_id }} button:focus-visible,
+  .ai-cart-{{ ai_gen_id }} input:focus-visible {
+    outline: 2px solid var(--cart-navy);
+    outline-offset: 3px;
+  }
+
+  /* ---------------------------------------------------------
+     TABLET
+  --------------------------------------------------------- */
+
+  @media screen and (max-width: 989px) {
+
+    .ai-cart-{{ ai_gen_id }} {
+      padding-left: 28px;
+      padding-right: 28px;
+    }
+
+    .ai-cart__layout-{{ ai_gen_id }} {
+      grid-template-columns: minmax(0, 1fr) minmax(275px, 330px);
+      gap: 30px;
+    }
+
+    .ai-cart__row-{{ ai_gen_id }} {
+      grid-template-columns: 94px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .ai-cart__image-wrap-{{ ai_gen_id }} {
+      width: 94px;
+      height: 120px;
+    }
+
+    .ai-cart__summary-{{ ai_gen_id }} {
+      padding: 22px;
+    }
+
+  }
+
+  /* ---------------------------------------------------------
+     MOBILE
+  --------------------------------------------------------- */
+
+  @media screen and (max-width: 749px) {
+
+    .ai-cart-{{ ai_gen_id }} {
+      width: 100%;
+      padding: 27px 18px 55px;
+    }
+
+    .ai-cart__top-{{ ai_gen_id }} {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ai-cart__title-{{ ai_gen_id }} {
+      font-size: 30px;
+    }
+
+    .ai-cart__layout-{{ ai_gen_id }} {
+      display: flex;
+      flex-direction: column;
+      gap: 34px;
+      padding-top: 25px;
+    }
+
+    .ai-cart__row-{{ ai_gen_id }} {
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 13px;
+      padding-bottom: 21px;
+      margin-bottom: 21px;
+    }
+
+    .ai-cart__image-wrap-{{ ai_gen_id }} {
+      width: 84px;
+      height: 108px;
+      border-radius: 8px;
+    }
+
+    .ai-cart__name-{{ ai_gen_id }} {
+      font-size: 13px;
+    }
+
+    .ai-cart__variant-{{ ai_gen_id }} {
+      font-size: 11px;
+    }
+
+    .ai-cart__price-{{ ai_gen_id }} {
+      font-size: 12px;
+    }
+
+    .ai-cart__embroidery-grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 3px;
+    }
+
+    .ai-cart__product-bottom-{{ ai_gen_id }} {
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .ai-cart__line-total-{{ ai_gen_id }} {
+      font-size: 13px;
+    }
+
+    .ai-cart__summary-{{ ai_gen_id }} {
+      position: static;
+      width: 100%;
+      padding: 22px 18px;
+      border-radius: 12px;
+    }
+
+    .ai-cart__upsell-{{ ai_gen_id }} {
+      margin-top: 30px;
+    }
+
+    .ai-cart__card-{{ ai_gen_id }} {
+      flex-basis: 142px;
+    }
+
+    .ai-cart__empty-{{ ai_gen_id }} {
+      min-height: 390px;
+      padding: 60px 10px;
+    }
+
+  }
+
+  @media screen and (max-width: 359px) {
+
+    .ai-cart-{{ ai_gen_id }} {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    .ai-cart__row-{{ ai_gen_id }} {
+      grid-template-columns: 68px minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .ai-cart__image-wrap-{{ ai_gen_id }} {
+      width: 68px;
+      height: 88px;
+    }
+
+    .ai-cart__product-bottom-{{ ai_gen_id }} {
+      align-items: flex-start;
+    }
+
+  }
+{% endstyle %}
+
+<cart-page-{{ ai_gen_id }}
+  class="ai-cart-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-cart__top-{{ ai_gen_id }}">
+    <div>
+      <p class="ai-cart__eyebrow-{{ ai_gen_id }}">Kapisa Healthcare</p>
+
+      <h1 class="ai-cart__title-{{ ai_gen_id }}">
+        {{ block.settings.heading }}
+        <span class="ai-cart__count-{{ ai_gen_id }}" data-count></span>
+      </h1>
+    </div>
+
+    <a
+      class="ai-cart__continue-{{ ai_gen_id }}"
+      href="{{ routes.all_products_collection_url }}"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+        <path d="M19 12H5M11 18l-6-6 6-6"/>
+      </svg>
+
+      {{ block.settings.continue_label }}
+    </a>
+  </div>
+
+  <div data-cart-area></div>
+
+  <div
+    class="ai-cart__status-{{ ai_gen_id }}"
+    data-cart-status
+    role="status"
+    aria-live="polite"
+  ></div>
+</cart-page-{{ ai_gen_id }}>
+
+<script>
+(function() {
+
+  class CartPage{{ ai_gen_id }} extends HTMLElement {
+
+    connectedCallback() {
+      this.area = this.querySelector('[data-cart-area]');
+      this.status = this.querySelector('[data-cart-status]');
+      this.count = this.querySelector('[data-count]');
+      this.render();
+    }
+
+    money(cents) {
+      if (window.Shopify && Shopify.formatMoney) {
+        return Shopify.formatMoney(
+          cents,
+          {{ shop.money_format | json }}
+        );
+      }
+
+      const format = {{ shop.money_format | json }};
+      const num = Number(cents || 0);
+      const val = (num / 100).toFixed(2);
+      if (/\{\{\s*amount_no_decimals\s*\}\}/.test(format)) {
+        return format.replace(/\{\{\s*amount_no_decimals\s*\}\}/, (num / 100).toFixed(0));
+      } else if (/\{\{\s*amount_with_comma_separator\s*\}\}/.test(format)) {
+        return format.replace(/\{\{\s*amount_with_comma_separator\s*\}\}/, val.replace('.', ','));
+      } else if (/\{\{\s*amount\s*\}\}/.test(format)) {
+        return format.replace(/\{\{\s*amount\s*\}\}/, val);
+      }
+      return format.replace(/\{\{[^}]+\}\}/, val);
+    }
+
+    escape(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async request(url, options = {}) {
+
+      const response = await fetch(url, {
+        ...options,
+        headers: {
+          'Accept': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Cart request failed');
+      }
+
+      return response.json();
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * EMBROIDERY HELPERS
+     * ---------------------------------------------------------
+     */
+
+    isEmbroideryService(item) {
+      const props = item.properties || {};
+      return (
+        Boolean(props['Embroidery For']) ||
+        item.handle === 'embroidery-options-service' ||
+        props['Embroidery Service'] === 'Yes' ||
+        props['Embroidery Service'] === 'yes' ||
+        props['Embroidery Service'] === true
+      );
+    }
+
+    getPersonalizationId(item) {
+      const props = item.properties || {};
+      return props['_personalization_id'] || props['Personalization ID'] || '';
+    }
+
+    getEmbroideryData(item) {
+
+      const props = item.properties || {};
+
+      return {
+        topText: props['Top Text'] || props['Embroidery Name'] || props['first_name'] || '',
+        bottomText: props['Bottom Text'] || props['Embroidery Designation'] || props['designation'] || props['bottom_name'] || '',
+        thread: props['Thread Colour'] || props['Embroidery Thread'] || props['Color'] || '',
+        font: props['Font'] || props['Embroidery Font'] || '',
+        placement: props['Embroidery'] || props['Embroidery Placement'] || '',
+        icon: props['Icon'] || props['Logo'] || '',
+        personalizationId: props['_personalization_id'] || props['Personalization ID'] || ''
+      };
+    }
+
+    /*
+     * Build groups:
+     *
+     * Main garment + Embroidery service are treated as one visual cart item.
+     * Standalone items and unlinked service items are also preserved.
+     */
+
+    buildCartGroups(cart) {
+
+      const services = {};
+      const normalItems = [];
+
+      cart.items.forEach(item => {
+
+        if (this.isEmbroideryService(item)) {
+
+          const pid = this.getPersonalizationId(item);
+
+          if (pid) {
+            services[pid] = item;
+          } else {
+            normalItems.push(item);
+          }
+
+          return;
+        }
+
+        normalItems.push(item);
+      });
+
+      const pairedPids = new Set();
+      const groups = normalItems.map(item => {
+
+        const pid = this.getPersonalizationId(item);
+        let service = null;
+        if (pid && services[pid]) {
+          service = services[pid];
+          pairedPids.add(pid);
+        }
+
+        return {
+          item: item,
+          service: service
+        };
+
+      });
+
+      // Any remaining service products not paired with a normal item MUST also be displayed!
+      Object.keys(services).forEach(pid => {
+        if (!pairedPids.has(pid)) {
+          groups.push({
+            item: services[pid],
+            service: null
+          });
+        }
+      });
+
+      return groups;
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * CHANGE CART
+     * ---------------------------------------------------------
+     */
+
+    async change(key, quantity) {
+
+      this.setBusy(true);
+
+      try {
+
+        const cartBefore = await this.request('{{ routes.cart_url }}.js');
+
+        const target = cartBefore.items.find(
+          item => item.key === key
+        );
+
+        /*
+         * If changing/removing a personalized garment,
+         * keep the linked embroidery service synchronized.
+         */
+
+        const updates = {};
+
+        if (target && !this.isEmbroideryService(target)) {
+
+          const pid = this.getPersonalizationId(target);
+
+          if (pid) {
+
+            const service = cartBefore.items.find(item =>
+              this.isEmbroideryService(item) &&
+              this.getPersonalizationId(item) === pid
+            );
+
+            updates[key] = quantity;
+
+            if (service) {
+              updates[service.key] = quantity;
+            }
+
+          } else {
+            updates[key] = quantity;
+          }
+
+        } else if (target && this.isEmbroideryService(target)) {
+
+          /*
+           * Removing the embroidery service removes the
+           * embroidery metadata from the garment as well.
+           *
+           * Shopify does not allow changing line item properties
+           * through /cart/change, so we rebuild the garment line
+           * without the personalization properties.
+           */
+
+          const pid = this.getPersonalizationId(target);
+
+          if (pid) {
+
+            const garment = cartBefore.items.find(item =>
+              !this.isEmbroideryService(item) &&
+              this.getPersonalizationId(item) === pid
+            );
+
+            updates[target.key] = 0;
+
+            if (garment) {
+              updates[garment.key] = 0;
+            }
+
+            await this.request('{{ routes.cart_update_url }}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                updates: updates
+              })
+            });
+
+            /*
+             * Re-add garment without embroidery properties.
+             *
+             * This is necessary because Shopify line-item
+             * properties cannot be edited directly.
+             */
+
+            if (garment && garment.quantity > 0) {
+
+              await this.request('{{ routes.cart_add_url }}', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  items: [{
+                    id: garment.variant_id,
+                    quantity: garment.quantity
+                  }]
+                })
+              });
+
+            }
+
+            await this.render();
+            return;
+          }
+
+        } else {
+
+          updates[key] = quantity;
+
+        }
+
+        await this.request('{{ routes.cart_update_url }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            updates: updates
+          })
+        });
+
+        await this.render();
+
+      } catch (error) {
+
+        console.error(error);
+
+        this.status.textContent =
+          'Unable to update your cart. Please try again.';
+
+      } finally {
+
+        this.setBusy(false);
+
+      }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * ADD UPSELL
+     * ---------------------------------------------------------
+     */
+
+    async add(id, button) {
+
+      if (!id) return;
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Adding…';
+      }
+
+      try {
+
+        await this.request('{{ routes.cart_add_url }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            items: [{
+              id: Number(id),
+              quantity: 1
+            }]
+          })
+        });
+
+        await this.render();
+
+        this.status.textContent = 'Added to cart.';
+
+      } catch (error) {
+
+        console.error(error);
+
+        this.status.textContent =
+          'Unable to add this product. Please try again.';
+
+      } finally {
+
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'Add to Cart';
+        }
+
+      }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * BUSY STATE
+     * ---------------------------------------------------------
+     */
+
+    setBusy(busy) {
+
+      this.querySelectorAll(
+        '[data-key], [data-remove], [data-add], [data-remove-embroidery]'
+      ).forEach(button => {
+
+        button.disabled = busy;
+
+      });
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * RENDER
+     * ---------------------------------------------------------
+     */
+
+    async render() {
+
+      try {
+
+        const cart = await this.request('{{ routes.cart_url }}.js');
+
+        this.count.textContent =
+          '(' +
+          cart.item_count +
+          ' ' +
+          (cart.item_count === 1 ? 'item' : 'items') +
+          ')';
+
+        if (!cart.item_count) {
+
+          this.area.innerHTML = this.emptyTemplate();
+
+          return;
+        }
+
+        this.area.innerHTML = this.template(cart);
+
+        this.bind();
+
+      } catch (error) {
+
+        console.error(error);
+
+        this.status.textContent =
+          'Unable to load your cart. Please refresh the page.';
+      }
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * EMPTY CART
+     * ---------------------------------------------------------
+     */
+
+    emptyTemplate() {
+
+      return `
+        <div class="ai-cart__empty-{{ ai_gen_id }}">
+
+          <div class="ai-cart__empty-icon-{{ ai_gen_id }}">
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <path d="M6 8h12l1 13H5L6 8Z"/>
+              <path d="M9 8a3 3 0 0 1 6 0"/>
+            </svg>
+
+          </div>
+
+          <h2>
+            {{ block.settings.empty_heading | escape }}
+          </h2>
+
+          <p>
+            {{ block.settings.empty_text | escape }}
+          </p>
+
+          <a
+            class="ai-cart__button-{{ ai_gen_id }} ai-cart__empty-link-{{ ai_gen_id }}"
+            href="{{ routes.all_products_collection_url }}"
+          >
+            {{ block.settings.start_label | escape }}
+
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+
+          </a>
+
+        </div>
+      `;
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * CART TEMPLATE
+     * ---------------------------------------------------------
+     */
+
+    template(cart) {
+
+      const groups = this.buildCartGroups(cart);
+
+      let embroideryTotal = 0;
+
+      groups.forEach(group => {
+
+        if (group.service) {
+          embroideryTotal += group.service.final_line_price;
+        }
+
+      });
+
+      const rows = groups.map(group => {
+
+        const item = group.item;
+        const service = group.service;
+
+        const embroidery = service
+          ? this.renderEmbroidery(service)
+          : '';
+
+        const image = item.image
+          ? `
+            <div class="ai-cart__image-wrap-{{ ai_gen_id }}">
+              <img
+                class="ai-cart__image-{{ ai_gen_id }}"
+                src="${this.escape(item.image)}"
+                alt="${this.escape(item.product_title)}"
+                loading="lazy"
+                width="118"
+                height="148"
+              >
+            </div>
+          `
+          : `
+            <div class="ai-cart__image-wrap-{{ ai_gen_id }}">
+              <div class="ai-cart__placeholder-{{ ai_gen_id }}">
+                {{ 'product-apparel-1' | placeholder_svg_tag }}
+              </div>
+            </div>
+          `;
+
+        const variant =
+          item.variant_title &&
+          item.variant_title !== 'Default Title'
+            ? this.escape(item.variant_title)
+            : '';
+
+        const personalized = !!service;
+
+        const quantityIncreaseDisabled = false;
+
+        return `
+          <article
+            class="ai-cart__row-{{ ai_gen_id }}"
+            data-cart-item="${this.escape(item.key)}"
+          >
+
+            ${image}
+
+            <div class="ai-cart__product-{{ ai_gen_id }}">
+
+              <div class="ai-cart__product-top-{{ ai_gen_id }}">
+
+                <div>
+
+                  <p class="ai-cart__name-{{ ai_gen_id }}">
+                    ${this.escape(item.product_title)}
+                  </p>
+
+                  ${
+                    variant
+                      ? `<p class="ai-cart__variant-{{ ai_gen_id }}">
+                           ${variant}
+                         </p>`
+                      : ''
+                  }
+
+                </div>
+
+                <span class="ai-cart__price-{{ ai_gen_id }}">
+                  ${this.money(item.final_price)}
+                </span>
+
+              </div>
+
+              ${embroidery}
+
+              <div class="ai-cart__product-bottom-{{ ai_gen_id }}">
+
+                <div class="ai-cart__qty-{{ ai_gen_id }}">
+
+                  <button
+                    type="button"
+                    data-key="${this.escape(item.key)}"
+                    data-qty="${Math.max(0, item.quantity - 1)}"
+                    aria-label="Decrease quantity of ${this.escape(item.product_title)}"
+                  >
+                    −
+                  </button>
+
+                  <span aria-label="Quantity">
+                    ${item.quantity}
+                  </span>
+
+                  <button
+                    type="button"
+                    data-key="${this.escape(item.key)}"
+                    data-qty="${item.quantity + 1}"
+                    ${quantityIncreaseDisabled ? 'disabled' : ''}
+                    aria-label="${
+                      quantityIncreaseDisabled
+                        ? 'Personalized items must be added separately'
+                        : 'Increase quantity of ' + this.escape(item.product_title)
+                    }"
+                  >
+                    +
+                  </button>
+
+                </div>
+
+                <span class="ai-cart__line-total-{{ ai_gen_id }}">
+                  ${this.money(item.final_line_price)}
+                </span>
+
+                <button
+                  type="button"
+                  class="ai-cart__remove-{{ ai_gen_id }}"
+                  data-remove="${this.escape(item.key)}"
+                  aria-label="Remove ${this.escape(item.product_title)}"
+                >
+
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    aria-hidden="true"
+                  >
+                    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>
+                  </svg>
+
+                  Remove
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </article>
+        `;
+
+      }).join('');
+
+      /*
+       * -------------------------------------------------------
+       * UPSELL
+       * -------------------------------------------------------
+       */
+
+      let upsell = '';
+
+      {% if upsell_collection != blank %}
+
+        upsell = `
+          <div class="ai-cart__upsell-{{ ai_gen_id }}">
+
+            <div class="ai-cart__upsell-head-{{ ai_gen_id }}">
+
+              <h2>
+                {{ block.settings.upsell_heading | escape }}
+              </h2>
+
+              <span>
+                Complete your look
+              </span>
+
+            </div>
+
+            <div class="ai-cart__upsell-row-{{ ai_gen_id }}">
+
+              {% for product in upsell_collection.products limit: 6 %}
+
+                {% assign upsell_variant = product.selected_or_first_available_variant %}
+
+                <div class="ai-cart__card-{{ ai_gen_id }}">
+
+                  <a
+                    class="ai-cart__card-image-{{ ai_gen_id }}"
+                    href="{{ product.url }}"
+                  >
+
+                    {% if product.featured_image %}
+
+                      <img
+                        src="{{ product.featured_image | image_url: width: 320 }}"
+                        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                        loading="lazy"
+                        width="160"
+                        height="184"
+                      >
+
+                    {% else %}
+
+                      {{ 'product-apparel-1' | placeholder_svg_tag }}
+
+                    {% endif %}
+
+                  </a>
+
+                  <div class="ai-cart__card-name-{{ ai_gen_id }}">
+                    {{ product.title | escape }}
+                  </div>
+
+                  <div class="ai-cart__card-price-{{ ai_gen_id }}">
+                    {{ product.price | money }}
+                  </div>
+
+                  {% if upsell_variant.available %}
+
+                    <button
+                      type="button"
+                      class="ai-cart__add-{{ ai_gen_id }}"
+                      data-add="{{ upsell_variant.id }}"
+                    >
+                      Add to Cart
+                    </button>
+
+                  {% endif %}
+
+                </div>
+
+              {% endfor %}
+
+            </div>
+
+          </div>
+        `;
+
+      {% endif %}
+
+      return `
+        <div class="ai-cart__layout-{{ ai_gen_id }}">
+
+          <div class="ai-cart__items-{{ ai_gen_id }}">
+
+            <div class="ai-cart__items-head-{{ ai_gen_id }}">
+
+              <h2>
+                Your Items
+              </h2>
+
+              <span>
+                Ready for checkout
+              </span>
+
+            </div>
+
+            ${rows}
+
+            ${upsell}
+
+          </div>
+
+          <aside class="ai-cart__summary-{{ ai_gen_id }}">
+
+            <div class="ai-cart__summary-head-{{ ai_gen_id }}">
+
+              <h2>
+                {{ block.settings.summary_heading | escape }}
+              </h2>
+
+              <span>
+                Kapisa
+              </span>
+
+            </div>
+
+            <div class="ai-cart__summary-lines-{{ ai_gen_id }}">
+
+              <div class="ai-cart__summary-line-{{ ai_gen_id }}">
+
+                <span>
+                  Subtotal
+                </span>
+
+                <strong>
+                  ${this.money(cart.items_subtotal_price)}
+                </strong>
+
+              </div>
+
+              ${
+                embroideryTotal > 0
+                  ? `
+                    <div class="ai-cart__summary-line-{{ ai_gen_id }}">
+
+                      <span>
+                        Custom Embroidery
+                      </span>
+
+                      <strong>
+                        ${this.money(embroideryTotal)}
+                      </strong>
+
+                    </div>
+                  `
+                  : ''
+              }
+
+              <div class="ai-cart__shipping-{{ ai_gen_id }}">
+                Shipping and applicable taxes are calculated at checkout.
+              </div>
+
+            </div>
+
+            <hr class="ai-cart__divider-{{ ai_gen_id }}">
+
+            <div class="ai-cart__summary-line-{{ ai_gen_id }} ai-cart__total-{{ ai_gen_id }}">
+
+              <span>
+                Total
+              </span>
+
+              <strong>
+                ${this.money(cart.total_price)}
+              </strong>
+
+            </div>
+
+            <div class="ai-cart__coupon-{{ ai_gen_id }}">
+
+              <input
+                type="text"
+                placeholder="Coupon code"
+                aria-label="Coupon code"
+                data-coupon
+              >
+
+              <button
+                type="button"
+                data-apply-coupon
+              >
+                Apply
+              </button>
+
+            </div>
+
+            <a
+              class="ai-cart__button-{{ ai_gen_id }}"
+              href="/checkout"
+              data-checkout-btn
+            >
+
+              {{ block.settings.checkout_label | escape }}
+
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6"/>
+              </svg>
+
+            </a>
+
+            <div class="ai-cart__trust-{{ ai_gen_id }}">
+
+              <div class="ai-cart__trust-item-{{ ai_gen_id }}">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <rect x="5" y="10" width="14" height="11" rx="2"/>
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                </svg>
+
+                Secure Checkout
+
+              </div>
+
+              <div class="ai-cart__trust-item-{{ ai_gen_id }}">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M3 7h13v11H3zM16 11h3l3 3v4h-6z"/>
+                  <path d="M7 18a2 2 0 1 0 0 .01M18 18a2 2 0 1 0 0 .01"/>
+                </svg>
+
+                Cash on Delivery
+
+              </div>
+
+              <div class="ai-cart__trust-item-{{ ai_gen_id }}">
+
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M4 12a8 8 0 1 0 2-5M4 4v6h6"/>
+                  <path d="M12 8v4l3 2"/>
+                </svg>
+
+                Easy Returns
+
+              </div>
+
+            </div>
+
+          </aside>
+
+        </div>
+      `;
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * EMBROIDERY DISPLAY
+     * ---------------------------------------------------------
+     */
+
+    renderEmbroidery(service) {
+
+      const data = this.getEmbroideryData(service);
+
+      return `
+        <div class="ai-cart__embroidery-{{ ai_gen_id }}">
+
+          <div class="ai-cart__embroidery-head-{{ ai_gen_id }}">
+
+            <span class="ai-cart__embroidery-title-{{ ai_gen_id }}">
+              Custom Embroidery
+            </span>
+
+            <span class="ai-cart__embroidery-price-{{ ai_gen_id }}">
+              ${this.money(service.final_line_price)}
+            </span>
+
+          </div>
+
+          <div class="ai-cart__embroidery-grid-{{ ai_gen_id }}">
+
+            ${
+              data.topText
+                ? `
+                  <div class="ai-cart__embroidery-detail-{{ ai_gen_id }}">
+                    <span>Top:</span>
+                    ${this.escape(data.topText)}
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              data.bottomText
+                ? `
+                  <div class="ai-cart__embroidery-detail-{{ ai_gen_id }}">
+                    <span>Bottom:</span>
+                    ${this.escape(data.bottomText)}
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              data.thread
+                ? `
+                  <div class="ai-cart__embroidery-detail-{{ ai_gen_id }}">
+                    <span>Thread:</span>
+                    ${this.escape(data.thread)}
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              data.font
+                ? `
+                  <div class="ai-cart__embroidery-detail-{{ ai_gen_id }}">
+                    <span>Font:</span>
+                    ${this.escape(data.font)}
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              data.placement
+                ? `
+                  <div class="ai-cart__embroidery-detail-{{ ai_gen_id }}">
+                    <span>Type:</span>
+                    ${this.escape(data.placement)}
+                  </div>
+                `
+                : ''
+            }
+
+            ${
+              data.icon
+                ? `
+                  <div class="ai-cart__embroidery-detail-{{ ai_gen_id }}">
+                    <span>Icon:</span>
+                    ${this.escape(data.icon)}
+                  </div>
+                `
+                : ''
+            }
+
+          </div>
+
+          <button
+            type="button"
+            class="ai-cart__embroidery-remove-{{ ai_gen_id }}"
+            data-remove-embroidery="${this.escape(service.key)}"
+          >
+            Remove embroidery
+          </button>
+
+        </div>
+      `;
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * EVENT BINDING
+     * ---------------------------------------------------------
+     */
+
+    bind() {
+
+      this.querySelectorAll('[data-key]').forEach(button => {
+
+        button.addEventListener('click', () => {
+
+          this.change(
+            button.dataset.key,
+            Number(button.dataset.qty)
+          );
+
+        });
+
+      });
+
+      this.querySelectorAll('[data-remove]').forEach(button => {
+
+        button.addEventListener('click', () => {
+
+          this.change(
+            button.dataset.remove,
+            0
+          );
+
+        });
+
+      });
+
+      /*
+       * Explicit embroidery removal.
+       */
+
+      this.querySelectorAll('[data-remove-embroidery]').forEach(button => {
+
+        button.addEventListener('click', () => {
+
+          this.change(
+            button.dataset.removeEmbroidery,
+            0
+          );
+
+        });
+
+      });
+
+      /*
+       * Upsells.
+       */
+
+      this.querySelectorAll('[data-add]').forEach(button => {
+
+        button.addEventListener('click', () => {
+
+          this.add(
+            Number(button.dataset.add),
+            button
+          );
+
+        });
+
+      });
+
+      /*
+       * Coupon.
+       */
+
+      const couponButton =
+        this.querySelector('[data-apply-coupon]');
+
+      if (couponButton) {
+
+        couponButton.addEventListener('click', () => {
+
+          const input =
+            this.querySelector('[data-coupon]');
+
+          const code =
+            input ? input.value.trim() : '';
+
+          if (!code) {
+
+            this.status.textContent =
+              'Enter a coupon code first.';
+
+            return;
+          }
+
+          window.location.href =
+            '/discount/' +
+            encodeURIComponent(code) +
+            '?redirect=/checkout';
+
+        });
+
+      }
+
+      /*
+       * Checkout Button.
+       */
+      const checkoutBtn = this.querySelector('[data-checkout-btn]');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', (event) => {
+          event.preventDefault();
+          window.location.href = '/checkout';
+        });
+      }
+
+    }
+
+  }
+
+  if (!customElements.get('cart-page-{{ ai_gen_id }}')) {
+
+    customElements.define(
+      'cart-page-{{ ai_gen_id }}',
+      CartPage{{ ai_gen_id }}
+    );
+
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Cart page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your Cart"
+    },
+    {
+      "type": "text",
+      "id": "continue_label",
+      "label": "Continue shopping label",
+      "default": "Continue Shopping"
+    },
+    {
+      "type": "text",
+      "id": "summary_heading",
+      "label": "Summary heading",
+      "default": "Order Summary"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Checkout label",
+      "default": "Proceed to Checkout"
+    },
+    {
+      "type": "text",
+      "id": "empty_heading",
+      "label": "Empty heading",
+      "default": "Your cart is empty"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Empty message",
+      "default": "Looks like you haven't added anything yet."
+    },
+    {
+      "type": "text",
+      "id": "start_label",
+      "label": "Start shopping label",
+      "default": "Start Shopping"
+    },
+    {
+      "type": "text",
+      "id": "upsell_heading",
+      "label": "Upsell heading",
+      "default": "You May Also Like"
+    },
+    {
+      "type": "collection",
+      "id": "upsell_collection",
+      "label": "Upsell collection"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cart page"
+    }
+  ],
+  
+  "class": "cart-page-block"
+}
+{% endschema %}
+
+
+

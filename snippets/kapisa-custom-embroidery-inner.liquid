@@ -1,0 +1,708 @@
+{%- comment -%}
+  KAPISA — Custom Embroidery Rebuild (Knya Medical Apparel Styling)
+  Single preview image, left-chest placement, icon selector, bundle logic, dynamic currency.
+{%- endcomment -%}
+
+{%- liquid
+  assign cfg = section.settings
+  assign max_chars = cfg.max_characters | default: 22
+  assign feature_off = false
+  if product.metafields.custom.embroidery_disabled.value == true
+    assign feature_off = true
+  endif
+
+  # Resolve preview images per product (top, bottom, combo)
+  assign preview_top = blank
+  if product.metafields.custom.top_embroidery_image.value != blank
+    assign preview_top = product.metafields.custom.top_embroidery_image.value
+  elsif product.metafields.custom.embroidery_preview_top.value != blank
+    assign preview_top = product.metafields.custom.embroidery_preview_top.value
+  elsif product.metafields.custom.embroidery_preview_image.value != blank
+    assign preview_top = product.metafields.custom.embroidery_preview_image.value
+  elsif product.featured_image != blank
+    assign preview_top = product.featured_image
+  elsif product.images.first != blank
+    assign preview_top = product.images.first
+  endif
+
+  assign preview_bottom = blank
+  if product.metafields.custom.bottom_embroidery_image.value != blank
+    assign preview_bottom = product.metafields.custom.bottom_embroidery_image.value
+  elsif product.metafields.custom.embroidery_preview_bottom.value != blank
+    assign preview_bottom = product.metafields.custom.embroidery_preview_bottom.value
+  endif
+
+  assign preview_combo = blank
+  if product.metafields.custom.combo_embroidery_image.value != blank
+    assign preview_combo = product.metafields.custom.combo_embroidery_image.value
+  elsif product.metafields.custom.embroidery_preview_combo.value != blank
+    assign preview_combo = product.metafields.custom.embroidery_preview_combo.value
+  endif
+
+  if preview_bottom == blank
+    assign preview_bottom = preview_top
+  endif
+  if preview_combo == blank
+    assign preview_combo = preview_top
+  endif
+
+  assign preview_top_url = blank
+  assign preview_top_w = 600
+  assign preview_top_h = 640
+  if preview_top != blank
+    assign preview_top_url = preview_top | image_url: width: 1200
+    assign preview_top_w = preview_top.width | default: 600
+    assign preview_top_h = preview_top.height | default: 640
+  else
+    assign preview_top_url = 'kapisa-scrub-default.svg' | asset_url
+  endif
+
+  assign preview_bot_url = blank
+  assign preview_bot_w = 600
+  assign preview_bot_h = 640
+  if preview_bottom != blank
+    assign preview_bot_url = preview_bottom | image_url: width: 1200
+    assign preview_bot_w = preview_bottom.width | default: 600
+    assign preview_bot_h = preview_bottom.height | default: 640
+  else
+    assign preview_bot_url = preview_top_url
+  endif
+
+  assign preview_com_url = blank
+  assign preview_com_w = 600
+  assign preview_com_h = 640
+  if preview_combo != blank
+    assign preview_com_url = preview_combo | image_url: width: 1200
+    assign preview_com_w = preview_combo.width | default: 600
+    assign preview_com_h = preview_combo.height | default: 640
+  else
+    assign preview_com_url = preview_top_url
+  endif
+
+  # Service product fallback
+  assign svc_prod = all_products['embroidery-options-service']
+
+  # Resolve embroidery options
+  assign raw_options = product.metafields.custom.embroidery_options.value
+  if raw_options == blank
+    assign raw_options = cfg.default_options
+  endif
+
+  assign valid_count = 0
+  assign min_price = 0
+-%}
+
+{%- capture options_json -%}
+[
+  {%- unless feature_off -%}
+    {%- if raw_options != blank -%}
+      {%- for opt in raw_options -%}
+        {%- liquid
+          assign kind = opt.kind.value | downcase | default: 'top'
+          assign label = opt.label.value | strip
+          assign handle = opt.system.handle | default: kind
+          assign sv = opt.service_variant.value
+          if sv == blank and svc_prod != blank
+            for v in svc_prod.variants
+              assign vt = v.title | downcase
+              if vt contains kind or kind contains vt
+                assign sv = v
+                break
+              endif
+            endfor
+          endif
+          if label == blank
+            case kind
+              when 'combo'
+                assign label = 'Embroidery Bundle'
+              when 'bottom'
+                assign label = 'Bottom Embroidery'
+              else
+                assign label = 'Top Embroidery'
+            endcase
+          endif
+          assign p_price = 39900
+          assign p_var_id = ''
+          if sv != blank
+            assign p_price = sv.price
+            assign p_var_id = sv.id
+          endif
+          assign badge = ''
+          assign desc = ''
+          case kind
+            when 'combo'
+              assign badge = 'Value Bundle'
+              assign desc = 'Name and Designation + Icon + Name on bottoms'
+            when 'bottom'
+              assign badge = 'New'
+              assign desc = 'Your name on your scrub bottom'
+            else
+              assign desc = 'Your name and icon/logo, stitched on your scrub top.'
+          endcase
+          if min_price == 0 or p_price < min_price
+            assign min_price = p_price
+          endif
+          assign valid_count = valid_count | plus: 1
+        -%}
+        {%- unless forloop.first -%},{%- endunless -%}
+        {
+          "handle": {{ handle | json }},
+          "label": {{ label | json }},
+          "kind": {{ kind | json }},
+          "badge": {{ badge | json }},
+          "description": {{ desc | json }},
+          "price": {{ p_price | json }},
+          "formattedPrice": {{ p_price | money | json }},
+          "variantId": {{ p_var_id | json }},
+          "sortOrder": {{ opt.sort_order.value | default: forloop.index | json }}
+        }
+      {%- endfor -%}
+    {%- else -%}
+      {%- comment -%} Standard fallback if no metafields set {%- endcomment -%}
+      {%- liquid
+        assign sv_top = blank
+        assign sv_bottom = blank
+        assign sv_combo = blank
+        for v in svc_prod.variants
+          assign vt = v.title | downcase
+          if vt contains 'combo' or vt contains 'bundle'
+            assign sv_combo = v
+          elsif vt contains 'bottom'
+            assign sv_bottom = v
+          elsif vt contains 'top'
+            assign sv_top = v
+          endif
+        endfor
+        if sv_top == blank
+          assign sv_top = svc_prod.variants[0]
+        endif
+        if sv_bottom == blank
+          assign sv_bottom = svc_prod.variants[1]
+        endif
+        if sv_combo == blank
+          assign sv_combo = svc_prod.variants[2]
+        endif
+        assign p_top = sv_top.price | default: 29900
+        assign p_bot = sv_bottom.price | default: 19900
+        assign p_com = sv_combo.price | default: 59800
+        assign min_price = p_bot
+        if p_top < min_price
+          assign min_price = p_top
+        endif
+        assign valid_count = 3
+      -%}
+      {
+        "handle": "combo",
+        "label": "Embroidery Bundle",
+        "kind": "combo",
+        "badge": "Value Bundle",
+        "description": "Name and Designation + Icon + Name on bottoms",
+        "price": {{ p_com | json }},
+        "formattedPrice": {{ p_com | money | json }},
+        "variantId": {{ sv_combo.id | json }},
+        "sortOrder": 1
+      },
+      {
+        "handle": "top",
+        "label": "Top Embroidery",
+        "kind": "top",
+        "badge": "",
+        "description": "Your name and icon/logo, stitched on your scrub top.",
+        "price": {{ p_top | json }},
+        "formattedPrice": {{ p_top | money | json }},
+        "variantId": {{ sv_top.id | json }},
+        "sortOrder": 2
+      },
+      {
+        "handle": "bottom",
+        "label": "Bottom Embroidery",
+        "kind": "bottom",
+        "badge": "New",
+        "description": "Your name on your scrub bottom",
+        "price": {{ p_bot | json }},
+        "formattedPrice": {{ p_bot | money | json }},
+        "variantId": {{ sv_bottom.id | json }},
+        "sortOrder": 3
+      }
+    {%- endif -%}
+  {%- endunless -%}
+]
+{%- endcapture -%}
+
+{%- capture thread_rows -%}
+  {%- for b in section.blocks -%}
+    {%- if b.type == 'thread_color' and b.settings.name != blank -%}
+      {{ b.settings.name | strip }}|{{ b.settings.color | color_to_hex }}~
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+{%- if thread_rows == blank -%}
+  {%- assign thread_rows = 'White|#FFFFFF~Black|#111111~Gold|#F5A623~Grey|#9E9E9E~Neon Green|#D4E157~Pink|#FF8DA1~' -%}
+{%- endif -%}
+{%- assign thread_list = thread_rows | split: '~' -%}
+
+{%- if valid_count > 0 or request.design_mode -%}
+<kapisa-embroidery
+  class="kemb"
+  id="KapisaEmbroidery-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  data-max="{{ max_chars }}"
+  data-ack="{{ cfg.show_acknowledgment }}"
+>
+  <script type="application/json" data-kemb-config>
+    {
+      "options": {{ options_json | strip_newlines }},
+      "previewImage": {
+        "url": {{ preview_top_url | json }},
+        "width": {{ preview_top_w | json }},
+        "height": {{ preview_top_h | json }}
+      },
+      "previewImages": {
+        "top": {
+          "url": {{ preview_top_url | json }},
+          "width": {{ preview_top_w | json }},
+          "height": {{ preview_top_h | json }}
+        },
+        "bottom": {
+          "url": {{ preview_bot_url | json }},
+          "width": {{ preview_bot_w | json }},
+          "height": {{ preview_bot_h | json }}
+        },
+        "combo": {
+          "url": {{ preview_com_url | json }},
+          "width": {{ preview_com_w | json }},
+          "height": {{ preview_com_h | json }}
+        }
+      },
+      "productTitle": {{ product.title | json }},
+      "moneyFormat": {{ shop.money_format | json }},
+      "currencyCode": {{ shop.currency | json }},
+      "cartUrl": {{ routes.cart_url | json }}
+    }
+  </script>
+
+  {%- if valid_count > 0 -%}
+    <div class="kemb-trigger-wrap" data-kemb-trigger-wrap>
+      
+      <!-- 1. INITIAL PDP WIDGET (Before Customization) -->
+      <div class="kemb-pdp-card kemb-pdp-card--initial" data-kemb-initial-view>
+        <div class="kemb-pdp-banner">
+          <div class="kemb-pdp-banner__icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <div class="kemb-pdp-banner__text">
+            <span class="kemb-pdp-banner__title">Custom Embroidery</span>
+            <span class="kemb-pdp-banner__sub">Starting at {{ min_price | money }} personalise your scrubs</span>
+          </div>
+        </div>
+        <div class="kemb-pdp-choices">
+          <label class="kemb-pdp-choice" data-kemb-choice-add>
+            <input type="radio" name="embroidery_pdp_choice" value="add" data-kemb-radio-add>
+            <span class="kemb-pdp-radio"></span>
+            <div class="kemb-pdp-choice__info">
+              <span class="kemb-pdp-choice__label">Add Embroidery</span>
+              <span class="kemb-pdp-choice__desc">Make it yours - name, hospital logo, or icon</span>
+            </div>
+          </label>
+          <label class="kemb-pdp-choice" data-kemb-choice-skip>
+            <input type="radio" name="embroidery_pdp_choice" value="skip" data-kemb-radio-skip checked>
+            <span class="kemb-pdp-radio"></span>
+            <div class="kemb-pdp-choice__info">
+              <span class="kemb-pdp-choice__label">Skip for Now</span>
+              <span class="kemb-pdp-choice__desc">and risk misplacing your scrubs</span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- 2. CONFIGURED SUMMARY CARD (After Proceeding in Modal) -->
+      <div class="kemb-pdp-card kemb-pdp-card--configured" data-kemb-configured-view hidden>
+        <div class="kemb-cfg-head">
+          <label class="kemb-cfg-checkbox-label">
+            <input type="checkbox" data-kemb-cfg-toggle checked>
+            <span class="kemb-cfg-checkbox"></span>
+            <span class="kemb-cfg-title">Custom Embroidery</span>
+          </label>
+          <div class="kemb-cfg-price-wrap">
+            <span class="kemb-cfg-price" data-kemb-cfg-price>{{ min_price | money }}</span>
+            <span class="kemb-cfg-divider">|</span>
+            <button type="button" class="kemb-cfg-delete" data-kemb-cfg-delete aria-label="Remove embroidery">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="kemb-cfg-body">
+          <!-- Mini Swatch Box -->
+          <div class="kemb-cfg-preview-box" data-kemb-cfg-preview>
+            <div class="kemb-cfg-preview-content">
+              <div class="kemb-cfg-preview-icon" data-kemb-cfg-mini-icon hidden></div>
+              <div class="kemb-cfg-preview-text" data-kemb-cfg-mini-text>
+                <span class="kemb-cfg-mini-line1" data-kemb-cfg-mini-line1></span>
+                <span class="kemb-cfg-mini-line2" data-kemb-cfg-mini-line2></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary Details -->
+          <div class="kemb-cfg-details">
+            <span class="kemb-cfg-type-name" data-kemb-cfg-type>Text</span>
+            <div class="kemb-cfg-row">
+              <span class="kemb-cfg-label">Text Position</span>
+              <span class="kemb-cfg-sep">:</span>
+              <span class="kemb-cfg-val" data-kemb-cfg-pos>Left Chest</span>
+            </div>
+            <div class="kemb-cfg-row">
+              <span class="kemb-cfg-label">Text</span>
+              <span class="kemb-cfg-sep">:</span>
+              <span class="kemb-cfg-val" data-kemb-cfg-text-val></span>
+            </div>
+            <div class="kemb-cfg-row">
+              <span class="kemb-cfg-label">Color</span>
+              <span class="kemb-cfg-sep">:</span>
+              <span class="kemb-cfg-val" data-kemb-cfg-color-val></span>
+            </div>
+            <div class="kemb-cfg-row">
+              <span class="kemb-cfg-label">Font</span>
+              <span class="kemb-cfg-sep">:</span>
+              <span class="kemb-cfg-val" data-kemb-cfg-font-val></span>
+            </div>
+            <div class="kemb-cfg-row" data-kemb-cfg-icon-row hidden>
+              <span class="kemb-cfg-label">Icon</span>
+              <span class="kemb-cfg-sep">:</span>
+              <span class="kemb-cfg-val" data-kemb-cfg-icon-val></span>
+            </div>
+          </div>
+
+          <!-- Edit Pencil Button -->
+          <button type="button" class="kemb-cfg-edit-btn" data-kemb-cfg-edit aria-label="Edit embroidery customization">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  {%- endif -%}
+
+  <dialog class="kemb-dialog" data-kemb-dialog aria-labelledby="KembTitle-{{ section.id }}">
+    <div class="kemb-sheet">
+      
+      <!-- LEFT COLUMN: LIVE PREVIEW -->
+      <div class="kemb-preview-col">
+        <button type="button" class="kemb-close-pill" data-kemb-close aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <span>CLOSE</span>
+        </button>
+
+        <div class="kemb-stage" data-kemb-stage>
+          <img class="kemb-stage__img" data-kemb-img src="{{ preview_top_url }}" alt="{{ product.title | escape }} Preview" width="{{ preview_top_w }}" height="{{ preview_top_h }}">
+          
+          <!-- Text Zone: Left Chest above pocket (wearer's left, viewer's right) -->
+          <div class="kemb-zone-text" data-kemb-zone-text>
+            <div class="kemb-line kemb-line--1" data-kemb-line="1"></div>
+            <div class="kemb-line kemb-line--2" data-kemb-line="2"></div>
+          </div>
+
+          <!-- Icon Zone: Right Chest (wearer's right, viewer's left) -->
+          <div class="kemb-zone-icon" data-kemb-zone-icon hidden>
+            <div class="kemb-icon-display" data-kemb-icon-display></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: FORM & SELECTION -->
+      <div class="kemb-form-col">
+        
+        <!-- HEADER -->
+        <header class="kemb-header">
+          <button type="button" class="kemb-back-btn" data-kemb-back hidden aria-label="Go back">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <h2 class="kemb-heading" id="KembTitle-{{ section.id }}">{{ cfg.modal_heading | default: 'Add Your Identity' | escape }}</h2>
+        </header>
+
+        <!-- STEP 2 SUBHEADER / PRICE SUMMARY -->
+        <div class="kemb-summary-bar" data-kemb-summary-bar hidden>
+          <div class="kemb-summary-bar__left">
+            <span class="kemb-summary-label">Embroidery Selected:</span>
+            <span class="kemb-summary-type" data-kemb-selected-type>Text</span>
+          </div>
+          <div class="kemb-summary-bar__price">
+            <span class="kemb-price-original" data-kemb-orig-price hidden></span>
+            <span class="kemb-price-current" data-kemb-curr-price></span>
+          </div>
+        </div>
+
+        <!-- SCROLLABLE BODY -->
+        <div class="kemb-body" data-kemb-body>
+          
+          <!-- STEP 1: CHOOSE EMBROIDERY TYPE -->
+          <div class="kemb-step kemb-step--choose" data-kemb-step="choose">
+            <div class="kemb-card-list" data-kemb-card-list></div>
+          </div>
+
+          <!-- STEP 2: CUSTOMIZATION FORM -->
+          <div class="kemb-step kemb-step--custom" data-kemb-step="custom" hidden>
+            
+            <!-- SECTION: ADD TEXT -->
+            <div class="kemb-section kemb-section--text">
+              <h3 class="kemb-section__title" data-kemb-text-title>Add Text</h3>
+              
+              <!-- Input Line 1: Text / Name -->
+              <div class="kemb-field" data-kemb-field="line1">
+                <label class="kemb-field__label" for="KembLine1-{{ section.id }}">Text</label>
+                <div class="kemb-input-wrap">
+                  <input
+                    type="text"
+                    class="kemb-input"
+                    id="KembLine1-{{ section.id }}"
+                    data-kemb-input="1"
+                    maxlength="{{ max_chars }}"
+                    placeholder="Enter Name"
+                    autocomplete="off"
+                    spellcheck="false"
+                  >
+                  <span class="kemb-input-aa" aria-hidden="true">Aa</span>
+                </div>
+                <div class="kemb-field__meta">
+                  <span class="kemb-field__hint" data-kemb-hint="1">*Above top's left pocket</span>
+                  <span class="kemb-field__count" data-kemb-count="1">0/{{ max_chars }}</span>
+                </div>
+                <p class="kemb-err" data-kemb-err="1"></p>
+              </div>
+
+              <!-- Input Line 2: Designation -->
+              <div class="kemb-field" data-kemb-field="line2">
+                <label class="kemb-field__label" for="KembLine2-{{ section.id }}">Designation</label>
+                <div class="kemb-input-wrap">
+                  <input
+                    type="text"
+                    class="kemb-input"
+                    id="KembLine2-{{ section.id }}"
+                    data-kemb-input="2"
+                    maxlength="{{ max_chars }}"
+                    placeholder="Enter Designation"
+                    autocomplete="off"
+                    spellcheck="false"
+                  >
+                  <span class="kemb-input-aa" aria-hidden="true">Aa</span>
+                </div>
+                <div class="kemb-field__meta">
+                  <span class="kemb-field__hint" data-kemb-hint="2">*on top only</span>
+                  <span class="kemb-field__count" data-kemb-count="2">0/{{ max_chars }}</span>
+                </div>
+                <p class="kemb-err" data-kemb-err="2"></p>
+              </div>
+
+              <!-- Input Line Bottom: Specific to Bottom Only Option -->
+              <div class="kemb-field" data-kemb-field="bottom_text" hidden>
+                <label class="kemb-field__label" for="KembBotText-{{ section.id }}">Name on bottom scrub</label>
+                <div class="kemb-input-wrap">
+                  <input
+                    type="text"
+                    class="kemb-input"
+                    id="KembBotText-{{ section.id }}"
+                    data-kemb-input="bottom"
+                    maxlength="{{ max_chars }}"
+                    placeholder="Enter Name for Bottom"
+                    autocomplete="off"
+                    spellcheck="false"
+                  >
+                  <span class="kemb-input-aa" aria-hidden="true">Aa</span>
+                </div>
+                <div class="kemb-field__meta">
+                  <span class="kemb-field__hint">*Stitched on your scrub bottom</span>
+                  <span class="kemb-field__count" data-kemb-count="bottom">0/{{ max_chars }}</span>
+                </div>
+                <p class="kemb-err" data-kemb-err="bottom"></p>
+              </div>
+
+              <!-- Text Color Swatches -->
+              <div class="kemb-color-picker">
+                <span class="kemb-picker-label">Text Color: <strong data-kemb-color-name>Gold</strong></span>
+                <div class="kemb-swatches" role="radiogroup" aria-label="Text colour">
+                  {%- for row in thread_list -%}
+                    {%- assign parts = row | split: '|' -%}
+                    {%- if parts.size == 2 -%}
+                      <button
+                        type="button"
+                        class="kemb-swatch-btn{% if forloop.index == 3 %} is-active{% endif %}"
+                        data-color-name="{{ parts[0] | escape }}"
+                        data-color-hex="{{ parts[1] | escape }}"
+                        style="--swatch-color: {{ parts[1] }};"
+                        aria-label="{{ parts[0] | escape }}"
+                        role="radio"
+                        aria-checked="{% if forloop.index == 3 %}true{% else %}false{% endif %}"
+                      >
+                        <span class="kemb-swatch-circle"></span>
+                      </button>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              <!-- Font Type: Segmented Block vs Script -->
+              <div class="kemb-font-picker">
+                <span class="kemb-picker-label">Font Type:</span>
+                <div class="kemb-font-toggles" role="radiogroup" aria-label="Font type">
+                  <button
+                    type="button"
+                    class="kemb-font-toggle is-active"
+                    data-kemb-font="block"
+                    role="radio"
+                    aria-checked="true"
+                  >
+                    <span class="kemb-font-toggle__label font--block">AA Block</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="kemb-font-toggle"
+                    data-kemb-font="script"
+                    role="radio"
+                    aria-checked="false"
+                  >
+                    <span class="kemb-font-toggle__label font--script">Aa Script</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Add Name to Bottom Scrub Toggle (Top option only) -->
+              <div class="kemb-addon-toggle" data-kemb-bottom-addon hidden>
+                <div class="kemb-addon-info">
+                  <span class="kemb-addon-title">Add name to bottom scrub</span>
+                  <span class="kemb-addon-badge">Value Bundle</span>
+                </div>
+                <label class="kemb-switch">
+                  <input type="checkbox" data-kemb-bottom-switch>
+                  <span class="kemb-switch__slider"></span>
+                </label>
+              </div>
+
+              <!-- Bundle Callout Banner -->
+              <div class="kemb-callout-banner" data-kemb-bundle-banner hidden>
+                <span>Name(First Line) added on bottom scrub</span>
+              </div>
+
+            </div>
+
+            <!-- SECTION: ADD LOGO / ICON -->
+            <div class="kemb-section kemb-section--icon" data-kemb-section-icon>
+              
+              <!-- Checkbox header for Top option -->
+              <div class="kemb-icon-toggle-bar" data-kemb-icon-toggle-bar hidden>
+                <label class="kemb-check-label">
+                  <input type="checkbox" data-kemb-icon-checkbox>
+                  <span class="kemb-check-custom"></span>
+                  <span class="kemb-check-text">Add Logo/ Icon</span>
+                </label>
+                <span class="kemb-icon-price">Included</span>
+              </div>
+
+              <!-- Collapsible Content / Full in Bundle -->
+              <div class="kemb-icon-content" data-kemb-icon-content>
+                <h3 class="kemb-section__title" data-kemb-icon-heading>Add Logo/ Icon</h3>
+
+                <div class="kemb-icon-group">
+                  <div class="kemb-icon-subhead">
+                    <span class="kemb-icon-subhead__title">Classic Icon: <strong data-kemb-icon-name>None</strong></span>
+                    <span class="kemb-icon-subhead__price" data-kemb-icon-selected-price>Included</span>
+                  </div>
+                  <div class="kemb-icon-grid" data-kemb-classic-grid>
+                    <!-- Injected by kapisa-embroidery.js from window.KAPISA_EMBROIDERY_ICONS -->
+                  </div>
+                </div>
+
+                <div class="kemb-icon-group">
+                  <div class="kemb-icon-subhead">
+                    <span class="kemb-icon-subhead__title">Limited Edition Icons:</span>
+                  </div>
+                  <div class="kemb-icon-grid" data-kemb-limited-grid>
+                    <!-- Injected by kapisa-embroidery.js -->
+                  </div>
+                </div>
+
+                <div class="kemb-divider-or">
+                  <span>Or</span>
+                </div>
+
+                <div class="kemb-custom-logo-wrap">
+                  <div class="kemb-custom-logo-head">
+                    <span class="kemb-custom-logo-title">Custom Logo</span>
+                    <span class="kemb-custom-logo-price" data-kemb-custom-logo-price>Included</span>
+                  </div>
+                  <label class="kemb-upload-box" data-kemb-upload-label>
+                    <input type="file" data-kemb-logo-upload accept="image/jpeg,image/png,image/jpg" hidden>
+                    <div class="kemb-upload-content" data-kemb-upload-content>
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                      <span class="kemb-upload-title">Upload Your Custom Logo</span>
+                    </div>
+                    <div class="kemb-upload-preview" data-kemb-upload-preview hidden>
+                      <img data-kemb-upload-img alt="Custom logo preview" width="48" height="48">
+                      <button type="button" class="kemb-upload-remove" data-kemb-upload-remove aria-label="Remove logo">&times;</button>
+                    </div>
+                  </label>
+                  <div class="kemb-upload-meta">
+                    <span class="kemb-upload-hint">Uploaded File should be JPG/JPEG</span>
+                    <span class="kemb-upload-size">0/5MB</span>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            {%- if cfg.show_acknowledgment -%}
+              <div class="kemb-ack-field">
+                <label class="kemb-check-label">
+                  <input type="checkbox" data-kemb-ack>
+                  <span class="kemb-check-custom"></span>
+                  <span class="kemb-ack-text">{{ cfg.acknowledgment_text | default: 'Embroidered items cannot be returned or exchanged' | escape }}</span>
+                </label>
+                <p class="kemb-err" data-kemb-err="ack"></p>
+              </div>
+            {%- endif -%}
+
+          </div>
+
+          <!-- STEP 3: SUCCESS CONFIRMATION -->
+          <div class="kemb-step kemb-step--done" data-kemb-step="done" hidden>
+            <div class="kemb-done-card">
+              <span class="kemb-done-icon">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+              <h3>Personalization Added!</h3>
+              <p>Your custom embroidery details were added to your order.</p>
+              <div class="kemb-done-actions">
+                <button type="button" class="kemb-btn-another" data-kemb-another>Personalize Another</button>
+                <a href="{{ routes.cart_url }}" class="kemb-btn-cart" data-kemb-viewcart>View Cart</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FOOTER ACTION BAR (Step 2) -->
+        <footer class="kemb-footer" data-kemb-footer hidden>
+          <button type="button" class="kemb-btn-reset" data-kemb-reset>RESET</button>
+          <button type="button" class="kemb-btn-proceed" data-kemb-submit>
+            <span data-kemb-submit-label>PROCEED</span>
+          </button>
+        </footer>
+
+      </div>
+
+    </div>
+  </dialog>
+</kapisa-embroidery>
+{%- endif -%}

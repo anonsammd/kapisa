@@ -1,0 +1,116 @@
+{% doc %}
+  @prompt
+    Create a clean Helpful Information section for the Kapisa Healthcare Contact Us page.
+    
+    Use soft blue-gray #F0F4F7 as the background. Use deep navy #0E1F3C for headings and charcoal #2B2B2E for text. Use gold #C9A227 for small accents.
+    
+    Create a compact accordion containing useful information such as:
+    
+    * Order Support
+    * Sizing Help
+    * Shipping Questions
+    * Bulk / Business Enquiries
+    
+    Desktop: maximum width 850px with clean horizontal rows and subtle borders.
+    
+    Mobile: use 20px horizontal padding. Make every row at least 58px tall with large tap-friendly areas. Use smooth expand/collapse animation and a clear plus/minus indicator.
+    
+    Shopify settings:
+    Create editable FAQ blocks with question and answer fields. Allow merchants to add, remove, and reorder questions.
+    
+    Do not create a contact form.
+    
+    Return complete Shopify Liquid, responsive CSS, accessible HTML, JavaScript if necessary, and valid schema.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-helpful-info-{{ ai_gen_id }} { display: block; width: 100%; background: #F0F4F7; color: #2B2B2E; padding: 56px 20px; }
+  .ai-helpful-info-{{ ai_gen_id }}__inner { width: {{ block.settings.desktop_width_percent }}%; max-width: 850px; margin: 0 auto; }
+  .ai-helpful-info-{{ ai_gen_id }}__heading { margin: 0 0 24px; color: #0E1F3C; font-size: 30px; line-height: 1.2; text-align: {{ block.settings.heading_alignment }}; }
+  .ai-helpful-info-{{ ai_gen_id }}__list { border-top: 1px solid rgba(14,31,60,.2); }
+  .ai-helpful-info-{{ ai_gen_id }}__item { border-bottom: 1px solid rgba(14,31,60,.2); }
+  .ai-helpful-info-{{ ai_gen_id }}__trigger { width: 100%; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; border: 0; background: transparent; color: #0E1F3C; font: inherit; font-weight: 600; font-size: 17px; line-height: 1.35; text-align: left; cursor: pointer; }
+  .ai-helpful-info-{{ ai_gen_id }}__trigger:focus-visible { outline: 3px solid #C9A227; outline-offset: 3px; }
+  .ai-helpful-info-{{ ai_gen_id }}__icon { position: relative; flex: 0 0 18px; width: 18px; height: 18px; color: #C9A227; }
+  .ai-helpful-info-{{ ai_gen_id }}__icon::before, .ai-helpful-info-{{ ai_gen_id }}__icon::after { content: ''; position: absolute; top: 50%; left: 50%; width: 16px; height: 2px; background: currentColor; transform: translate(-50%,-50%); }
+  .ai-helpful-info-{{ ai_gen_id }}__icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 180ms ease; }
+  .ai-helpful-info-{{ ai_gen_id }}__trigger[aria-expanded='true'] .ai-helpful-info-{{ ai_gen_id }}__icon::after { transform: translate(-50%,-50%) rotate(0deg); }
+  .ai-helpful-info-{{ ai_gen_id }}__answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 220ms ease; }
+  .ai-helpful-info-{{ ai_gen_id }}__answer[aria-hidden='false'] { grid-template-rows: 1fr; }
+  .ai-helpful-info-{{ ai_gen_id }}__answer-inner { overflow: hidden; color: #2B2B2E; font-size: 16px; line-height: 1.6; }
+  .ai-helpful-info-{{ ai_gen_id }}__answer[aria-hidden='false'] .ai-helpful-info-{{ ai_gen_id }}__answer-inner { padding: 0 38px 18px 0; }
+  @media screen and (max-width: 749px) { .ai-helpful-info-{{ ai_gen_id }} { padding: 40px 20px; } .ai-helpful-info-{{ ai_gen_id }}__inner { width: 100%; } .ai-helpful-info-{{ ai_gen_id }}__heading { font-size: 26px; } .ai-helpful-info-{{ ai_gen_id }}__trigger { min-height: 58px; font-size: 16px; } }
+  @media (prefers-reduced-motion: reduce) { .ai-helpful-info-{{ ai_gen_id }}__answer, .ai-helpful-info-{{ ai_gen_id }}__icon::after { transition: none; } }
+{% endstyle %}
+
+<helpful-information-{{ ai_gen_id }} class="ai-helpful-info-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-helpful-info-{{ ai_gen_id }}__inner">
+    <h2 class="ai-helpful-info-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
+    <div class="ai-helpful-info-{{ ai_gen_id }}__list">
+      {% for i in (1..4) %}
+        {% liquid
+          assign question_key = 'question_' | append: i
+          assign answer_key = 'answer_' | append: i
+          assign question = block.settings[question_key]
+          assign answer = block.settings[answer_key]
+          assign item_id = 'ai-helpful-info-' | append: ai_gen_id | append: '-' | append: i
+        %}
+        {% if question != blank %}
+          <div class="ai-helpful-info-{{ ai_gen_id }}__item">
+            <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__trigger" id="{{ item_id }}-trigger" aria-expanded="false" aria-controls="{{ item_id }}-answer">
+              <span>{{ question | escape }}</span><span class="ai-helpful-info-{{ ai_gen_id }}__icon" aria-hidden="true"></span>
+            </button>
+            <div class="ai-helpful-info-{{ ai_gen_id }}__answer" id="{{ item_id }}-answer" role="region" aria-labelledby="{{ item_id }}-trigger" aria-hidden="true">
+              <div class="ai-helpful-info-{{ ai_gen_id }}__answer-inner">{{ answer }}</div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</helpful-information-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class HelpfulInformation{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        this.querySelectorAll('.ai-helpful-info-{{ ai_gen_id }}__trigger').forEach((button) => {
+          button.addEventListener('click', () => {
+            const expanded = button.getAttribute('aria-expanded') === 'true';
+            button.setAttribute('aria-expanded', String(!expanded));
+            this.querySelector('#' + button.getAttribute('aria-controls')).setAttribute('aria-hidden', String(expanded));
+          });
+        });
+      }
+    }
+    if (!customElements.get('helpful-information-{{ ai_gen_id }}')) customElements.define('helpful-information-{{ ai_gen_id }}', HelpfulInformation{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Helpful information",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Helpful information" },
+    { "type": "select", "id": "heading_alignment", "label": "Heading alignment", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"}], "default": "left" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "header", "content": "Question 1" },
+    { "type": "text", "id": "question_1", "label": "Question", "default": "Order support" },
+    { "type": "richtext", "id": "answer_1", "label": "Answer", "default": "<p>For help with an existing order, please have your order number ready when contacting our support team.</p>" },
+    { "type": "header", "content": "Question 2" },
+    { "type": "text", "id": "question_2", "label": "Question", "default": "Sizing help" },
+    { "type": "richtext", "id": "answer_2", "label": "Answer", "default": "<p>Review the product sizing information before ordering, or contact us for guidance.</p>" },
+    { "type": "header", "content": "Question 3" },
+    { "type": "text", "id": "question_3", "label": "Question", "default": "Shipping questions" },
+    { "type": "richtext", "id": "answer_3", "label": "Answer", "default": "<p>Shipping options and estimated delivery details are shown during checkout.</p>" },
+    { "type": "header", "content": "Question 4" },
+    { "type": "text", "id": "question_4", "label": "Question", "default": "Bulk / business enquiries" },
+    { "type": "richtext", "id": "answer_4", "label": "Answer", "default": "<p>Contact our team with your quantities and requirements so we can discuss business orders.</p>" }
+  ],
+  "presets": [{ "name": "Helpful information" }],
+  "tag": null,
+  "class": "helpful-information-block"
+}
+{% endschema %}

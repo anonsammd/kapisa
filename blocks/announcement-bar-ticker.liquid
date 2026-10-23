@@ -1,0 +1,344 @@
+{% doc %}
+  @prompt
+    Create a standalone announcement bar section, separate from the header, navy
+    #0E1F3C background, off-white #FAF7F0 text. Rotate 3–4 short messages
+    automatically every 4 seconds with a smooth fade/slide transition.
+    The announcement bar remains in normal document flow and is independent
+    from the fixed Kapisa header.
+
+    UPDATE: merchant-editable toggle to keep the bar always visible while
+    scrolling (fixed) or let it scroll away with the page (static). Exposes
+    a data-kapisa-announcement attribute so other sections (header) can
+    reliably detect its real height/position.
+{% enddoc %}
+
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-announcement-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    z-index: 100000;
+    width: {{ block.settings.desktop_width_percent }}%;
+    height: {{ block.settings.bar_height }}px;
+    overflow: hidden;
+    background: {{ block.settings.background_color }};
+    color: {{ block.settings.text_color }};
+    isolation: isolate;
+  }
+
+  .ai-announcement-{{ ai_gen_id }}.is-fixed {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 100000 !important;
+  }
+
+  .ai-announcement-{{ ai_gen_id }}__spacer {
+    display: none !important;
+  }
+
+  .ai-announcement-{{ ai_gen_id }}__viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 16px;
+  }
+
+  .ai-announcement-{{ ai_gen_id }}__message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    text-align: center;
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: {{ block.settings.text_size }}px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+
+  .ai-announcement-{{ ai_gen_id }}__message.is-changing {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .ai-announcement-{{ ai_gen_id }}__icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    color: {{ block.settings.icon_color }};
+  }
+
+  .ai-announcement-{{ ai_gen_id }}__icon svg {
+    display: block;
+    width: 13px;
+    height: 13px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-announcement-{{ ai_gen_id }} {
+      width: 100%;
+    }
+
+    .ai-announcement-{{ ai_gen_id }}__viewport {
+      padding: 0 12px;
+    }
+
+    .ai-announcement-{{ ai_gen_id }}__message {
+      font-size: {{ block.settings.mobile_text_size }}px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-announcement-{{ ai_gen_id }}__message {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+<announcement-bar-{{ ai_gen_id }}
+  class="ai-announcement-{{ ai_gen_id }}{% if block.settings.always_visible %} is-fixed{% endif %}"
+  data-kapisa-announcement="true"
+  data-always-visible="{{ block.settings.always_visible }}"
+  {{ block.shopify_attributes }}
+>
+  <div
+    class="ai-announcement-{{ ai_gen_id }}__viewport"
+    role="status"
+    aria-live="polite"
+  >
+    <p class="ai-announcement-{{ ai_gen_id }}__message">
+      <span
+        class="ai-announcement-{{ ai_gen_id }}__icon"
+        aria-hidden="true"
+      >
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 3.5l2.4 5.1 5.6.7-4.1 3.9 1.1 5.5L12 16l-5 2.7 1.1-5.5L4 9.3l5.6-.7L12 3.5z"
+            fill="currentColor"
+          />
+        </svg>
+      </span>
+
+      <span class="ai-announcement-{{ ai_gen_id }}__text"></span>
+    </p>
+  </div>
+</announcement-bar-{{ ai_gen_id }}>
+
+{% if block.settings.always_visible %}
+  <div class="ai-announcement-{{ ai_gen_id }}__spacer" aria-hidden="true"></div>
+{% endif %}
+
+<script>
+  (function() {
+    class AnnouncementBar{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        this.messages = [
+          {{ block.settings.message_1 | json }},
+          {{ block.settings.message_2 | json }}
+          {% if block.settings.message_3 != blank %},
+            {{ block.settings.message_3 | json }}
+          {% endif %}
+          {% if block.settings.message_4 != blank %},
+            {{ block.settings.message_4 | json }}
+          {% endif %}
+        ].filter(Boolean);
+
+        this.messageElement = this.querySelector(
+          '.ai-announcement-{{ ai_gen_id }}__message'
+        );
+
+        this.textElement = this.querySelector(
+          '.ai-announcement-{{ ai_gen_id }}__text'
+        );
+
+        this.interval =
+          Number(this.dataset.interval) || 4000;
+
+        this.index = 0;
+
+        this.textElement.textContent =
+          this.messages[0] || '';
+
+        this.startRotation();
+      }
+
+      startRotation() {
+        if (this.messages.length < 2) return;
+
+        this.rotationTimer = window.setInterval(
+          () => this.changeMessage(),
+          this.interval
+        );
+      }
+
+      changeMessage() {
+        this.messageElement.classList.add('is-changing');
+
+        window.setTimeout(() => {
+          this.index =
+            (this.index + 1) % this.messages.length;
+
+          this.textElement.textContent =
+            this.messages[this.index];
+
+          this.messageElement.classList.remove(
+            'is-changing'
+          );
+        }, 220);
+      }
+
+      disconnectedCallback() {
+        if (this.rotationTimer) {
+          window.clearInterval(this.rotationTimer);
+        }
+      }
+    }
+
+    if (
+      !customElements.get(
+        'announcement-bar-{{ ai_gen_id }}'
+      )
+    ) {
+      customElements.define(
+        'announcement-bar-{{ ai_gen_id }}',
+        AnnouncementBar{{ ai_gen_id }}
+      );
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Messages"
+    },
+    {
+      "type": "text",
+      "id": "message_1",
+      "label": "Message 1",
+      "default": "Free Shipping on Prepaid Orders"
+    },
+    {
+      "type": "text",
+      "id": "message_2",
+      "label": "Message 2",
+      "default": "Custom Embroidery Available"
+    },
+    {
+      "type": "text",
+      "id": "message_3",
+      "label": "Message 3",
+      "default": "Cash on Delivery Across India"
+    },
+    {
+      "type": "text",
+      "id": "message_4",
+      "label": "Message 4"
+    },
+    {
+      "type": "range",
+      "id": "rotation_interval",
+      "label": "Rotation interval",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "s",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Scroll behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "always_visible",
+      "label": "Keep always visible while scrolling",
+      "info": "On: the bar stays pinned to the top of the screen at all times. Off: the bar scrolls away with the page like normal content.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "label": "Bar height",
+      "min": 32,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 11,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "mobile_text_size",
+      "label": "Mobile text size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#0E1F3C"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#FAF7F0"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon",
+      "default": "#C9A227"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar"
+    }
+  ],
+  "tag": null,
+  "class": "announcement-bar-block"
+}
+{% endschema %}

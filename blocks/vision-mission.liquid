@@ -1,0 +1,243 @@
+{% doc %}
+  @prompt
+    Create a premium Vision and Mission section for the Kapisa Healthcare About Us page.
+    
+    Use deep navy #0E1F3C as the full-width background. Use warm cream #FAF7F0 for the section heading and card text. Use gold #C9A227 for small decorative lines and icon accents. Use a very subtle transparent white overlay for the cards, approximately rgba(255,255,255,0.06).
+    
+    Desktop layout:
+    Place the section inside a maximum width of 1200px. Add a centered cream heading “Our Vision & Mission” approximately 44px. Below it, create two equal cards side by side. Each card should have 32px padding, 18px rounded corners, and a subtle border using rgba(255,255,255,0.12). Add a small gold line, a cream card heading, and a readable paragraph.
+    
+    Mobile layout:
+    Use 20px horizontal padding. Stack the two cards vertically with 16px spacing. Make the main heading 30px and card headings 25px. Use 24px card padding. Cards should feel like premium mobile app panels with comfortable touch-friendly spacing.
+    
+    Animation:
+    Cards should fade upward when entering the viewport. Add a subtle hover lift on desktop. Do not use excessive movement. Respect reduced-motion preferences.
+    
+    Shopify settings:
+    Add editable section heading, vision heading, vision text, mission heading, and mission text. Allow merchants to edit both cards.
+    
+    Return complete Shopify Liquid with responsive CSS and valid schema. Do not modify the header or footer.
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-vision-mission-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__inner {
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__heading {
+    margin: 0 0 44px;
+    color: #FAF7F0;
+    text-align: center;
+    font-size: 44px;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__card {
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 600ms ease, transform 600ms ease, box-shadow 250ms ease;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__line {
+    display: block;
+    width: 44px;
+    height: 3px;
+    margin-bottom: 24px;
+    background: #C9A227;
+    border-radius: 2px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__card-heading {
+    margin: 0 0 14px;
+    color: #FAF7F0;
+    font-size: 30px;
+    line-height: 1.2;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__text {
+    color: #FAF7F0;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__text p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-vision-mission-{{ ai_gen_id }}__inner {
+      width: 100%;
+      padding: 56px 20px;
+    }
+
+    .ai-vision-mission-{{ ai_gen_id }}__heading {
+      margin-bottom: 32px;
+      font-size: 30px;
+    }
+
+    .ai-vision-mission-{{ ai_gen_id }}__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .ai-vision-mission-{{ ai_gen_id }}__card {
+      padding: 24px;
+    }
+
+    .ai-vision-mission-{{ ai_gen_id }}__card-heading {
+      font-size: 25px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-vision-mission-{{ ai_gen_id }}__card {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .ai-vision-mission-{{ ai_gen_id }}__card:hover {
+      transform: none;
+    }
+  }
+{% endstyle %}
+
+<vision-mission-{{ ai_gen_id }} class="ai-vision-mission-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-vision-mission-{{ ai_gen_id }}__inner">
+    <h2 class="ai-vision-mission-{{ ai_gen_id }}__heading">{{ block.settings.section_heading | escape }}</h2>
+    <div class="ai-vision-mission-{{ ai_gen_id }}__grid">
+      <article class="ai-vision-mission-{{ ai_gen_id }}__card">
+        <span class="ai-vision-mission-{{ ai_gen_id }}__line" aria-hidden="true"></span>
+        <h3 class="ai-vision-mission-{{ ai_gen_id }}__card-heading">{{ block.settings.vision_heading | escape }}</h3>
+        <div class="ai-vision-mission-{{ ai_gen_id }}__text">{{ block.settings.vision_text }}</div>
+      </article>
+      <article class="ai-vision-mission-{{ ai_gen_id }}__card">
+        <span class="ai-vision-mission-{{ ai_gen_id }}__line" aria-hidden="true"></span>
+        <h3 class="ai-vision-mission-{{ ai_gen_id }}__card-heading">{{ block.settings.mission_heading | escape }}</h3>
+        <div class="ai-vision-mission-{{ ai_gen_id }}__text">{{ block.settings.mission_text }}</div>
+      </article>
+    </div>
+  </div>
+</vision-mission-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class VisionMission{{ ai_gen_id }} extends HTMLElement {
+      connectedCallback() {
+        const cards = this.querySelectorAll('.ai-vision-mission-{{ ai_gen_id }}__card');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+          cards.forEach((card) => card.classList.add('is-visible'));
+          return;
+        }
+        const observer = new IntersectionObserver((entries, instance) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              instance.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        cards.forEach((card) => observer.observe(card));
+      }
+    }
+    if (!customElements.get('vision-mission-{{ ai_gen_id }}')) {
+      customElements.define('vision-mission-{{ ai_gen_id }}', VisionMission{{ ai_gen_id }});
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Vision and mission",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section heading",
+      "default": "Our Vision & Mission"
+    },
+    {
+      "type": "header",
+      "content": "Vision card"
+    },
+    {
+      "type": "text",
+      "id": "vision_heading",
+      "label": "Heading",
+      "default": "Our vision"
+    },
+    {
+      "type": "richtext",
+      "id": "vision_text",
+      "label": "Text",
+      "default": "<p>To build a healthier future through trusted, accessible healthcare solutions that help people live with confidence.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Mission card"
+    },
+    {
+      "type": "text",
+      "id": "mission_heading",
+      "label": "Heading",
+      "default": "Our mission"
+    },
+    {
+      "type": "richtext",
+      "id": "mission_text",
+      "label": "Text",
+      "default": "<p>To deliver thoughtful healthcare products and experiences with integrity, innovation, and care at every step.</p>"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vision and mission"
+    }
+  ],
+  "tag": null,
+  "class": "vision-mission-block"
+}
+{% endschema %}
