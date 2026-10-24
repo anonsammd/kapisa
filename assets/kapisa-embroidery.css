@@ -1,6 +1,6 @@
 /* ==========================================================================
    KAPISA CUSTOM EMBROIDERY — KNYA MEDICAL APPAREL THEME REBUILD
-   Colors: Navy #122343, Purple #4C2882, Gold #F5A623, Text #1E293B, Gray #64748B
+   Colors: Navy #122343, Accent #121212, Gold #F5A623, Text #1E293B, Gray #64748B
    ========================================================================== */
 
 :root,
@@ -8,8 +8,8 @@ kapisa-embroidery,
 .kemb-trigger-wrap,
 .kemb-pdp-card {
   --k-navy: #122343;
-  --k-purple: #4C2882;
-  --k-purple-light: #FAF7FD;
+  --k-purple: #121212;
+  --k-purple-light: #F5F5F5;
   --k-gold: #F5A623;
   --k-text: #1E293B;
   --k-muted: #64748B;
@@ -21,6 +21,21 @@ kapisa-embroidery,
 
 kapisa-embroidery {
   display: block;
+}
+
+[hidden],
+[hidden="true"],
+.kemb-dialog [hidden],
+.kemb-trigger-wrap [hidden],
+.kemb-pdp-card [hidden],
+.kemb-addon-toggle[hidden],
+.kemb-cfg-row[hidden],
+.kemb-section[hidden],
+.kemb-field[hidden],
+.kemb-callout-banner[hidden],
+.kemb-icon-toggle-bar[hidden],
+.kemb-cfg-preview-icon[hidden] {
+  display: none !important;
 }
 
 html.kemb-lock {
@@ -606,13 +621,13 @@ html.kemb-lock {
   transition: all 0.2s ease;
 }
 .kemb-card:hover {
-  border-color: var(--k-purple);
-  box-shadow: 0 4px 14px rgba(76, 40, 130, 0.08);
+  border-color: #121212;
+  box-shadow: 0 4px 14px rgba(18, 18, 18, 0.08);
 }
 .kemb-card.is-active {
-  border-color: var(--k-purple);
-  background: var(--k-purple-light);
-  box-shadow: 0 0 0 1px var(--k-purple);
+  border-color: #121212;
+  background: #F5F5F5;
+  box-shadow: 0 0 0 1px #121212;
 }
 .kemb-card__radio {
   width: 18px;
@@ -626,14 +641,14 @@ html.kemb-lock {
   transition: border-color 0.15s ease;
 }
 .kemb-card.is-active .kemb-card__radio {
-  border-color: var(--k-purple);
+  border-color: #121212;
 }
 .kemb-card.is-active .kemb-card__radio::after {
   content: '';
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--k-purple);
+  background: #121212;
 }
 .kemb-card__content {
   flex: 1;
@@ -734,8 +749,8 @@ html.kemb-lock {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .kemb-input-wrap:focus-within {
-  border-color: var(--k-purple);
-  box-shadow: 0 0 0 3px rgba(76, 40, 130, 0.12);
+  border-color: #121212;
+  box-shadow: 0 0 0 3px rgba(18, 18, 18, 0.12);
 }
 .kemb-input {
   width: 100%;
@@ -822,7 +837,7 @@ html.kemb-lock {
   transition: all 0.15s ease;
 }
 .kemb-swatch-btn.is-active .kemb-swatch-circle {
-  outline: 2px solid var(--k-purple);
+  outline: 2px solid #121212;
   outline-offset: 2.5px;
   transform: scale(1.05);
 }
@@ -849,7 +864,7 @@ html.kemb-lock {
   transition: all 0.15s ease;
 }
 .kemb-font-toggle:hover {
-  border-color: var(--k-purple);
+  border-color: #121212;
 }
 .kemb-font-toggle.is-active {
   background: #2B2B2E;
@@ -937,7 +952,7 @@ html.kemb-lock {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 .kemb-switch input:checked + .kemb-switch__slider {
-  background-color: var(--k-purple);
+  background-color: #121212;
 }
 .kemb-switch input:checked + .kemb-switch__slider::before {
   transform: translateX(20px);
@@ -945,8 +960,8 @@ html.kemb-lock {
 
 /* Bundle Callout Banner */
 .kemb-callout-banner {
-  background: #EDE7F6;
-  color: #4A148C;
+  background: #F5F5F5;
+  color: #121212;
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 13px;
@@ -989,8 +1004,8 @@ html.kemb-lock {
   transition: all 0.15s ease;
 }
 .kemb-check-label input:checked + .kemb-check-custom {
-  background: var(--k-purple);
-  border-color: var(--k-purple);
+  background: #121212;
+  border-color: #121212;
 }
 .kemb-check-label input:checked + .kemb-check-custom::after {
   content: '';
@@ -1045,13 +1060,13 @@ html.kemb-lock {
   transition: all 0.15s ease;
 }
 .kemb-icon-card:hover {
-  border-color: var(--k-purple);
-  background: var(--k-purple-light);
+  border-color: #121212;
+  background: #F5F5F5;
 }
 .kemb-icon-card.is-active {
-  border-color: var(--k-purple);
-  background: var(--k-purple-light);
-  box-shadow: 0 0 0 1px var(--k-purple);
+  border-color: #121212;
+  background: #F5F5F5;
+  box-shadow: 0 0 0 1px #121212;
 }
 .kemb-icon-card svg {
   width: 100%;
@@ -1104,8 +1119,8 @@ html.kemb-lock {
   transition: all 0.15s ease;
 }
 .kemb-upload-box:hover {
-  border-color: var(--k-purple);
-  background: #FAF9FC;
+  border-color: #121212;
+  background: #F9F9F9;
 }
 .kemb-upload-content {
   display: flex;
@@ -1197,7 +1212,7 @@ html.kemb-lock {
   justify-content: center;
 }
 .kemb-btn-proceed:hover {
-  background: #3B1C54;
+  background: #333333;
 }
 .kemb-btn-proceed[aria-busy="true"] {
   opacity: 0.75;
@@ -1219,7 +1234,7 @@ html.kemb-lock {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--k-purple);
+  background: #121212;
   margin-bottom: 16px;
 }
 .kemb-done-card h3 {
@@ -1257,7 +1272,7 @@ html.kemb-lock {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--k-purple);
+  background: #121212;
   color: #FFFFFF;
   font: inherit;
   font-size: 13px;
