@@ -10,6 +10,9 @@
   if product.metafields.custom.embroidery_disabled.value == true
     assign feature_off = true
   endif
+  if product.gift_card? or product.type == 'Gift Card' or product.handle contains 'gift-card' or product.handle contains 'embroidery-options'
+    assign feature_off = true
+  endif
 
   # Resolve preview images per product (top, bottom, combo)
   assign preview_top = blank

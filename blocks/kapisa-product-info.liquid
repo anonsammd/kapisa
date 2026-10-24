@@ -734,34 +734,128 @@
 
       <!--
         ===================================================
-        COLOR
+        COLOR (Rendered only if product genuinely has colors)
         ===================================================
       -->
+      {%- liquid
+        assign color_option = blank
+        for opt in product.options_with_values
+          assign opt_name_lower = opt.name | downcase
+          if opt_name_lower contains 'color' or opt_name_lower contains 'colour'
+            assign color_option = opt
+            break
+          endif
+        endfor
 
-      <div class="ai-pdp-{{ ai_gen_id }}__color-picker">
-        <span class="ai-pdp-{{ ai_gen_id }}__label"> Color: {{ color_name }} </span>
+        assign show_color_picker = false
+        if color_products != blank or color_option != blank
+          assign show_color_picker = true
+        endif
+      -%}
 
-        <div class="ai-pdp-{{ ai_gen_id }}__swatches">
-          {% if color_products != blank %}
-            {% for related in color_products %}
-              {% assign related_color_name = related.metafields.custom.color_name.value %}
-              {% assign related_color = related.metafields.custom.color_swatch.value %}
+      {% if show_color_picker %}
+        <div class="ai-pdp-{{ ai_gen_id }}__color-picker">
+          {%- assign active_color_label = color_name -%}
+          {%- if color_option != blank and color_products == blank -%}
+            {%- assign active_color_label = color_option.selected_value | default: color_option.values.first -%}
+          {%- endif -%}
+          <span class="ai-pdp-{{ ai_gen_id }}__label"> Color: {{ active_color_label }} </span>
 
-              {% if related_color_name != blank and related_color != blank %}
-                <a
-                  href="{{ related.url }}"
-                  class="ai-pdp-{{ ai_gen_id }}__swatch{% if related.id == product.id %} is-current{% endif %}"
-                  style="background-color: {{ related_color }};"
-                  title="{{ related_color_name }}"
-                  aria-label="{{ related_color_name }}"
+          <div class="ai-pdp-{{ ai_gen_id }}__swatches">
+            {% if color_products != blank %}
+              {% for related in color_products %}
+                {%- liquid
+                  assign rel_url = blank
+                  if related.handle != blank
+                    assign rel_url = '/products/' | append: related.handle
+                  elsif related.url != blank
+                    assign rel_url = related.url
+                  endif
+
+                  assign rel_color_name = related.metafields.custom.color_name.value
+                  if rel_color_name == blank
+                    assign rel_color_name = related.title
+                  endif
+
+                  assign rel_color = related.metafields.custom.color_swatch.value
+                  if rel_color == blank
+                    assign title_down = related.title | downcase
+                    if title_down contains 'navy' or title_down contains 'blue'
+                      assign rel_color = '#1B3B6F'
+                    elsif title_down contains 'black'
+                      assign rel_color = '#18191C'
+                    elsif title_down contains 'green' or title_down contains 'hunter'
+                      assign rel_color = '#1B4942'
+                    elsif title_down contains 'red' or title_down contains 'wine' or title_down contains 'burgundy'
+                      assign rel_color = '#4A1525'
+                    elsif title_down contains 'grey' or title_down contains 'gray' or title_down contains 'slate'
+                      assign rel_color = '#40464D'
+                    elsif title_down contains 'pastel' or title_down contains 'lavender' or title_down contains 'lilac'
+                      assign rel_color = '#756B98'
+                    else
+                      assign rel_color = '#1E293B'
+                    endif
+                  endif
+                -%}
+
+                {% if rel_url != blank %}
+                  <a
+                    href="{{ rel_url }}"
+                    data-href="{{ rel_url }}"
+                    class="ai-pdp-{{ ai_gen_id }}__swatch{% if related.id == product.id or related.handle == product.handle %} is-current{% endif %}"
+                    style="background-color: {{ rel_color }}; cursor: pointer;"
+                    title="{{ rel_color_name | escape }}"
+                    aria-label="{{ rel_color_name | escape }}"
+                  >
+                    <span></span>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            {% elsif color_option != blank %}
+              {% for val in color_option.values %}
+                {%- liquid
+                  assign color_clean = val | downcase | strip
+                  assign bg_color = color_clean
+                  if color_clean contains 'navy'
+                    assign bg_color = '#1B3B6F'
+                  elsif color_clean contains 'black'
+                    assign bg_color = '#18191C'
+                  elsif color_clean contains 'hunter' or color_clean contains 'green'
+                    assign bg_color = '#1B4942'
+                  elsif color_clean contains 'wine' or color_clean contains 'burgundy' or color_clean contains 'maroon'
+                    assign bg_color = '#4A1525'
+                  elsif color_clean contains 'grey' or color_clean contains 'gray' or color_clean contains 'slate'
+                    assign bg_color = '#40464D'
+                  elsif color_clean contains 'royal' or color_clean contains 'blue'
+                    assign bg_color = '#2563EB'
+                  elsif color_clean contains 'pastel' or color_clean contains 'lavender' or color_clean contains 'lilac'
+                    assign bg_color = '#756B98'
+                  endif
+
+                  assign matched_var = blank
+                  for v in product.variants
+                    if v.options contains val
+                      assign matched_var = v
+                      break
+                    endif
+                  endfor
+                -%}
+                <button
+                  type="button"
+                  class="ai-pdp-{{ ai_gen_id }}__swatch{% if current_variant.options contains val %} is-current{% endif %}"
+                  style="background-color: {{ bg_color }}; cursor: pointer;"
+                  title="{{ val | escape }}"
+                  aria-label="{{ val | escape }}"
+                  data-variant-option
+                  data-variant-id="{{ matched_var.id | default: current_variant.id }}"
                 >
                   <span></span>
-                </a>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
+                </button>
+              {% endfor %}
+            {% endif %}
+          </div>
         </div>
-      </div>
+      {% endif %}
 
       <!--
         ===================================================
@@ -783,46 +877,54 @@
           data-variant-id
         >
 
-        <!-- SIZE -->
+        <!-- PRODUCT OPTIONS (Size, Denominations, etc.) -->
+        {%- for option in product.options_with_values -%}
+          {%- assign opt_down = option.name | downcase -%}
+          {%- if opt_down == 'title' and option.values.size == 1 and option.values.first == 'Default Title' -%}
+            {%- continue -%}
+          {%- endif -%}
+          {%- if opt_down contains 'color' or opt_down contains 'colour' -%}
+            {%- continue -%}
+          {%- endif -%}
 
-        <div class="ai-pdp-{{ ai_gen_id }}__size-section">
-          <div class="ai-pdp-{{ ai_gen_id }}__size-head">
-            <span class="ai-pdp-{{ ai_gen_id }}__label"> Size </span>
+          <div class="ai-pdp-{{ ai_gen_id }}__size-section">
+            <div class="ai-pdp-{{ ai_gen_id }}__size-head">
+              <span class="ai-pdp-{{ ai_gen_id }}__label"> {{ option.name }} </span>
 
-            <button
-              type="button"
-              class="ai-pdp-{{ ai_gen_id }}__guide"
-              data-size-guide
-            >
-              Size Guide
-            </button>
+              {%- if opt_down contains 'size' -%}
+                <button
+                  type="button"
+                  class="ai-pdp-{{ ai_gen_id }}__guide"
+                  data-size-guide
+                >
+                  Size Guide
+                </button>
+              {%- endif -%}
+            </div>
+
+            <div class="ai-pdp-{{ ai_gen_id }}__sizes">
+              {%- for value in option.values -%}
+                {%- liquid
+                  assign matched_variant = blank
+                  for v in product.variants
+                    if v.options contains value
+                      assign matched_variant = v
+                      break
+                    endif
+                  endfor
+                -%}
+                <button
+                  type="button"
+                  class="ai-pdp-{{ ai_gen_id }}__size{% if current_variant.options contains value %} is-selected{% endif %}"
+                  data-variant-option
+                  data-variant-id="{{ matched_variant.id | default: current_variant.id }}"
+                >
+                  {{ value }}
+                </button>
+              {%- endfor -%}
+            </div>
           </div>
-
-          <div class="ai-pdp-{{ ai_gen_id }}__sizes">
-            {% assign rendered_sizes = '' %}
-
-            {% for variant in product.variants %}
-              {% assign variant_size = variant.option1 %}
-
-              {% if variant_size != blank %}
-                {% assign size_marker = '|' | append: variant_size | append: '|' %}
-
-                {% unless rendered_sizes contains size_marker %}
-                  {% assign rendered_sizes = rendered_sizes | append: size_marker %}
-
-                  <button
-                    type="button"
-                    class="ai-pdp-{{ ai_gen_id }}__size{% if variant.id == current_variant.id %} is-selected{% endif %}"
-                    data-variant-option
-                    data-variant-id="{{ variant.id }}"
-                  >
-                    {{ variant_size }}
-                  </button>
-                {% endunless %}
-              {% endif %}
-            {% endfor %}
-          </div>
-        </div>
+        {%- endfor -%}
 
         <!--
           =================================================
@@ -1020,6 +1122,7 @@
         this.bindGallery();
         this.bindQuantity();
         this.bindVariants();
+        this.bindColorSwatches();
         this.bindCart();
         this.bindSizeGuide();
         this.bindCopyLink();
@@ -1219,6 +1322,23 @@
 
         });
 
+      }
+
+
+      bindColorSwatches() {
+        this.querySelectorAll('.ai-pdp-{{ ai_gen_id }}__swatch').forEach(swatch => {
+          swatch.addEventListener('click', (event) => {
+            const targetUrl = swatch.getAttribute('href') || swatch.dataset.href;
+            if (targetUrl && targetUrl !== '#' && targetUrl !== '') {
+              if (swatch.classList.contains('is-current')) {
+                event.preventDefault();
+                return;
+              }
+              // Immediately navigate to the related color product
+              window.location.href = targetUrl;
+            }
+          });
+        });
       }
 
 

@@ -1,125 +1,751 @@
 {% doc %}
   @prompt
-    Design a modern, high-converting, and tactile 'Shop by Color' interactive discovery section for an e-commerce platform.
-    
-    1. Layout & Typography:
-    Background: Clean off-white background with subtle vertical breathing room (padding top/bottom).
-    
-    Section Heading: Centered, bold charcoal title 'Shop by Color' with modern sans-serif typography. Include a short, sleek secondary subtitle below in subtle charcoal text: 'Find your perfect shade in our classic collection'.
-    
-    2. Swatch Container & Responsive Behavior:
-    Desktop Layout: A beautifully centered, evenly spaced horizontal flex row of interactive color swatches.
-    
-    Mobile Layout: A smooth, touch-optimized horizontal carousel/scrollable container with hidden scrollbars, featuring subtle peek indicators at the edges to signal swipeability.
-    
-    3. Swatch Item Design:
-    Circle Specs: Large, high-precision circular color swatches (75px diameter) displaying rich color fills pulled directly from the custom.color_swatch metafield.
-    
-    Borders & Framing: Each swatch is encircled by a crisp, ultrathin 1px border in subtle slate (#8FA3B8), offering clean contrast against the off-white background.
-    
-    Labeling: Directly below each circular swatch, render the color name (pulled from custom.color_name) in neat, small charcoal typography (font-weight: 500, letter-spacing: subtle).
-    
-    4. Motion & Micro-Interactions (Canvas Animations):
-    Hover State: Upon hover, the swatch smoothly scales up by 108% (scale(1.08)) with a buttery-smooth cubic-bezier transition (approx. 250ms).
-    
-    Focus Ring / Outline: During hover or active state, the subtle slate border dynamically transforms into a glowing, crisp gold ring (#C9A227). A soft, elevated drop shadow gently appears underneath the hovered circle to create floating depth.
-    
-    Click/Selection State: Clicking any swatch visually activates a smooth click-down feedback animation and instantly filters/navigates to the collection URL parameterized by the corresponding color_family value."
+    Kapisa Healthcare - Shop by Colours (Knya Med Style)
+    A high-converting, aesthetic visual discovery section featuring landscape color cards
+    with folded scrub sets, matching medical accessories, and direct collection filtering.
 {% enddoc %}
-{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% assign id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
-  .ai-shop-color-{{ ai_gen_id }} { display:block; width:{{ block.settings.desktop_width_percent }}%; max-width:100%; margin:0 auto; padding:{{ block.settings.vertical_padding }}px 20px; background:{{ block.settings.background_color }}; color:{{ block.settings.text_color }}; font-family:{{ block.settings.body_font.family }}; }
-  .ai-shop-color-{{ ai_gen_id }}__heading { margin:0; color:{{ block.settings.text_color }}; font-family:{{ block.settings.heading_font.family }}; font-size:{{ block.settings.heading_size }}px; font-weight:700; line-height:1.2; text-align:center; }
-  .ai-shop-color-{{ ai_gen_id }}__subtitle { max-width:520px; margin:10px auto 28px; color:{{ block.settings.subtitle_color }}; font-size:{{ block.settings.subtitle_size }}px; line-height:1.5; text-align:center; }
-  .ai-shop-color-{{ ai_gen_id }}__track-wrap { position:relative; max-width:940px; margin:0 auto; }
-  .ai-shop-color-{{ ai_gen_id }}__track { display:flex; align-items:flex-start; justify-content:center; gap:34px; padding:8px 6px 12px; }
-  .ai-shop-color-{{ ai_gen_id }}__item { flex:0 0 auto; width:105px; color:inherit; text-align:center; text-decoration:none; }
-  .ai-shop-color-{{ ai_gen_id }}__swatch { display:block; width:75px; height:75px; margin:0 auto 12px; border:1px solid #8FA3B8; border-radius:50%; box-shadow:0 0 0 0 transparent; transition:transform 250ms cubic-bezier(.22,1,.36,1), border-color 250ms ease, box-shadow 250ms ease; }
-  .ai-shop-color-{{ ai_gen_id }}__item:hover .ai-shop-color-{{ ai_gen_id }}__swatch, .ai-shop-color-{{ ai_gen_id }}__item:focus-visible .ai-shop-color-{{ ai_gen_id }}__swatch, .ai-shop-color-{{ ai_gen_id }}__item.is-active .ai-shop-color-{{ ai_gen_id }}__swatch { transform:scale(1.08); border-color:#C9A227; box-shadow:0 8px 18px rgba(38,43,51,.18), 0 0 0 3px rgba(201,162,39,.22); }
-  .ai-shop-color-{{ ai_gen_id }}__item:active .ai-shop-color-{{ ai_gen_id }}__swatch { transform:scale(1.02); }
-  .ai-shop-color-{{ ai_gen_id }}__label { display:block; color:{{ block.settings.text_color }}; font-size:{{ block.settings.label_size }}px; font-weight:500; letter-spacing:.03em; line-height:1.3; }
-  .ai-shop-color-{{ ai_gen_id }}__empty { color:#596574; text-align:center; }
-  @media screen and (max-width:749px) {
-    .ai-shop-color-{{ ai_gen_id }} { padding-right:0; padding-left:0; }
-    .ai-shop-color-{{ ai_gen_id }}__heading, .ai-shop-color-{{ ai_gen_id }}__subtitle { padding-right:20px; padding-left:20px; }
-    .ai-shop-color-{{ ai_gen_id }}__track-wrap:before, .ai-shop-color-{{ ai_gen_id }}__track-wrap:after { position:absolute; top:0; bottom:0; z-index:1; width:22px; content:''; pointer-events:none; }
-    .ai-shop-color-{{ ai_gen_id }}__track-wrap:before { left:0; background:linear-gradient(90deg,{{ block.settings.background_color }},transparent); }
-    .ai-shop-color-{{ ai_gen_id }}__track-wrap:after { right:0; background:linear-gradient(270deg,{{ block.settings.background_color }},transparent); }
-    .ai-shop-color-{{ ai_gen_id }}__track { justify-content:flex-start; gap:22px; overflow-x:auto; scroll-snap-type:x proximity; scrollbar-width:none; -webkit-overflow-scrolling:touch; padding-right:42px; padding-left:42px; }
-    .ai-shop-color-{{ ai_gen_id }}__track::-webkit-scrollbar { display:none; }
-    .ai-shop-color-{{ ai_gen_id }}__item { scroll-snap-align:center; }
+  .kapisa-color-section-{{ id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ block.settings.background_color | default: '#FAF9F6' }};
+    padding: {{ block.settings.padding_top | default: 56 }}px 0 {{ block.settings.padding_bottom | default: 56 }}px;
+    font-family: inherit;
+    color: {{ block.settings.text_color | default: '#1E293B' }};
+  }
+
+  .kapisa-color-container-{{ id }} {
+    width: min(1360px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+  .kapisa-color-header-{{ id }} {
+    margin-bottom: {{ block.settings.heading_spacing | default: 28 }}px;
+    text-align: {{ block.settings.heading_align | default: 'left' }};
+  }
+
+  .kapisa-color-eyebrow-{{ id }} {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: {{ block.settings.accent_color | default: '#C9A227' }};
+    margin-bottom: 8px;
+  }
+
+  .kapisa-color-title-{{ id }} {
+    margin: 0;
+    font-size: clamp(24px, 3.2vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: {{ block.settings.heading_color | default: '#0E1F3C' }};
+    letter-spacing: -0.02em;
+  }
+
+  .kapisa-color-subtitle-{{ id }} {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: {{ block.settings.subtitle_color | default: '#64748B' }};
+    max-width: 600px;
+  }
+
+  /* Grid of Color Cards */
+  .kapisa-color-grid-{{ id }} {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .kapisa-color-card-{{ id }} {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .kapisa-color-card-{{ id }}:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Image / Visual Stage */
+  .kapisa-color-thumb-{{ id }} {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #1E293B;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.08);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    border: 1px solid rgba(14, 31, 60, 0.06);
+  }
+
+  .kapisa-color-card-{{ id }}:hover .kapisa-color-thumb-{{ id }} {
+    box-shadow: 0 10px 26px rgba(14, 31, 60, 0.16);
+  }
+
+  .kapisa-color-img-{{ id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+
+  .kapisa-color-card-{{ id }}:hover .kapisa-color-img-{{ id }} {
+    transform: scale(1.05);
+  }
+
+  /* Default CSS Mockup Artwork if no image is uploaded */
+  .kapisa-color-fallback-{{ id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .kapisa-color-fallback-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.8) 1px, transparent 0);
+    background-size: 16px 16px;
+  }
+
+  .kapisa-color-fallback-fold {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .kapisa-color-card-{{ id }}:hover .kapisa-color-fallback-fold {
+    transform: scale(1.08);
+  }
+
+  .kapisa-color-fallback-fold svg {
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+  }
+
+  /* Color Label */
+  .kapisa-color-meta-{{ id }} {
+    padding-top: 12px;
+    text-align: left;
+  }
+
+  .kapisa-color-name-{{ id }} {
+    font-size: 14px;
+    font-weight: 700;
+    color: {{ block.settings.heading_color | default: '#0E1F3C' }};
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kapisa-color-arrow-{{ id }} {
+    font-size: 13px;
+    color: {{ block.settings.accent_color | default: '#C9A227' }};
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .kapisa-color-card-{{ id }}:hover .kapisa-color-arrow-{{ id }} {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .kapisa-color-count-{{ id }} {
+    font-size: 12px;
+    color: {{ block.settings.subtitle_color | default: '#64748B' }};
+    margin-top: 2px;
+  }
+
+  /* Responsive Behavior: Smooth horizontal scrolling on mobile/tablet */
+  @media screen and (max-width: 1024px) {
+    .kapisa-color-grid-{{ id }} {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .kapisa-color-section-{{ id }} {
+      padding: {{ block.settings.mobile_padding | default: 38 }}px 0;
+    }
+
+    .kapisa-color-container-{{ id }} {
+      width: 100%;
+      padding: 0 16px;
+    }
+
+    .kapisa-color-grid-{{ id }} {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      gap: 14px;
+      padding-bottom: 8px;
+    }
+
+    .kapisa-color-grid-{{ id }}::-webkit-scrollbar {
+      display: none;
+    }
+
+    .kapisa-color-card-{{ id }} {
+      flex: 0 0 160px;
+      scroll-snap-align: start;
+    }
+
+    .kapisa-color-thumb-{{ id }} {
+      aspect-ratio: 16 / 12;
+    }
+
+    .kapisa-color-name-{{ id }} {
+      font-size: 13px;
+    }
   }
 {% endstyle %}
 
-<shop-by-color-{{ ai_gen_id }} class="ai-shop-color-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
-  <h2 class="ai-shop-color-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
-  <p class="ai-shop-color-{{ ai_gen_id }}__subtitle">{{ block.settings.subtitle | escape }}</p>
-  <div class="ai-shop-color-{{ ai_gen_id }}__track-wrap">
-    <div class="ai-shop-color-{{ ai_gen_id }}__track" role="list" aria-label="{{ block.settings.heading | escape }}">
-      {% assign color_products = block.settings.products | default: collections.all.products %}
-      {% if color_products != blank %}
-        {% for product in color_products limit: 12 %}
-          {% assign color_swatch = product.metafields.custom.color_swatch.value | default: '#D9D9D9' %}
-          {% assign color_name = product.metafields.custom.color_name.value | default: product.title %}
-          {% assign color_family = product.metafields.custom.color_family.value | default: color_name %}
-          {% assign color_url = product.url %}
-          {% if block.settings.collection != blank %}
-            {% assign color_url = block.settings.collection.url | append: '?filter.p.m.custom.color_family=' | append: color_family %}
-          {% endif %}
-          <a class="ai-shop-color-{{ ai_gen_id }}__item" href="{{ color_url }}" role="listitem" aria-label="Shop {{ color_name | escape }}">
-            <span class="ai-shop-color-{{ ai_gen_id }}__swatch" style="background-color:{{ color_swatch }};"></span>
-            <span class="ai-shop-color-{{ ai_gen_id }}__label">{{ color_name | escape }}</span>
-          </a>
-        {% endfor %}
-      {% else %}
-        <p class="ai-shop-color-{{ ai_gen_id }}__empty">Choose products to display your color collection.</p>
+<section class="kapisa-color-section-{{ id }}" {{ block.shopify_attributes }}>
+  <div class="kapisa-color-container-{{ id }}">
+    
+    <!-- Heading Area -->
+    <div class="kapisa-color-header-{{ id }}">
+      {% if block.settings.eyebrow != blank %}
+        <span class="kapisa-color-eyebrow-{{ id }}">{{ block.settings.eyebrow | escape }}</span>
+      {% endif %}
+      <h2 class="kapisa-color-title-{{ id }}">{{ block.settings.heading | default: 'Shop By Colours' | escape }}</h2>
+      {% if block.settings.subtitle != blank %}
+        <p class="kapisa-color-subtitle-{{ id }}">{{ block.settings.subtitle | escape }}</p>
       {% endif %}
     </div>
-  </div>
-</shop-by-color-{{ ai_gen_id }}>
 
-<script>
-  (function() {
-    class ShopByColor{{ ai_gen_id }} extends HTMLElement {
-      connectedCallback() {
-        this.querySelectorAll('.ai-shop-color-{{ ai_gen_id }}__item').forEach((item) => {
-          item.addEventListener('click', () => {
-            this.querySelectorAll('.ai-shop-color-{{ ai_gen_id }}__item').forEach((other) => other.classList.remove('is-active'));
-            item.classList.add('is-active');
-          });
-        });
-      }
-    }
-    if (!customElements.get('shop-by-color-{{ ai_gen_id }}')) customElements.define('shop-by-color-{{ ai_gen_id }}', ShopByColor{{ ai_gen_id }});
-  })();
-</script>
+    <!-- 6 Aesthetic Color Cards (Knya Med Style) -->
+    <div class="kapisa-color-grid-{{ id }}">
+
+      {%- comment -%} Card 1: All Blues {%- endcomment -%}
+      {% if block.settings.color_1_enabled %}
+        <a href="{{ block.settings.color_1_link | default: '/collections/all?filter.v.option.color=Blue&filter.p.m.custom.color_family=Blue&color=Blue' }}" class="kapisa-color-card-{{ id }}" aria-label="{{ block.settings.color_1_name | default: 'All Blues' | escape }}">
+          <div class="kapisa-color-thumb-{{ id }}" style="background: {{ block.settings.color_1_bg | default: '#1B3B6F' }};">
+            {% if block.settings.color_1_image != blank %}
+              <img src="{{ block.settings.color_1_image | image_url: width: 600 }}" alt="{{ block.settings.color_1_name | escape }}" class="kapisa-color-img-{{ id }}" loading="lazy" width="600" height="412">
+            {% else %}
+              <div class="kapisa-color-fallback-{{ id }}" style="background: linear-gradient(135deg, #1B3B6F 0%, #0E1F3C 100%);">
+                <div class="kapisa-color-fallback-pattern"></div>
+                <div class="kapisa-color-fallback-fold">
+                  <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                  </svg>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="kapisa-color-meta-{{ id }}">
+            <div class="kapisa-color-name-{{ id }}">
+              <span>{{ block.settings.color_1_name | default: 'All Blues' | escape }}</span>
+              <span class="kapisa-color-arrow-{{ id }}">→</span>
+            </div>
+            {% if block.settings.color_1_sub != blank %}
+              <div class="kapisa-color-count-{{ id }}">{{ block.settings.color_1_sub | escape }}</div>
+            {% endif %}
+          </div>
+        </a>
+      {% endif %}
+
+      {%- comment -%} Card 2: All Blacks {%- endcomment -%}
+      {% if block.settings.color_2_enabled %}
+        <a href="{{ block.settings.color_2_link | default: '/collections/all?filter.v.option.color=Black&filter.p.m.custom.color_family=Black&color=Black' }}" class="kapisa-color-card-{{ id }}" aria-label="{{ block.settings.color_2_name | default: 'All Blacks' | escape }}">
+          <div class="kapisa-color-thumb-{{ id }}" style="background: {{ block.settings.color_2_bg | default: '#18191C' }};">
+            {% if block.settings.color_2_image != blank %}
+              <img src="{{ block.settings.color_2_image | image_url: width: 600 }}" alt="{{ block.settings.color_2_name | escape }}" class="kapisa-color-img-{{ id }}" loading="lazy" width="600" height="412">
+            {% else %}
+              <div class="kapisa-color-fallback-{{ id }}" style="background: linear-gradient(135deg, #242833 0%, #121212 100%);">
+                <div class="kapisa-color-fallback-pattern"></div>
+                <div class="kapisa-color-fallback-fold">
+                  <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                  </svg>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="kapisa-color-meta-{{ id }}">
+            <div class="kapisa-color-name-{{ id }}">
+              <span>{{ block.settings.color_2_name | default: 'All Blacks' | escape }}</span>
+              <span class="kapisa-color-arrow-{{ id }}">→</span>
+            </div>
+            {% if block.settings.color_2_sub != blank %}
+              <div class="kapisa-color-count-{{ id }}">{{ block.settings.color_2_sub | escape }}</div>
+            {% endif %}
+          </div>
+        </a>
+      {% endif %}
+
+      {%- comment -%} Card 3: All Greens {%- endcomment -%}
+      {% if block.settings.color_3_enabled %}
+        <a href="{{ block.settings.color_3_link | default: '/collections/all?filter.v.option.color=Green&filter.p.m.custom.color_family=Green&color=Green' }}" class="kapisa-color-card-{{ id }}" aria-label="{{ block.settings.color_3_name | default: 'All Greens' | escape }}">
+          <div class="kapisa-color-thumb-{{ id }}" style="background: {{ block.settings.color_3_bg | default: '#1B4942' }};">
+            {% if block.settings.color_3_image != blank %}
+              <img src="{{ block.settings.color_3_image | image_url: width: 600 }}" alt="{{ block.settings.color_3_name | escape }}" class="kapisa-color-img-{{ id }}" loading="lazy" width="600" height="412">
+            {% else %}
+              <div class="kapisa-color-fallback-{{ id }}" style="background: linear-gradient(135deg, #1B4942 0%, #0F2D28 100%);">
+                <div class="kapisa-color-fallback-pattern"></div>
+                <div class="kapisa-color-fallback-fold">
+                  <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                  </svg>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="kapisa-color-meta-{{ id }}">
+            <div class="kapisa-color-name-{{ id }}">
+              <span>{{ block.settings.color_3_name | default: 'All Greens' | escape }}</span>
+              <span class="kapisa-color-arrow-{{ id }}">→</span>
+            </div>
+            {% if block.settings.color_3_sub != blank %}
+              <div class="kapisa-color-count-{{ id }}">{{ block.settings.color_3_sub | escape }}</div>
+            {% endif %}
+          </div>
+        </a>
+      {% endif %}
+
+      {%- comment -%} Card 4: All Reds {%- endcomment -%}
+      {% if block.settings.color_4_enabled %}
+        <a href="{{ block.settings.color_4_link | default: '/collections/all?filter.v.option.color=Red&filter.p.m.custom.color_family=Red&color=Red' }}" class="kapisa-color-card-{{ id }}" aria-label="{{ block.settings.color_4_name | default: 'All Reds' | escape }}">
+          <div class="kapisa-color-thumb-{{ id }}" style="background: {{ block.settings.color_4_bg | default: '#4A1525' }};">
+            {% if block.settings.color_4_image != blank %}
+              <img src="{{ block.settings.color_4_image | image_url: width: 600 }}" alt="{{ block.settings.color_4_name | escape }}" class="kapisa-color-img-{{ id }}" loading="lazy" width="600" height="412">
+            {% else %}
+              <div class="kapisa-color-fallback-{{ id }}" style="background: linear-gradient(135deg, #5C1D30 0%, #350E1A 100%);">
+                <div class="kapisa-color-fallback-pattern"></div>
+                <div class="kapisa-color-fallback-fold">
+                  <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                  </svg>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="kapisa-color-meta-{{ id }}">
+            <div class="kapisa-color-name-{{ id }}">
+              <span>{{ block.settings.color_4_name | default: 'All Reds' | escape }}</span>
+              <span class="kapisa-color-arrow-{{ id }}">→</span>
+            </div>
+            {% if block.settings.color_4_sub != blank %}
+              <div class="kapisa-color-count-{{ id }}">{{ block.settings.color_4_sub | escape }}</div>
+            {% endif %}
+          </div>
+        </a>
+      {% endif %}
+
+      {%- comment -%} Card 5: All Pastels {%- endcomment -%}
+      {% if block.settings.color_5_enabled %}
+        <a href="{{ block.settings.color_5_link | default: '/collections/all?filter.v.option.color=Pastel&filter.p.m.custom.color_family=Pastel&color=Pastel' }}" class="kapisa-color-card-{{ id }}" aria-label="{{ block.settings.color_5_name | default: 'All Pastels' | escape }}">
+          <div class="kapisa-color-thumb-{{ id }}" style="background: {{ block.settings.color_5_bg | default: '#756B98' }};">
+            {% if block.settings.color_5_image != blank %}
+              <img src="{{ block.settings.color_5_image | image_url: width: 600 }}" alt="{{ block.settings.color_5_name | escape }}" class="kapisa-color-img-{{ id }}" loading="lazy" width="600" height="412">
+            {% else %}
+              <div class="kapisa-color-fallback-{{ id }}" style="background: linear-gradient(135deg, #877CA8 0%, #5E5380 100%);">
+                <div class="kapisa-color-fallback-pattern"></div>
+                <div class="kapisa-color-fallback-fold">
+                  <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                  </svg>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="kapisa-color-meta-{{ id }}">
+            <div class="kapisa-color-name-{{ id }}">
+              <span>{{ block.settings.color_5_name | default: 'All Pastels' | escape }}</span>
+              <span class="kapisa-color-arrow-{{ id }}">→</span>
+            </div>
+            {% if block.settings.color_5_sub != blank %}
+              <div class="kapisa-color-count-{{ id }}">{{ block.settings.color_5_sub | escape }}</div>
+            {% endif %}
+          </div>
+        </a>
+      {% endif %}
+
+      {%- comment -%} Card 6: All Greys {%- endcomment -%}
+      {% if block.settings.color_6_enabled %}
+        <a href="{{ block.settings.color_6_link | default: '/collections/all?filter.v.option.color=Grey&filter.p.m.custom.color_family=Grey&color=Grey' }}" class="kapisa-color-card-{{ id }}" aria-label="{{ block.settings.color_6_name | default: 'All Greys' | escape }}">
+          <div class="kapisa-color-thumb-{{ id }}" style="background: {{ block.settings.color_6_bg | default: '#40464D' }};">
+            {% if block.settings.color_6_image != blank %}
+              <img src="{{ block.settings.color_6_image | image_url: width: 600 }}" alt="{{ block.settings.color_6_name | escape }}" class="kapisa-color-img-{{ id }}" loading="lazy" width="600" height="412">
+            {% else %}
+              <div class="kapisa-color-fallback-{{ id }}" style="background: linear-gradient(135deg, #525961 0%, #30353A 100%);">
+                <div class="kapisa-color-fallback-pattern"></div>
+                <div class="kapisa-color-fallback-fold">
+                  <svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/>
+                  </svg>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+          <div class="kapisa-color-meta-{{ id }}">
+            <div class="kapisa-color-name-{{ id }}">
+              <span>{{ block.settings.color_6_name | default: 'All Greys' | escape }}</span>
+              <span class="kapisa-color-arrow-{{ id }}">→</span>
+            </div>
+            {% if block.settings.color_6_sub != blank %}
+              <div class="kapisa-color-count-{{ id }}">{{ block.settings.color_6_sub | escape }}</div>
+            {% endif %}
+          </div>
+        </a>
+      {% endif %}
+
+    </div>
+  </div>
+</section>
 
 {% schema %}
 {
-  "name":"Shop by color",
-  "settings":[
-    {"type":"header","content":"Content"},
-    {"type":"text","id":"heading","label":"Heading","default":"Shop by Color"},
-    {"type":"text","id":"subtitle","label":"Subtitle","default":"Find your perfect shade in our classic collection"},
-    {"type":"product_list","id":"products","label":"Color products","limit":12},
-    {"type":"collection","id":"collection","label":"Color collection"},
-    {"type":"header","content":"Layout"},
-    {"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},
-    {"type":"range","id":"vertical_padding","label":"Vertical spacing","min":20,"max":100,"step":5,"unit":"px","default":55},
-    {"type":"header","content":"Typography"},
-    {"type":"font_picker","id":"heading_font","label":"Heading font","default":"assistant_n4"},
-    {"type":"font_picker","id":"body_font","label":"Body font","default":"assistant_n4"},
-    {"type":"range","id":"heading_size","label":"Heading size","min":20,"max":48,"step":2,"unit":"px","default":32},
-    {"type":"range","id":"subtitle_size","label":"Subtitle size","min":12,"max":22,"step":1,"unit":"px","default":15},
-    {"type":"range","id":"label_size","label":"Label size","min":11,"max":18,"step":1,"unit":"px","default":14},
-    {"type":"header","content":"Colors"},
-    {"type":"color","id":"background_color","label":"Background","default":"#F8F7F3"},
-    {"type":"color","id":"text_color","label":"Text","default":"#292D33"},
-    {"type":"color","id":"subtitle_color","label":"Subtitle","default":"#596574"}
+  "name": "Shop by Colours",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section Header"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow text",
+      "default": "KAPISA PALETTE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop By Colours"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Find your signature shade in our classic medical collection"
+    },
+    {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Heading Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "Colors & Layout"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Section Background",
+      "default": "#FAF9F6"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#0E1F3C"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle Color",
+      "default": "#64748B"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#C9A227"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding (px)",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding (px)",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding",
+      "label": "Mobile Padding (px)",
+      "min": 15,
+      "max": 60,
+      "step": 5,
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Color 1: All Blues"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_1_enabled",
+      "label": "Enable Color 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_1_name",
+      "label": "Title",
+      "default": "All Blues"
+    },
+    {
+      "type": "text",
+      "id": "color_1_sub",
+      "label": "Subtext (e.g. Royal & Navy)",
+      "default": "Royal & Navy"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_1_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "color",
+      "id": "color_1_bg",
+      "label": "Card Background Tint",
+      "default": "#1B3B6F"
+    },
+    {
+      "type": "url",
+      "id": "color_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Color 2: All Blacks"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_2_enabled",
+      "label": "Enable Color 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_2_name",
+      "label": "Title",
+      "default": "All Blacks"
+    },
+    {
+      "type": "text",
+      "id": "color_2_sub",
+      "label": "Subtext (e.g. Midnight Onyx)",
+      "default": "Midnight Onyx"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_2_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "color",
+      "id": "color_2_bg",
+      "label": "Card Background Tint",
+      "default": "#18191C"
+    },
+    {
+      "type": "url",
+      "id": "color_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Color 3: All Greens"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_3_enabled",
+      "label": "Enable Color 3",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_3_name",
+      "label": "Title",
+      "default": "All Greens"
+    },
+    {
+      "type": "text",
+      "id": "color_3_sub",
+      "label": "Subtext (e.g. Hunter & Sage)",
+      "default": "Hunter & Sage"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_3_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "color",
+      "id": "color_3_bg",
+      "label": "Card Background Tint",
+      "default": "#1B4942"
+    },
+    {
+      "type": "url",
+      "id": "color_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Color 4: All Reds"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_4_enabled",
+      "label": "Enable Color 4",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_4_name",
+      "label": "Title",
+      "default": "All Reds"
+    },
+    {
+      "type": "text",
+      "id": "color_4_sub",
+      "label": "Subtext (e.g. Burgundy & Wine)",
+      "default": "Burgundy & Wine"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_4_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "color",
+      "id": "color_4_bg",
+      "label": "Card Background Tint",
+      "default": "#4A1525"
+    },
+    {
+      "type": "url",
+      "id": "color_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Color 5: All Pastels"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_5_enabled",
+      "label": "Enable Color 5",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_5_name",
+      "label": "Title",
+      "default": "All Pastels"
+    },
+    {
+      "type": "text",
+      "id": "color_5_sub",
+      "label": "Subtext (e.g. Lavender & Lilac)",
+      "default": "Lavender & Lilac"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_5_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "color",
+      "id": "color_5_bg",
+      "label": "Card Background Tint",
+      "default": "#756B98"
+    },
+    {
+      "type": "url",
+      "id": "color_5_link",
+      "label": "Link"
+    },
+    {
+      "type": "header",
+      "content": "Color 6: All Greys"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_6_enabled",
+      "label": "Enable Color 6",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "color_6_name",
+      "label": "Title",
+      "default": "All Greys"
+    },
+    {
+      "type": "text",
+      "id": "color_6_sub",
+      "label": "Subtext (e.g. Slate & Heather)",
+      "default": "Slate & Heather"
+    },
+    {
+      "type": "image_picker",
+      "id": "color_6_image",
+      "label": "Card Image"
+    },
+    {
+      "type": "color",
+      "id": "color_6_bg",
+      "label": "Card Background Tint",
+      "default": "#40464D"
+    },
+    {
+      "type": "url",
+      "id": "color_6_link",
+      "label": "Link"
+    }
   ],
-  "presets":[{"name":"Shop by color"}],
-  "tag":null,
-  "class":"shop-by-color-block"
+  "presets": [
+    {
+      "name": "Shop by Colours"
+    }
+  ],
+  "tag": null,
+  "class": "shop-by-color-block"
 }
 {% endschema %}
