@@ -38,32 +38,12 @@
         "bottom_text": "Premium healthcare apparel",
         "show_scroll_indicator": true,
         "scroll_text": "Scroll to explore"
-      }
+      },
+      "disabled": true
     },
     "178911726578348b29": {
       "type": "_blocks",
       "blocks": {
-        "ai_gen_block_e3a21f5_FRQ7qj": {
-          "type": "marquee-strip",
-          "settings": {
-            "item_one": "BACKED BY TECHNOLOGY",
-            "item_two": "TONS OF STORAGE",
-            "item_three": "ANTI-DISTRACTION",
-            "item_four": "LAB TESTED",
-            "item_five": "LONG-SHIFT VERIFIED",
-            "item_six": "4-WAY STRETCH FABRIC",
-            "accessibility_label": "Store highlights",
-            "desktop_width_percent": 100,
-            "strip_height": 42,
-            "text_size": 11,
-            "letter_spacing": 1.5,
-            "scroll_speed": 26,
-            "bg_color": "#0E1F3C",
-            "text_color": "#FAF7F0",
-            "divider_color": "#C9A227"
-          },
-          "blocks": {}
-        },
         "ai_gen_block_7ef4646_mw3deK": {
           "type": "shop-by-category",
           "settings": {
@@ -199,7 +179,6 @@
         }
       },
       "block_order": [
-        "ai_gen_block_e3a21f5_FRQ7qj",
         "ai_gen_block_7ef4646_mw3deK",
         "ai_gen_block_794dda0_MBw9kp",
         "ai_gen_block_3225b3c_TeVJWj",
@@ -339,10 +318,57 @@
     "178911956152f70a9a": {
       "type": "_blocks",
       "settings": {}
+    },
+    "marquee_bar_section": {
+      "type": "_blocks",
+      "blocks": {
+        "top_marquee_strip": {
+          "type": "marquee-strip",
+          "settings": {
+            "item_one": "BACKED BY TECHNOLOGY",
+            "item_two": "TONS OF STORAGE",
+            "item_three": "ANTI-DISTRACTION",
+            "item_four": "LAB TESTED",
+            "item_five": "LONG-SHIFT VERIFIED",
+            "item_six": "4-WAY STRETCH FABRIC",
+            "accessibility_label": "Store highlights",
+            "desktop_width_percent": 100,
+            "strip_height": 42,
+            "text_size": 11,
+            "letter_spacing": 1.5,
+            "scroll_speed": 26,
+            "bg_color": "#0E1F3C",
+            "text_color": "#FAF7F0",
+            "divider_color": "#C9A227"
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "top_marquee_strip"
+      ],
+      "settings": {}
+    },
+    "virtual_rack_section": {
+      "type": "virtual-rack",
+      "settings": {
+        "subheading": "KAPISA EXPERIENCE",
+        "heading": "Virtual Rack",
+        "source_type": "collection",
+        "product_limit": 14,
+        "bg_color": "#FAF8F5",
+        "button_text": "Quick View / Shop Now",
+        "show_price": false,
+        "rod_color_preset": "dark_chrome",
+        "padding_top": 44,
+        "padding_bottom": 24
+      }
     }
   },
   "order": [
     "image_banner",
+    "marquee_bar_section",
+    "virtual_rack_section",
     "178911726578348b29",
     "17891190880977d5e7",
     "17891191932d1dcfbd",

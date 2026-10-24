@@ -1,0 +1,978 @@
+{% comment %}
+  -----------------------------------------------------------------------------
+  KAPISA HEALTHCARE - VIRTUAL SCRUBS RACK
+  File: sections/virtual-rack.liquid
+  Description: A photorealistic, 3D interactive closet clothing rack where scrubs hang
+               in side-profile along a horizontal metallic rod and smoothly expand,
+               flip to front view, and glow on hover with a quick view pill.
+  -----------------------------------------------------------------------------
+{% endcomment %}
+
+{% liquid
+  assign sec_id = section.id
+  assign bg_color = section.settings.bg_color | default: '#FAF8F5'
+  assign subheading = section.settings.subheading | default: 'KAPISA EXPERIENCE'
+  assign heading = section.settings.heading | default: 'Virtual Rack'
+  assign description = section.settings.description
+  assign button_text = section.settings.button_text | default: 'Quick View / Shop Now'
+  assign source_type = section.settings.source_type | default: 'collection'
+  assign target_collection = section.settings.collection
+  assign product_limit = section.settings.product_limit | default: 14
+  assign show_price = section.settings.show_price
+  assign rod_preset = section.settings.rod_color_preset | default: 'dark_chrome'
+
+  assign items_count = 0
+  if source_type == 'blocks' and section.blocks.size > 0
+    assign items_count = section.blocks.size
+  elsif source_type == 'collection' and target_collection != blank and target_collection.products_count > 0
+    assign items_count = target_collection.products.size | at_most: product_limit
+  endif
+%}
+
+{% style %}
+  #shopify-section-{{ sec_id }} {
+    display: block;
+    width: 100%;
+    background-color: {{ bg_color }};
+    padding-top: {{ section.settings.padding_top | default: 48 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | default: 48 }}px;
+    overflow: hidden;
+    position: relative;
+    font-family: inherit;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__header {
+    text-align: left;
+    margin-bottom: 28px;
+    max-width: 800px;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__subheading {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #D4A338;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__heading {
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 800;
+    color: #0F1E36;
+    margin: 0 0 8px 0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__description {
+    font-size: 15px;
+    color: #556275;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* -------------------------------------------------------------
+     THE METALLIC RACK BAR ASSEMBLY
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__bar-assembly {
+    position: relative;
+    width: 100%;
+    height: 26px;
+    margin-top: 10px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__rod {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    height: 16px;
+    border-radius: 8px;
+    z-index: 10;
+    box-sizing: border-box;
+  }
+
+  /* Metallic Finish Variations */
+  {% if rod_preset == 'brass_gold' %}
+    #shopify-section-{{ sec_id }} .ai-rack__rod {
+      background: linear-gradient(180deg, #F3DF8A 0%, #D4A338 35%, #9E7418 70%, #5E430B 100%);
+      box-shadow: 0 2px 3px rgba(255, 255, 255, 0.4) inset, 0 6px 16px rgba(15, 30, 54, 0.25);
+    }
+    #shopify-section-{{ sec_id }} .ai-rack__finial {
+      background: radial-gradient(circle at 35% 35%, #FFF0B8 0%, #D4A338 55%, #63470D 100%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+    }
+  {% elsif rod_preset == 'silver' %}
+    #shopify-section-{{ sec_id }} .ai-rack__rod {
+      background: linear-gradient(180deg, #FFFFFF 0%, #D1D5DB 35%, #9CA3AF 70%, #4B5563 100%);
+      box-shadow: 0 2px 3px rgba(255, 255, 255, 0.6) inset, 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    #shopify-section-{{ sec_id }} .ai-rack__finial {
+      background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #9CA3AF 55%, #374151 100%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+    }
+  {% else %}
+    /* Dark Gunmetal / Black Chrome Default */
+    #shopify-section-{{ sec_id }} .ai-rack__rod {
+      background: linear-gradient(180deg, #606060 0%, #383838 35%, #1F1F1F 70%, #0F0F0F 100%);
+      box-shadow: 0 2px 2px rgba(255, 255, 255, 0.22) inset, 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
+    #shopify-section-{{ sec_id }} .ai-rack__finial {
+      background: radial-gradient(circle at 35% 35%, #7D7D7D 0%, #2A2A2A 60%, #0A0A0A 100%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+    }
+  {% endif %}
+
+  #shopify-section-{{ sec_id }} .ai-rack__finial {
+    position: absolute;
+    top: 1px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    z-index: 12;
+    box-sizing: border-box;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__finial--left {
+    left: 4px;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__finial--right {
+    right: 4px;
+  }
+
+  /* -------------------------------------------------------------
+     SCROLLABLE TRACK & 3D CLOSET SUSPENSION
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__stage {
+    position: relative;
+    width: 100%;
+    margin-top: -10px; /* Overlaps hook directly onto the rod */
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 0 12px 64px 12px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212, 163, 56, 0.4) transparent;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__stage::-webkit-scrollbar {
+    height: 5px;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__stage::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__stage::-webkit-scrollbar-thumb {
+    background: rgba(212, 163, 56, 0.35);
+    border-radius: 999px;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__track {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: max-content;
+    min-width: 100%;
+    margin: 0 auto;
+    padding: 0 40px;
+    box-sizing: border-box;
+    perspective: 1200px;
+    perspective-origin: 50% 15%;
+  }
+
+  /* -------------------------------------------------------------
+     INDIVIDUAL HANGER ITEM
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__item {
+    position: relative;
+    flex: 0 0 52px;
+    width: 52px;
+    margin: 0 -3px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    outline: none;
+    cursor: pointer;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    will-change: transform, margin, width;
+    transition: 
+      margin 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      z-index 0s 0.2s;
+    z-index: 5;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Hover Expansion: Smoothly pushes neighboring scrubs along the bar */
+  #shopify-section-{{ sec_id }} .ai-rack__item:hover,
+  #shopify-section-{{ sec_id }} .ai-rack__item:focus-visible,
+  #shopify-section-{{ sec_id }} .ai-rack__item.is-active {
+    margin: 0 78px;
+    z-index: 60;
+    transition: 
+      margin 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      z-index 0s 0s;
+  }
+
+  /* -------------------------------------------------------------
+     REALISTIC HANGER HOOK & SHOULDER BAR
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__hanger-wrap {
+    position: relative;
+    width: 140px;
+    height: 52px;
+    margin-left: -44px; /* Center 140px hanger over 52px footprint */
+    display: flex;
+    justify-content: center;
+    z-index: 15;
+    pointer-events: none;
+    transition: filter 0.35s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transform-origin: top center;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__hanger-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+    transition: filter 0.35s ease;
+  }
+
+  /* Warm Golden Hanger Glow on Hover */
+  #shopify-section-{{ sec_id }} .ai-rack__item:hover .ai-rack__hanger-wrap,
+  #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__hanger-wrap {
+    filter: drop-shadow(0 0 14px rgba(212, 163, 56, 0.85));
+    transform: scale(1.06);
+  }
+
+  /* -------------------------------------------------------------
+     3D ROTATING GARMENT CARD (SIDE-PROFILE RESTING -> FRONT FLIP)
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__garment-card {
+    position: relative;
+    width: 220px;
+    margin-left: -84px; /* Centered with respect to 52px item */
+    margin-top: -14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateY(-68deg) scale(0.92);
+    will-change: transform, filter;
+    transition: 
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      filter 0.35s ease;
+    filter: brightness(0.91) contrast(1.06) drop-shadow(4px 10px 14px rgba(0, 0, 0, 0.16));
+  }
+
+  /* On Hover: Pull Out, Flip to Front Dead-On, Pop Downward */
+  #shopify-section-{{ sec_id }} .ai-rack__item:hover .ai-rack__garment-card,
+  #shopify-section-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__garment-card,
+  #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__garment-card {
+    transform: perspective(1000px) rotateY(0deg) translateY(18px) scale(1.18);
+    filter: brightness(1) contrast(1) drop-shadow(0 22px 34px rgba(15, 30, 54, 0.26));
+  }
+
+  /* Media Container */
+  #shopify-section-{{ sec_id }} .ai-rack__media-frame {
+    position: relative;
+    width: 100%;
+    height: 310px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__img--side {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    opacity: 1;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__img--front {
+    position: relative;
+    opacity: 1;
+  }
+
+  /* If a dedicated side-profile image is provided, cross-fade on hover */
+  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img .ai-rack__img--front {
+    opacity: 0;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img:hover .ai-rack__img--side,
+  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img.is-active .ai-rack__img--side {
+    opacity: 0;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img:hover .ai-rack__img--front,
+  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img.is-active .ai-rack__img--front {
+    opacity: 1;
+  }
+
+  /* -------------------------------------------------------------
+     FLOATING PILL BUTTON ("Quick View / Shop Now")
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__pill-btn {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+    background: #FFFFFF;
+    color: #0F1E36;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    box-shadow: 0 10px 24px rgba(15, 30, 54, 0.22), 0 2px 6px rgba(0, 0, 0, 0.08);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(212, 163, 56, 0.35);
+    transition: 
+      opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), 
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.2s ease,
+      color 0.2s ease;
+    z-index: 100;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__item:hover .ai-rack__pill-btn,
+  #shopify-section-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__pill-btn,
+  #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__pill-btn {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__pill-btn:hover {
+    background: #0F1E36;
+    color: #FAF8F5;
+    border-color: #0F1E36;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__pill-price {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748B;
+    margin-left: 2px;
+  }
+  #shopify-section-{{ sec_id }} .ai-rack__pill-btn:hover .ai-rack__pill-price {
+    color: #D4A338;
+  }
+
+  /* -------------------------------------------------------------
+     REALISTIC VECTOR FALLBACK GARMENTS (FOR ONBOARDING / EMPTY STATE)
+     ------------------------------------------------------------- */
+  #shopify-section-{{ sec_id }} .ai-rack__silhouette {
+    width: 200px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  #shopify-section-{{ sec_id }} .ai-rack__silhouette-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+  }
+
+  /* -------------------------------------------------------------
+     MOBILE & TOUCH OPTIMIZATION
+     ------------------------------------------------------------- */
+  @media (max-width: 768px) {
+    #shopify-section-{{ sec_id }} {
+      padding-top: {{ section.settings.padding_top | default: 48 | divided_by: 1.4 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | default: 48 | divided_by: 1.4 | round }}px;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__container {
+      padding: 0 16px;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__stage {
+      padding: 0 8px 56px 8px;
+      scroll-snap-type: x mandatory;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__track {
+      justify-content: flex-start;
+      padding: 0 24px;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__item {
+      flex: 0 0 46px;
+      width: 46px;
+      margin: 0 -2px;
+      scroll-snap-align: center;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__item.is-active {
+      margin: 0 68px;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__garment-card {
+      width: 185px;
+      margin-left: -70px;
+      transform: perspective(900px) rotateY(-64deg) scale(0.9);
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__garment-card {
+      transform: perspective(900px) rotateY(0deg) translateY(14px) scale(1.12);
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__media-frame {
+      height: 260px;
+    }
+
+    #shopify-section-{{ sec_id }} .ai-rack__pill-btn {
+      font-size: 12px;
+      padding: 8px 18px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-rack__container" role="region" aria-label="{{ heading | escape }}">
+  {% if subheading != blank or heading != blank %}
+    <div class="ai-rack__header">
+      {% if subheading != blank %}
+        <span class="ai-rack__subheading">{{ subheading }}</span>
+      {% endif %}
+      {% if heading != blank %}
+        <h2 class="ai-rack__heading">{{ heading }}</h2>
+      {% endif %}
+      {% if description != blank %}
+        <div class="ai-rack__description">{{ description }}</div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Horizontal Metallic Wardrobe Rod Assembly -->
+  <div class="ai-rack__bar-assembly" aria-hidden="true">
+    <div class="ai-rack__finial ai-rack__finial--left"></div>
+    <div class="ai-rack__rod"></div>
+    <div class="ai-rack__finial ai-rack__finial--right"></div>
+  </div>
+
+  <!-- Interactive 3D Suspended Clothing Stage -->
+  <div class="ai-rack__stage" id="ai-rack-stage-{{ sec_id }}">
+    <div class="ai-rack__track">
+      {% comment %}
+        Determine data items: either manual blocks, collection products, or onboarding demo items
+      {% endcomment %}
+
+      {% if source_type == 'blocks' and section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          {% liquid
+            assign blk_product = block.settings.product
+            assign front_img = block.settings.custom_front_image
+            assign side_img = block.settings.custom_side_image
+            assign garment_tint = block.settings.garment_color
+
+            assign item_title = block.settings.custom_title
+            if item_title == blank and blk_product != blank
+              assign item_title = blk_product.title
+            elsif item_title == blank
+              assign item_title = 'Classic Medical Scrub'
+            endif
+
+            assign item_url = blk_product.url | default: '/collections/all'
+            assign item_price = blk_product.price
+
+            if front_img == blank and blk_product != blank and blk_product.featured_image != blank
+              assign front_img = blk_product.featured_image
+            endif
+          %}
+
+          <a 
+            href="{{ item_url }}" 
+            class="ai-rack__item{% if side_img != blank %} has-side-img{% endif %}" 
+            data-index="{{ forloop.index0 }}"
+            aria-label="{{ item_title | escape }}"
+            {{ block.shopify_attributes }}
+          >
+            <!-- SVG Realistic Hanger Hook & Bar -->
+            <div class="ai-rack__hanger-wrap" aria-hidden="true">
+              <svg class="ai-rack__hanger-svg" viewBox="0 0 160 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="hookGrad-{{ sec_id }}-{{ forloop.index }}" x1="70" y1="0" x2="95" y2="35" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#E5E7EB"/>
+                    <stop offset="50%" stop-color="#6B7280"/>
+                    <stop offset="100%" stop-color="#1F2937"/>
+                  </linearGradient>
+                  <linearGradient id="bodyGrad-{{ sec_id }}-{{ forloop.index }}" x1="10" y1="45" x2="150" y2="65" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#374151"/>
+                    <stop offset="50%" stop-color="#1F2937"/>
+                    <stop offset="100%" stop-color="#111827"/>
+                  </linearGradient>
+                </defs>
+                <!-- Open Hook looping over the metallic bar -->
+                <path d="M 80 27 C 80 18, 92 14, 92 6 C 92 -2, 78 -2, 74 6" stroke="url(#hookGrad-{{ sec_id }}-{{ forloop.index }})" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+                <!-- Swivel collar -->
+                <rect x="77" y="27" width="6" height="5" rx="1.5" fill="#374151"/>
+                <!-- Contoured shoulder hanger beam -->
+                <path d="M 12 59 Q 80 32 148 59 Q 152 61 146 63 Q 80 38 14 63 Q 8 61 12 59 Z" fill="url(#bodyGrad-{{ sec_id }}-{{ forloop.index }})"/>
+              </svg>
+            </div>
+
+            <!-- 3D Suspended Garment Card -->
+            <div class="ai-rack__garment-card">
+              <div class="ai-rack__media-frame">
+                {% if front_img != blank %}
+                  {% if side_img != blank %}
+                    <img 
+                      src="{{ side_img | image_url: width: 440 }}" 
+                      alt="{{ item_title | escape }} side profile" 
+                      loading="lazy" 
+                      class="ai-rack__img ai-rack__img--side"
+                      width="220"
+                      height="310"
+                    >
+                  {% endif %}
+                  <img 
+                    src="{{ front_img | image_url: width: 440 }}" 
+                    alt="{{ item_title | escape }}" 
+                    loading="lazy" 
+                    class="ai-rack__img ai-rack__img--front"
+                    width="220"
+                    height="310"
+                  >
+                {% else %}
+                  <!-- Elegant Silhouette fallback with custom tint -->
+                  <div class="ai-rack__silhouette" style="--scrub-color: {{ garment_tint | default: '#1B3B6F' }};">
+                    <svg class="ai-rack__silhouette-svg" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M 64 140 L 64 265 C 64 270, 72 272, 88 272 C 94 272, 98 266, 100 240 C 102 266, 106 272, 112 272 C 128 272, 136 270, 136 265 L 136 140 Z" fill="{{ garment_tint | default: '#1B3B6F' }}" fill-opacity="0.85"/>
+                      <rect x="74" y="142" width="52" height="4" rx="2" fill="rgba(255,255,255,0.22)"/>
+                      <path d="M 60 22 L 20 68 C 16 74, 25 82, 32 78 L 56 60 Z" fill="{{ garment_tint | default: '#1B3B6F' }}"/>
+                      <path d="M 140 22 L 180 68 C 184 74, 175 82, 168 78 L 144 60 Z" fill="{{ garment_tint | default: '#1B3B6F' }}"/>
+                      <path d="M 58 22 C 70 20, 130 20, 142 22 L 148 148 C 148 152, 144 154, 140 154 L 60 154 C 56 154, 52 152, 52 148 Z" fill="{{ garment_tint | default: '#1B3B6F' }}"/>
+                      <path d="M 82 21 L 100 52 L 118 21 Z" fill="{{ bg_color }}"/>
+                      <path d="M 80 20 L 100 54 L 120 20" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                      <path d="M 112 70 L 132 70 L 130 92 L 114 92 Z" fill="rgba(0,0,0,0.12)" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+                      <line x1="124" y1="67" x2="124" y2="76" stroke="rgba(212, 163, 56, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Quick View / Shop Now Floating Pill Button -->
+              <div class="ai-rack__pill-btn">
+                <span>{{ button_text }}</span>
+                {% if show_price and item_price != blank %}
+                  <span class="ai-rack__pill-price">· {{ item_price | money }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+
+      {% elsif source_type == 'collection' and target_collection != blank and target_collection.products_count > 0 %}
+        {% for prod in target_collection.products limit: product_limit %}
+          {% liquid
+            assign item_title = prod.title
+            assign item_url = prod.url
+            assign item_price = prod.price
+            assign front_img = prod.featured_image
+            assign garment_tint = prod.metafields.custom.color_swatch.value
+          %}
+
+          <a 
+            href="{{ item_url }}" 
+            class="ai-rack__item" 
+            data-index="{{ forloop.index0 }}"
+            aria-label="{{ item_title | escape }}"
+          >
+            <!-- SVG Realistic Hanger Hook & Bar -->
+            <div class="ai-rack__hanger-wrap" aria-hidden="true">
+              <svg class="ai-rack__hanger-svg" viewBox="0 0 160 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="collHookGrad-{{ sec_id }}-{{ forloop.index }}" x1="70" y1="0" x2="95" y2="35" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#E5E7EB"/>
+                    <stop offset="50%" stop-color="#6B7280"/>
+                    <stop offset="100%" stop-color="#1F2937"/>
+                  </linearGradient>
+                  <linearGradient id="collBodyGrad-{{ sec_id }}-{{ forloop.index }}" x1="10" y1="45" x2="150" y2="65" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#374151"/>
+                    <stop offset="50%" stop-color="#1F2937"/>
+                    <stop offset="100%" stop-color="#111827"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 80 27 C 80 18, 92 14, 92 6 C 92 -2, 78 -2, 74 6" stroke="url(#collHookGrad-{{ sec_id }}-{{ forloop.index }})" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+                <rect x="77" y="27" width="6" height="5" rx="1.5" fill="#374151"/>
+                <path d="M 12 59 Q 80 32 148 59 Q 152 61 146 63 Q 80 38 14 63 Q 8 61 12 59 Z" fill="url(#collBodyGrad-{{ sec_id }}-{{ forloop.index }})"/>
+              </svg>
+            </div>
+
+            <!-- 3D Suspended Garment Card -->
+            <div class="ai-rack__garment-card">
+              <div class="ai-rack__media-frame">
+                {% if front_img != blank %}
+                  <img 
+                    src="{{ front_img | image_url: width: 440 }}" 
+                    alt="{{ item_title | escape }}" 
+                    loading="lazy" 
+                    class="ai-rack__img ai-rack__img--front"
+                    width="220"
+                    height="310"
+                  >
+                {% else %}
+                  <div class="ai-rack__silhouette" style="--scrub-color: {{ garment_tint | default: '#1B3B6F' }};">
+                    <svg class="ai-rack__silhouette-svg" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M 64 140 L 64 265 C 64 270, 72 272, 88 272 C 94 272, 98 266, 100 240 C 102 266, 106 272, 112 272 C 128 272, 136 270, 136 265 L 136 140 Z" fill="{{ garment_tint | default: '#1B3B6F' }}" fill-opacity="0.85"/>
+                      <rect x="74" y="142" width="52" height="4" rx="2" fill="rgba(255,255,255,0.22)"/>
+                      <path d="M 60 22 L 20 68 C 16 74, 25 82, 32 78 L 56 60 Z" fill="{{ garment_tint | default: '#1B3B6F' }}"/>
+                      <path d="M 140 22 L 180 68 C 184 74, 175 82, 168 78 L 144 60 Z" fill="{{ garment_tint | default: '#1B3B6F' }}"/>
+                      <path d="M 58 22 C 70 20, 130 20, 142 22 L 148 148 C 148 152, 144 154, 140 154 L 60 154 C 56 154, 52 152, 52 148 Z" fill="{{ garment_tint | default: '#1B3B6F' }}"/>
+                      <path d="M 82 21 L 100 52 L 118 21 Z" fill="{{ bg_color }}"/>
+                      <path d="M 80 20 L 100 54 L 120 20" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                      <path d="M 112 70 L 132 70 L 130 92 L 114 92 Z" fill="rgba(0,0,0,0.12)" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+                      <line x1="124" y1="67" x2="124" y2="76" stroke="rgba(212, 163, 56, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Quick View / Shop Now Floating Pill Button -->
+              <div class="ai-rack__pill-btn">
+                <span>{{ button_text }}</span>
+                {% if show_price and item_price != blank %}
+                  <span class="ai-rack__pill-price">· {{ item_price | money }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+
+      {% else %}
+        {% comment %}
+          ONBOARDING / DEMO STATE:
+          Renders 14 realistic demo scrubs in classic medical scrub shades so the section
+          looks fully populated and visually stunning upon initial setup.
+        {% endcomment %}
+        {% assign demo_colors = '#1B3B6F,#0D5C63,#4A1525,#1E3A8A,#1B4942,#2D3142,#3D4A26,#334155,#18191C,#6B5B82,#5E1929,#1E40AF,#2E4057,#34495E' | split: ',' %}
+        {% assign demo_titles = 'Apex Pro Top - Navy,Core Stretch - Teal,Burgundy Classic,Royal Blue V-Neck,Hunter Green Pro,Charcoal Scrub Set,Olive Duty Top,Slate Performance,Midnight Onyx,Lavender Soft,Tailored Wine,Ocean Wave Set,Pacific Deep,Granite Scrub' | split: ',' %}
+
+        {% for i in (0..13) %}
+          {% assign demo_color = demo_colors[i] %}
+          {% assign demo_title = demo_titles[i] %}
+
+          <a 
+            href="/collections/all" 
+            class="ai-rack__item" 
+            data-index="{{ i }}"
+            aria-label="{{ demo_title }}"
+          >
+            <!-- SVG Realistic Hanger Hook & Bar -->
+            <div class="ai-rack__hanger-wrap" aria-hidden="true">
+              <svg class="ai-rack__hanger-svg" viewBox="0 0 160 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="demoHook-{{ sec_id }}-{{ i }}" x1="70" y1="0" x2="95" y2="35" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#E5E7EB"/>
+                    <stop offset="50%" stop-color="#6B7280"/>
+                    <stop offset="100%" stop-color="#1F2937"/>
+                  </linearGradient>
+                  <linearGradient id="demoBody-{{ sec_id }}-{{ i }}" x1="10" y1="45" x2="150" y2="65" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#374151"/>
+                    <stop offset="50%" stop-color="#1F2937"/>
+                    <stop offset="100%" stop-color="#111827"/>
+                  </linearGradient>
+                </defs>
+                <path d="M 80 27 C 80 18, 92 14, 92 6 C 92 -2, 78 -2, 74 6" stroke="url(#demoHook-{{ sec_id }}-{{ i }})" stroke-width="4.2" stroke-linecap="round" fill="none"/>
+                <rect x="77" y="27" width="6" height="5" rx="1.5" fill="#374151"/>
+                <path d="M 12 59 Q 80 32 148 59 Q 152 61 146 63 Q 80 38 14 63 Q 8 61 12 59 Z" fill="url(#demoBody-{{ sec_id }}-{{ i }})"/>
+              </svg>
+            </div>
+
+            <!-- 3D Suspended Garment Card -->
+            <div class="ai-rack__garment-card">
+              <div class="ai-rack__media-frame">
+                <div class="ai-rack__silhouette" style="--scrub-color: {{ demo_color }};">
+                  <svg class="ai-rack__silhouette-svg" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="sg-{{ sec_id }}-{{ i }}" x1="30" y1="10" x2="170" y2="270" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="{{ demo_color }}" stop-opacity="1"/>
+                        <stop offset="70%" stop-color="{{ demo_color }}" stop-opacity="0.92"/>
+                        <stop offset="100%" stop-color="#000000" stop-opacity="0.35"/>
+                      </linearGradient>
+                      <linearGradient id="pant-{{ sec_id }}-{{ i }}" x1="40" y1="140" x2="160" y2="280" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="{{ demo_color }}" stop-opacity="0.85"/>
+                        <stop offset="100%" stop-color="#000000" stop-opacity="0.45"/>
+                      </linearGradient>
+                    </defs>
+
+                    <!-- Scrub Pants Silhouette beneath -->
+                    <path d="M 64 140 L 64 265 C 64 270, 72 272, 88 272 C 94 272, 98 266, 100 240 C 102 266, 106 272, 112 272 C 128 272, 136 270, 136 265 L 136 140 Z" fill="url(#pant-{{ sec_id }}-{{ i }})"/>
+                    <!-- Scrub Pants Drawstring / Waistband Accent -->
+                    <rect x="74" y="142" width="52" height="4" rx="2" fill="rgba(255,255,255,0.22)"/>
+                    <path d="M 98 144 L 96 158 M 102 144 L 105 160" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+
+                    <!-- Scrub Top Silhouette with Folded Sleeves & V-Neck -->
+                    <!-- Left Sleeve -->
+                    <path d="M 60 22 L 20 68 C 16 74, 25 82, 32 78 L 56 60 Z" fill="{{ demo_color }}"/>
+                    <!-- Right Sleeve -->
+                    <path d="M 140 22 L 180 68 C 184 74, 175 82, 168 78 L 144 60 Z" fill="{{ demo_color }}"/>
+                    <!-- Main Body -->
+                    <path d="M 58 22 C 70 20, 130 20, 142 22 L 148 148 C 148 152, 144 154, 140 154 L 60 154 C 56 154, 52 152, 52 148 Z" fill="url(#sg-{{ sec_id }}-{{ i }})"/>
+                    <!-- V-Neck Collar Detail -->
+                    <path d="M 82 21 L 100 52 L 118 21 Z" fill="{{ bg_color }}"/>
+                    <path d="M 80 20 L 100 54 L 120 20" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <!-- Chest Pocket Accent -->
+                    <path d="M 112 70 L 132 70 L 130 92 L 114 92 Z" fill="rgba(0,0,0,0.12)" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
+                    <!-- Subtle Pen Slot -->
+                    <line x1="124" y1="67" x2="124" y2="76" stroke="rgba(212, 163, 56, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Quick View / Shop Now Floating Pill Button -->
+              <div class="ai-rack__pill-btn">
+                <span>{{ button_text }}</span>
+                {% if show_price %}
+                  <span class="ai-rack__pill-price">· $45.00</span>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var sectionRoot = document.getElementById('shopify-section-{{ sec_id }}');
+    if (!sectionRoot) return;
+
+    var stage = sectionRoot.querySelector('.ai-rack__stage');
+    var items = sectionRoot.querySelectorAll('.ai-rack__item');
+
+    if (!items.length) return;
+
+    // Mobile / Touch handling: Single tap expands, second tap or pill navigates
+    var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+    if (isTouchDevice) {
+      items.forEach(function(item) {
+        item.addEventListener('click', function(e) {
+          var isActive = item.classList.contains('is-active');
+          var clickedPill = e.target.closest('.ai-rack__pill-btn');
+
+          if (!isActive && !clickedPill) {
+            e.preventDefault();
+            items.forEach(function(other) { other.classList.remove('is-active'); });
+            item.classList.add('is-active');
+
+            // Scroll active item smoothly into view if partially obscured
+            if (stage) {
+              var itemRect = item.getBoundingClientRect();
+              var stageRect = stage.getBoundingClientRect();
+              if (itemRect.left < stageRect.left || itemRect.right > stageRect.right) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+              }
+            }
+          }
+          // If already active or clicked directly on pill, link proceeds normally
+        });
+      });
+
+      // Tap outside to dismiss active item
+      document.addEventListener('click', function(e) {
+        if (!sectionRoot.contains(e.target)) {
+          items.forEach(function(item) { item.classList.remove('is-active'); });
+        }
+      });
+    }
+
+    // Centering the rack comfortably on initial desktop load
+    if (stage && stage.scrollWidth > stage.clientWidth) {
+      // Gentle center offset if scrollable
+      stage.scrollLeft = (stage.scrollWidth - stage.clientWidth) / 2;
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Virtual Scrubs Rack",
+  "tag": "section",
+  "class": "section-virtual-rack",
+  "settings": [
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "KAPISA EXPERIENCE"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Virtual Rack"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "source_type",
+      "label": "Product Source",
+      "options": [
+        {
+          "value": "blocks",
+          "label": "Manual Blocks"
+        },
+        {
+          "value": "collection",
+          "label": "Collection"
+        }
+      ],
+      "default": "collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 6,
+      "max": 20,
+      "step": 1,
+      "label": "Product Limit",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#FAF8F5"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Quick View / Shop Now"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show Price in Pill",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "rod_color_preset",
+      "label": "Rod Finish",
+      "options": [
+        {
+          "value": "dark_chrome",
+          "label": "Dark Gunmetal / Black Chrome"
+        },
+        {
+          "value": "brass_gold",
+          "label": "Brushed Brass / Gold"
+        },
+        {
+          "value": "silver",
+          "label": "Polished Silver / Stainless"
+        }
+      ],
+      "default": "dark_chrome"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 16,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 16,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding Bottom",
+      "default": 48
+    }
+  ],
+  "blocks": [
+    {
+      "type": "scrub_item",
+      "name": "Scrub Hanger",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_front_image",
+          "label": "Custom Front Image (Transparent PNG)"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_side_image",
+          "label": "Custom Side Profile Image (Optional)"
+        },
+        {
+          "type": "color",
+          "id": "garment_color",
+          "label": "Fallback / Tint Color"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "Custom Title Override (Optional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Virtual Scrubs Rack"
+    }
+  ]
+}
+{% endschema %}
