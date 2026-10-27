@@ -1,12 +1,11 @@
 {% comment %}
   -----------------------------------------------------------------------------
-  KAPISA HEALTHCARE - VIRTUAL SCRUBS RACK
-  File: sections/virtual-rack.liquid
-  Description: Photorealistic 3D interactive closet clothing rack where real store
-               scrub products hang along a horizontal metallic rod in side-profile.
-               Hovering expands the rack, flips the scrub to front view with an
-               illuminated hanger glow, and shows a floating "Quick View / Shop Now" pill.
-               Clicking navigates directly to that specific product page.
+  KAPISA - VIRTUAL RACK (v2)
+  A straight metal rail with evenly spaced hangers. Garments overlap like a real
+  rack; hover lifts one out with a glow + "Quick View / Shop Now" pill; click opens
+  a focus view (others blur away) with Front/Back toggle - like the reference reel.
+  Tip: transparent PNG cut-outs look best. Plain white/light photo backgrounds are
+  removed automatically in the browser so garments can overlap like a real rack.
   -----------------------------------------------------------------------------
 {% endcomment %}
 
@@ -15,693 +14,297 @@
   assign bg_color = section.settings.bg_color | default: '#FAF8F5'
   assign subheading = section.settings.subheading | default: 'KAPISA EXPERIENCE'
   assign heading = section.settings.heading | default: 'Virtual Rack'
-  assign description = section.settings.description
   assign button_text = section.settings.button_text | default: 'Quick View / Shop Now'
   assign source_type = section.settings.source_type | default: 'collection'
-  assign target_collection = section.settings.collection
   assign product_limit = section.settings.product_limit | default: 16
   assign show_price = section.settings.show_price
+  assign repeat_products = section.settings.repeat_products
   assign rod_preset = section.settings.rod_color_preset | default: 'dark_chrome'
 
-  # Build candidate list of real products
-  assign scrubs_list = '' | split: ''
-
-  if source_type == 'blocks' and section.blocks.size > 0
-    # Manual blocks mode handled in template loop below
+  if rod_preset == 'brass_gold'
+    assign rod_css = 'linear-gradient(180deg,#F5E59C 0%,#D4A338 35%,#9E7418 70%,#5E430B 100%)'
+  elsif rod_preset == 'silver'
+    assign rod_css = 'linear-gradient(180deg,#FFFFFF 0%,#D1D5DB 35%,#9CA3AF 70%,#4B5563 100%)'
   else
-    if target_collection != blank and target_collection.products_count > 0
-      assign scrubs_list = target_collection.products
-    else
-      # Auto-filter real medical scrubs from store catalog (excluding gift cards, snowboards, service items)
-      assign raw_products = collections['all'].products
-      for prod in raw_products
-        assign h = prod.handle | downcase
-        unless h contains 'gift-card' or h contains 'snowboard' or h contains 'embroidery-options'
-          if prod.featured_image != blank
-            assign single_item = prod | where: 'id', prod.id
-            assign scrubs_list = scrubs_list | concat: single_item
-          endif
-        endunless
-      endfor
-    endif
+    assign rod_css = 'linear-gradient(180deg,#6a6a6a 0%,#303030 40%,#151515 80%,#050505 100%)'
+  endif
 
-    # Fallback to collections['all'] if no scrubs found
-    if scrubs_list.size == 0
-      assign scrubs_list = collections['all'].products
-    endif
+  if section.settings.collection != blank and section.settings.collection.products_count > 0
+    assign pool = section.settings.collection.products
+  else
+    assign pool = collections.all.products
   endif
 %}
 
 {% style %}
-  #shopify-section-{{ sec_id }} {
-    display: block;
-    width: 100%;
-    background-color: {{ bg_color }};
-    padding-top: {{ section.settings.padding_top | default: 40 }}px;
-    padding-bottom: {{ section.settings.padding_bottom | default: 36 }}px;
-    overflow: visible;
-    position: relative;
-    font-family: inherit;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__container {
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-    box-sizing: border-box;
-    position: relative;
-    overflow: visible;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__header {
-    text-align: left;
-    margin-bottom: 22px;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__subheading {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: #D4A338;
-    margin-bottom: 4px;
-    line-height: 1.3;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__heading {
-    font-size: clamp(26px, 3.6vw, 36px);
-    font-weight: 800;
-    color: #0F1E36;
-    margin: 0 0 6px 0;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__description {
-    font-size: 14px;
-    color: #64748B;
-    margin: 0;
-    line-height: 1.5;
-  }
-
-  /* -------------------------------------------------------------
-     METALLIC WARDROBE ROD ASSEMBLY
-     ------------------------------------------------------------- */
-  #shopify-section-{{ sec_id }} .ai-rack__bar-assembly {
-    position: relative;
-    width: 100%;
-    height: 22px;
-    margin-top: 14px;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__rod {
-    position: absolute;
-    left: 14px;
-    right: 14px;
-    height: 14px;
-    border-radius: 7px;
-    z-index: 10;
-    box-sizing: border-box;
-  }
-
-  {% if rod_preset == 'brass_gold' %}
-    #shopify-section-{{ sec_id }} .ai-rack__rod {
-      background: linear-gradient(180deg, #F5E59C 0%, #D4A338 35%, #9E7418 70%, #5E430B 100%);
-      box-shadow: 0 2px 3px rgba(255, 255, 255, 0.4) inset, 0 4px 12px rgba(15, 30, 54, 0.2);
-    }
-    #shopify-section-{{ sec_id }} .ai-rack__finial {
-      background: radial-gradient(circle at 35% 35%, #FFF0B8 0%, #D4A338 55%, #63470D 100%);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    }
-  {% elsif rod_preset == 'silver' %}
-    #shopify-section-{{ sec_id }} .ai-rack__rod {
-      background: linear-gradient(180deg, #FFFFFF 0%, #D1D5DB 35%, #9CA3AF 70%, #4B5563 100%);
-      box-shadow: 0 2px 3px rgba(255, 255, 255, 0.6) inset, 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-    #shopify-section-{{ sec_id }} .ai-rack__finial {
-      background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #9CA3AF 55%, #374151 100%);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.6);
-    }
-  {% else %}
-    /* Dark Gunmetal / Black Chrome Default */
-    #shopify-section-{{ sec_id }} .ai-rack__rod {
-      background: linear-gradient(180deg, #5A5A5A 0%, #303030 40%, #151515 80%, #050505 100%);
-      box-shadow: 0 2px 2px rgba(255, 255, 255, 0.28) inset, 0 5px 14px rgba(0, 0, 0, 0.4);
-    }
-    #shopify-section-{{ sec_id }} .ai-rack__finial {
-      background: radial-gradient(circle at 35% 35%, #777777 0%, #262626 60%, #0A0A0A 100%);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4);
-    }
-  {% endif %}
-
-  #shopify-section-{{ sec_id }} .ai-rack__finial {
-    position: absolute;
-    top: 0px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    z-index: 12;
-    box-sizing: border-box;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__finial--left { left: 4px; }
-  #shopify-section-{{ sec_id }} .ai-rack__finial--right { right: 4px; }
-
-  /* -------------------------------------------------------------
-     STAGE & SCROLLABLE RACK TRACK
-     ------------------------------------------------------------- */
-  #shopify-section-{{ sec_id }} .ai-rack__stage {
-    position: relative;
-    width: 100%;
-    margin-top: -15px; /* Aligns hanger hook directly over the rod */
-    overflow-x: auto;
-    overflow-y: visible;
-    padding: 0 10px 42px 10px;
-    box-sizing: border-box;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(212, 163, 56, 0.35) transparent;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__stage::-webkit-scrollbar {
-    height: 4px;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__stage::-webkit-scrollbar-thumb {
-    background: rgba(212, 163, 56, 0.3);
-    border-radius: 999px;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__track {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    width: max-content;
-    min-width: 100%;
-    margin: 0 auto;
-    padding: 0 32px;
-    box-sizing: border-box;
-    perspective: 1000px;
-    perspective-origin: 50% 20%;
-  }
-
-  /* -------------------------------------------------------------
-     INDIVIDUAL HANGER ITEM
-     ------------------------------------------------------------- */
-  #shopify-section-{{ sec_id }} .ai-rack__item {
-    position: relative;
-    flex: 0 0 38px;
-    width: 38px;
-    margin: 0 -2px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    outline: none;
-    cursor: pointer;
-    transform-origin: top center;
-    transform-style: preserve-3d;
-    will-change: transform, margin, width;
-    transition: 
-      margin 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      z-index 0s 0.2s;
-    z-index: 5;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Hover Expansion */
-  #shopify-section-{{ sec_id }} .ai-rack__item:hover,
-  #shopify-section-{{ sec_id }} .ai-rack__item:focus-visible,
-  #shopify-section-{{ sec_id }} .ai-rack__item.is-active {
-    margin: 0 58px;
-    z-index: 60;
-    transition: 
-      margin 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      z-index 0s 0s;
-  }
-
-  /* -------------------------------------------------------------
-     REALISTIC HANGER HOOK & SHOULDER BAR
-     ------------------------------------------------------------- */
-  #shopify-section-{{ sec_id }} .ai-rack__hanger-wrap {
-    position: relative;
-    width: 110px;
-    height: 44px;
-    margin-left: -36px; /* Centers 110px hanger over 38px slot */
-    display: flex;
-    justify-content: center;
-    z-index: 15;
-    pointer-events: none;
-    transition: filter 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    transform-origin: top center;
-    overflow: visible;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__hanger-svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
-    transition: filter 0.3s ease;
-  }
-
-  /* Golden Radial Hanger Glow on Hover */
-  #shopify-section-{{ sec_id }} .ai-rack__item:hover .ai-rack__hanger-wrap,
-  #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__hanger-wrap {
-    filter: drop-shadow(0 -3px 14px rgba(212, 163, 56, 0.95)) drop-shadow(0 4px 10px rgba(212, 163, 56, 0.6));
-    transform: scale(1.05);
-  }
-
-  /* -------------------------------------------------------------
-     3D ROTATING REAL PRODUCT GARMENT CARD
-     ------------------------------------------------------------- */
-  #shopify-section-{{ sec_id }} .ai-rack__garment-card {
-    position: relative;
-    width: 136px;
-    margin-left: -49px; /* Centers 136px card over 38px slot */
-    margin-top: -6px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform-origin: top center;
-    transform-style: preserve-3d;
-    transform: perspective(850px) rotateY(-66deg) scale(0.9);
-    will-change: transform, filter;
-    transition: 
-      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-      filter 0.3s ease;
-    filter: brightness(0.92) contrast(1.05) drop-shadow(3px 8px 12px rgba(0, 0, 0, 0.18));
-  }
-
-  /* On Hover: Pulls out, flips face-forward, pops lower */
-  #shopify-section-{{ sec_id }} .ai-rack__item:hover .ai-rack__garment-card,
-  #shopify-section-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__garment-card,
-  #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__garment-card {
-    transform: perspective(850px) rotateY(0deg) translateY(6px) scale(1.14);
-    filter: brightness(1) contrast(1) drop-shadow(0 14px 24px rgba(15, 30, 54, 0.28));
-  }
-
-  /* Media Frame & Real Product Photography */
-  #shopify-section-{{ sec_id }} .ai-rack__media-frame {
-    position: relative;
-    width: 100%;
-    height: 185px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    overflow: hidden;
-    background: #FFFFFF;
-    box-shadow: 0 4px 10px rgba(15, 30, 54, 0.08);
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
-    user-select: none;
-    pointer-events: none;
-    display: block;
-    transition: opacity 0.3s ease;
-  }
-
-  /* Side profile image cross-fade support */
-  #shopify-section-{{ sec_id }} .ai-rack__img--side {
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    opacity: 1;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__img--front {
-    position: relative;
-    opacity: 1;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img .ai-rack__img--front {
-    opacity: 0;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img:hover .ai-rack__img--side,
-  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img.is-active .ai-rack__img--side {
-    opacity: 0;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img:hover .ai-rack__img--front,
-  #shopify-section-{{ sec_id }} .ai-rack__item.has-side-img.is-active .ai-rack__img--front {
-    opacity: 1;
-  }
-
-  /* -------------------------------------------------------------
-     FLOATING PILL BUTTON ("Quick View / Shop Now")
-     ------------------------------------------------------------- */
-  #shopify-section-{{ sec_id }} .ai-rack__pill-btn {
-    position: absolute;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%) translateY(8px) scale(0.9);
-    opacity: 0;
-    pointer-events: none;
-    background: #FFFFFF;
-    color: #0F1E36;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    padding: 7px 16px;
-    border-radius: 999px;
-    box-shadow: 0 6px 18px rgba(15, 30, 54, 0.22);
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid rgba(212, 163, 56, 0.35);
-    transition: 
-      opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1), 
-      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-      background-color 0.15s ease,
-      color 0.15s ease;
-    z-index: 50;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__item:hover .ai-rack__pill-btn,
-  #shopify-section-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__pill-btn,
-  #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__pill-btn {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__pill-btn:hover {
-    background: #0F1E36;
-    color: #FAF8F5;
-    border-color: #0F1E36;
-  }
-
-  #shopify-section-{{ sec_id }} .ai-rack__pill-price {
-    font-size: 10px;
-    font-weight: 600;
-    color: #64748B;
-  }
-  #shopify-section-{{ sec_id }} .ai-rack__pill-btn:hover .ai-rack__pill-price {
-    color: #D4A338;
-  }
-
-  /* -------------------------------------------------------------
-     MOBILE RESPONSIVENESS
-     ------------------------------------------------------------- */
-  @media (max-width: 768px) {
-    #shopify-section-{{ sec_id }} {
-      padding-top: {{ section.settings.padding_top | default: 40 | divided_by: 1.4 | round }}px;
-      padding-bottom: {{ section.settings.padding_bottom | default: 36 | divided_by: 1.4 | round }}px;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__container {
-      padding: 0 16px;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__stage {
-      padding: 0 6px 36px 6px;
-      scroll-snap-type: x mandatory;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__track {
-      justify-content: flex-start;
-      padding: 0 16px;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__item {
-      flex: 0 0 32px;
-      width: 32px;
-      margin: 0 -2px;
-      scroll-snap-align: center;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__item.is-active {
-      margin: 0 48px;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__hanger-wrap {
-      width: 95px;
-      margin-left: -31px;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__garment-card {
-      width: 118px;
-      margin-left: -43px;
-      transform: perspective(700px) rotateY(-62deg) scale(0.88);
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__item.is-active .ai-rack__garment-card {
-      transform: perspective(700px) rotateY(0deg) translateY(4px) scale(1.1);
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__media-frame {
-      height: 160px;
-    }
-
-    #shopify-section-{{ sec_id }} .ai-rack__pill-btn {
-      font-size: 10px;
-      padding: 6px 12px;
-      bottom: 6px;
-    }
-  }
+  #shopify-section-{{ sec_id }} { background: {{ bg_color }}; padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px; }
+  #ai-rack-{{ sec_id }} { --rod: {{ rod_css }}; }
 {% endstyle %}
 
-<div class="ai-rack__container" role="region" aria-label="{{ heading | escape }}">
-  {% if subheading != blank or heading != blank %}
-    <div class="ai-rack__header">
-      {% if subheading != blank %}
-        <span class="ai-rack__subheading">{{ subheading }}</span>
-      {% endif %}
-      {% if heading != blank %}
-        <h2 class="ai-rack__heading">{{ heading }}</h2>
-      {% endif %}
-      {% if description != blank %}
-        <div class="ai-rack__description">{{ description }}</div>
-      {% endif %}
-    </div>
-  {% endif %}
+<div class="ai-rack" id="ai-rack-{{ sec_id }}" role="region" aria-label="{{ heading | escape }}">
+  <style>
+    #ai-rack-{{ sec_id }}{--slot:64px;--card:140px;max-width:1400px;margin:0 auto;padding:0 20px;box-sizing:border-box;position:relative;font-family:inherit;-webkit-font-smoothing:antialiased}
+    #ai-rack-{{ sec_id }} *{box-sizing:border-box}
+    #ai-rack-{{ sec_id }} .ai-rack__header{margin-bottom:18px;text-align:left}
+    #ai-rack-{{ sec_id }} .ai-rack__sub{display:block;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#D4A338;margin-bottom:4px}
+    #ai-rack-{{ sec_id }} .ai-rack__heading{font-size:clamp(26px,3.6vw,36px);font-weight:800;color:#0F1E36;margin:0;line-height:1.15;letter-spacing:-.02em}
 
-  <!-- Horizontal Metallic Wardrobe Rod Assembly -->
-  <div class="ai-rack__bar-assembly" aria-hidden="true">
-    <div class="ai-rack__finial ai-rack__finial--left"></div>
-    <div class="ai-rack__rod"></div>
-    <div class="ai-rack__finial ai-rack__finial--right"></div>
+    /* stage + rail */
+    #ai-rack-{{ sec_id }} .ai-rack__stage{position:relative;min-height:calc(var(--card)*1.62 + 110px);transition:min-height .5s cubic-bezier(.22,1,.36,1)}
+    #ai-rack-{{ sec_id }}.is-focus .ai-rack__stage{min-height:560px}
+    #ai-rack-{{ sec_id }} .ai-rack__rail{position:absolute;left:0;right:0;top:5px;height:14px;border-radius:7px;background:var(--rod);box-shadow:inset 0 2px 2px rgba(255,255,255,.28),0 6px 14px rgba(0,0,0,.25);z-index:1}
+    #ai-rack-{{ sec_id }} .ai-rack__rail::before,#ai-rack-{{ sec_id }} .ai-rack__rail::after{content:"";position:absolute;top:-4px;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a8a8a 0%,#2a2a2a 60%,#0a0a0a 100%);box-shadow:0 3px 8px rgba(0,0,0,.4)}
+    #ai-rack-{{ sec_id }} .ai-rack__rail::before{left:-6px}
+    #ai-rack-{{ sec_id }} .ai-rack__rail::after{right:-6px}
+    #ai-rack-{{ sec_id }} .ai-rack__scroller{position:relative;overflow-x:auto;overflow-y:visible;padding:0 0 70px;scrollbar-width:none;transition:filter .45s ease,opacity .45s ease}
+    #ai-rack-{{ sec_id }} .ai-rack__scroller::-webkit-scrollbar{display:none}
+    #ai-rack-{{ sec_id }} .ai-rack__track{display:flex;justify-content:center;width:max-content;min-width:100%;padding:0 30px}
+    #ai-rack-{{ sec_id }}.is-focus .ai-rack__scroller{filter:blur(7px) saturate(.8);opacity:.45;pointer-events:none}
+
+    /* item */
+    #ai-rack-{{ sec_id }} .ai-rack__item{position:relative;flex:0 0 var(--slot);width:var(--slot);height:calc(var(--card)*1.62 + 34px);display:block;text-decoration:none;color:inherit;outline:none;cursor:pointer;transition:transform .45s cubic-bezier(.22,1,.36,1);-webkit-tap-highlight-color:transparent;z-index:2}
+    #ai-rack-{{ sec_id }} .ai-rack__hanger{pointer-events:none;position:absolute;top:0;left:50%;width:calc(var(--card)*.62);max-width:84px;height:auto;transform:translateX(-50%);z-index:5;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28));transition:filter .3s ease,transform .45s cubic-bezier(.22,1,.36,1)}
+    #ai-rack-{{ sec_id }} .ai-rack__garment{pointer-events:none;position:absolute;top:calc(var(--card)*.2 + 8px);left:50%;width:var(--card);height:calc(var(--card)*1.55);transform:translateX(-50%);transform-origin:50% 0;transition:transform .45s cubic-bezier(.22,1,.36,1)}
+    #ai-rack-{{ sec_id }} .ai-rack__garment img{width:100%;height:100%;object-fit:contain;object-position:top center;display:block;user-select:none;pointer-events:none}
+
+    /* hover: lift one out, neighbours make room */
+    #ai-rack-{{ sec_id }} .ai-rack__item:hover,#ai-rack-{{ sec_id }} .ai-rack__item:focus-visible{z-index:30}
+    #ai-rack-{{ sec_id }} .ai-rack__item:hover .ai-rack__garment,#ai-rack-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__garment{transform:translateX(-50%) scale(1.3)}
+    #ai-rack-{{ sec_id }} .ai-rack__item:hover .ai-rack__hanger,#ai-rack-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__hanger{transform:translateX(-50%) scale(1.15);filter:drop-shadow(0 -2px 14px rgba(212,163,56,.95)) drop-shadow(0 3px 8px rgba(212,163,56,.6))}
+    #ai-rack-{{ sec_id }} .ai-rack__item:hover + .ai-rack__item{transform:translateX(calc(var(--card)*.32))}
+    #ai-rack-{{ sec_id }} .ai-rack__item:has(+ .ai-rack__item:hover){transform:translateX(calc(var(--card)*-.32))}
+    #ai-rack-{{ sec_id }} .ai-rack__pill{position:absolute;left:50%;top:calc(var(--card)*.2 + var(--card)*1.55*1.3 + 18px);transform:translate(-50%,8px) scale(.92);opacity:0;pointer-events:none;background:#fff;color:#0F1E36;font-size:12px;font-weight:700;padding:8px 16px;border-radius:999px;white-space:nowrap;box-shadow:0 6px 18px rgba(15,30,54,.2);border:1px solid rgba(212,163,56,.35);transition:opacity .25s ease,transform .25s ease;z-index:40}
+    #ai-rack-{{ sec_id }} .ai-rack__pill em{font-style:normal;color:#64748B}
+    #ai-rack-{{ sec_id }} .ai-rack__item:hover .ai-rack__pill,#ai-rack-{{ sec_id }} .ai-rack__item:focus-visible .ai-rack__pill{opacity:1;pointer-events:auto;transform:translate(-50%,0) scale(1)}
+
+    /* focus view (reel style) */
+    #ai-rack-{{ sec_id }} .ai-rack__focus{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;opacity:0;pointer-events:none;transition:opacity .4s ease;z-index:50;text-align:center}
+    #ai-rack-{{ sec_id }}.is-focus .ai-rack__focus{opacity:1;pointer-events:auto}
+    #ai-rack-{{ sec_id }} .ai-rack__f-hanger{width:92px;margin-top:-2px;position:relative;z-index:2;filter:drop-shadow(0 -2px 14px rgba(212,163,56,.7))}
+    #ai-rack-{{ sec_id }} .ai-rack__f-img{width:min(340px,78vw);height:min(400px,52vw);min-height:260px;margin-top:-18px;object-fit:contain;object-position:top center;transition:opacity .25s ease,transform .35s cubic-bezier(.22,1,.36,1)}
+    #ai-rack-{{ sec_id }} .ai-rack__f-img.is-swap{opacity:0;transform:translateY(6px) scale(.98)}
+    #ai-rack-{{ sec_id }} .ai-rack__f-title{margin:14px 0 10px;font-size:15px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#0F1E36}
+    #ai-rack-{{ sec_id }} .ai-rack__toggle{display:inline-flex;padding:3px;border-radius:999px;background:#fff;border:1px solid rgba(15,30,54,.12);margin-bottom:12px}
+    #ai-rack-{{ sec_id }} .ai-rack__toggle button{border:0;background:transparent;font:inherit;font-size:11px;font-weight:700;padding:5px 16px;border-radius:999px;cursor:pointer;color:#64748B}
+    #ai-rack-{{ sec_id }} .ai-rack__toggle button.is-on{background:#0F1E36;color:#fff}
+    #ai-rack-{{ sec_id }} .ai-rack__shop{display:inline-block;padding:10px 24px;border-radius:999px;border:1.5px solid #0F1E36;color:#0F1E36;font-size:12px;font-weight:800;letter-spacing:.04em;text-decoration:none;background:transparent;transition:background .2s,color .2s}
+    #ai-rack-{{ sec_id }} .ai-rack__shop:hover{background:#0F1E36;color:#fff}
+    #ai-rack-{{ sec_id }} .ai-rack__nav,#ai-rack-{{ sec_id }} .ai-rack__close{position:absolute;border:1px solid rgba(15,30,54,.14);background:#fff;color:#0F1E36;width:42px;height:42px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:18px;box-shadow:0 6px 16px rgba(15,30,54,.12);transition:transform .2s,background .2s,color .2s}
+    #ai-rack-{{ sec_id }} .ai-rack__nav:hover,#ai-rack-{{ sec_id }} .ai-rack__close:hover{background:#0F1E36;color:#fff;transform:scale(1.06)}
+    #ai-rack-{{ sec_id }} .ai-rack__nav--prev{left:4%;top:190px}
+    #ai-rack-{{ sec_id }} .ai-rack__nav--next{right:4%;top:190px}
+    #ai-rack-{{ sec_id }} .ai-rack__close{right:2%;top:40px;width:36px;height:36px;font-size:15px}
+
+    @media (max-width:768px){
+      #ai-rack-{{ sec_id }}{padding:0 12px}
+      #ai-rack-{{ sec_id }} .ai-rack__track{justify-content:flex-start}
+      #ai-rack-{{ sec_id }} .ai-rack__scroller{scroll-snap-type:x proximity}
+      #ai-rack-{{ sec_id }} .ai-rack__item{scroll-snap-align:center}
+      #ai-rack-{{ sec_id }}.is-focus .ai-rack__stage{min-height:540px}
+      #ai-rack-{{ sec_id }} .ai-rack__nav--prev{left:0;top:170px}
+      #ai-rack-{{ sec_id }} .ai-rack__nav--next{right:0;top:170px}
+    }
+    @media (hover:none){
+      #ai-rack-{{ sec_id }} .ai-rack__pill{display:none}
+      #ai-rack-{{ sec_id }} .ai-rack__item:hover + .ai-rack__item,#ai-rack-{{ sec_id }} .ai-rack__item:has(+ .ai-rack__item:hover){transform:none}
+    }
+    @media (prefers-reduced-motion:reduce){#ai-rack-{{ sec_id }} *{transition:none!important}}
+  </style>
+
+  <div class="ai-rack__header">
+    {% if subheading != blank %}<span class="ai-rack__sub">{{ subheading }}</span>{% endif %}
+    {% if heading != blank %}<h2 class="ai-rack__heading">{{ heading }}</h2>{% endif %}
   </div>
 
-  <!-- Interactive 3D Suspended Clothing Stage -->
-  <div class="ai-rack__stage" id="ai-rack-stage-{{ sec_id }}">
-    <div class="ai-rack__track">
+  <div class="ai-rack__stage">
+    <div class="ai-rack__rail" aria-hidden="true"></div>
 
-      {% if source_type == 'blocks' and section.blocks.size > 0 %}
-        {% for block in section.blocks %}
-          {% liquid
-            assign blk_product = block.settings.product
-            assign front_img = block.settings.custom_front_image
-            assign side_img = block.settings.custom_side_image
+    <div class="ai-rack__scroller">
+      <div class="ai-rack__track">
+        {%- assign n = 0 -%}
+        {%- if source_type == 'blocks' and section.blocks.size > 0 -%}
+          {%- for block in section.blocks -%}
+            {%- assign bp = block.settings.product -%}
+            {%- assign t = block.settings.custom_title | default: bp.title | default: 'Kapisa Scrub' -%}
+            {%- assign f = block.settings.custom_front_image | default: bp.featured_image -%}
+            {%- assign b = block.settings.custom_side_image | default: bp.images[1] -%}
+            {%- assign bp_url = bp.url | default: '/collections/all' -%}
+            {%- if f != blank -%}
+              {%- assign n = n | plus: 1 -%}
+              {% render 'virtual-rack-item', uid: forloop.index, href: bp_url, title: t, price: bp.price, front: f, back: b, attrs: block.shopify_attributes, button_text: button_text, show_price: show_price %}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- else -%}
+          {%- assign passes = 1 -%}
+          {%- if repeat_products -%}{%- assign passes = 4 -%}{%- endif -%}
+          {%- for pass in (1..passes) -%}
+            {%- for prod in pool -%}
+              {%- if n < product_limit -%}
+                {%- assign h = prod.handle | downcase -%}
+                {%- unless h contains 'gift-card' or h contains 'embroidery' or h contains 'snowboard' -%}
+                  {%- if prod.featured_image != blank -%}
+                    {%- assign n = n | plus: 1 -%}
+                    {% render 'virtual-rack-item', uid: n, href: prod.url, title: prod.title, price: prod.price, front: prod.featured_image, back: prod.images[1], attrs: '', button_text: button_text, show_price: show_price %}
+                  {%- endif -%}
+                {%- endunless -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+          {%- comment -%} Last resort: nothing matched the filter, show whatever exists {%- endcomment -%}
+          {%- if n == 0 -%}
+            {%- for prod in collections.all.products limit: product_limit -%}
+              {%- if prod.featured_image != blank -%}
+                {%- assign n = n | plus: 1 -%}
+                {% render 'virtual-rack-item', uid: n, href: prod.url, title: prod.title, price: prod.price, front: prod.featured_image, back: prod.images[1], attrs: '', button_text: button_text, show_price: show_price %}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+    </div>
 
-            assign item_title = block.settings.custom_title
-            if item_title == blank and blk_product != blank
-              assign item_title = blk_product.title
-            elsif item_title == blank
-              assign item_title = 'Classic Medical Scrub'
-            endif
-
-            assign item_url = blk_product.url | default: '/collections/all'
-            assign item_price = blk_product.price
-
-            if front_img == blank and blk_product != blank and blk_product.featured_image != blank
-              assign front_img = blk_product.featured_image
-            endif
-          %}
-
-          <a 
-            href="{{ item_url }}" 
-            class="ai-rack__item{% if side_img != blank %} has-side-img{% endif %}" 
-            data-index="{{ forloop.index0 }}"
-            aria-label="{{ item_title | escape }}"
-            {{ block.shopify_attributes }}
-          >
-            <!-- SVG Realistic Hanger Hook & Bar -->
-            <div class="ai-rack__hanger-wrap" aria-hidden="true">
-              <svg class="ai-rack__hanger-svg" viewBox="0 -6 120 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="hookGrad-{{ sec_id }}-{{ forloop.index }}" x1="50" y1="-5" x2="72" y2="24" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#FFFFFF"/>
-                    <stop offset="45%" stop-color="#9CA3AF"/>
-                    <stop offset="100%" stop-color="#374151"/>
-                  </linearGradient>
-                  <linearGradient id="bodyGrad-{{ sec_id }}-{{ forloop.index }}" x1="10" y1="26" x2="110" y2="48" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#3A3E47"/>
-                    <stop offset="50%" stop-color="#1E222A"/>
-                    <stop offset="100%" stop-color="#0F1115"/>
-                  </linearGradient>
-                </defs>
-                <path d="M 60 20 C 60 11, 70 7, 70 2 C 70 -4, 58 -4, 55 2" stroke="url(#hookGrad-{{ sec_id }}-{{ forloop.index }})" stroke-width="3" stroke-linecap="round" fill="none"/>
-                <circle cx="60" cy="20" r="2.5" fill="#4B5563"/>
-                <path d="M 10 44 Q 60 24 110 44 Q 112 45 108 46 Q 60 27 12 46 Q 8 45 10 44 Z" fill="url(#bodyGrad-{{ sec_id }}-{{ forloop.index }})"/>
-                <path d="M 14 43 Q 60 25 106 43" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1" fill="none"/>
-              </svg>
-            </div>
-
-            <!-- 3D Suspended Garment Card -->
-            <div class="ai-rack__garment-card">
-              <div class="ai-rack__media-frame">
-                {% if front_img != blank %}
-                  {% if side_img != blank %}
-                    <img 
-                      src="{{ side_img | image_url: width: 320 }}" 
-                      alt="{{ item_title | escape }} side profile" 
-                      loading="lazy" 
-                      class="ai-rack__img ai-rack__img--side"
-                      width="160"
-                      height="215"
-                    >
-                  {% endif %}
-                  <img 
-                    src="{{ front_img | image_url: width: 320 }}" 
-                    alt="{{ item_title | escape }}" 
-                    loading="lazy" 
-                    class="ai-rack__img ai-rack__img--front"
-                    width="160"
-                    height="215"
-                  >
-                {% endif %}
-              </div>
-
-              <!-- Floating Quick View / Shop Now Pill Button -->
-              <div class="ai-rack__pill-btn">
-                <span>{{ button_text }}</span>
-                {% if show_price and item_price != blank %}
-                  <span class="ai-rack__pill-price">· {{ item_price | money }}</span>
-                {% endif %}
-              </div>
-            </div>
-          </a>
-        {% endfor %}
-
-      {% else %}
-        {% comment %}
-          REAL STORE PRODUCTS:
-          Loops through actual store medical scrub products.
-          Each card renders the actual product's first image and links directly to that product!
-        {% endcomment %}
-        {% assign pool_size = scrubs_list.size %}
-
-        {% if pool_size > 0 %}
-          {% for i in (1..product_limit) %}
-            {% assign idx = i | minus: 1 | modulo: pool_size %}
-            {% assign prod = scrubs_list[idx] %}
-
-            {% if prod != blank and prod.featured_image != blank %}
-              <a 
-                href="{{ prod.url }}" 
-                class="ai-rack__item" 
-                data-index="{{ forloop.index0 }}"
-                aria-label="{{ prod.title | escape }}"
-              >
-                <!-- SVG Realistic Hanger Hook & Bar -->
-                <div class="ai-rack__hanger-wrap" aria-hidden="true">
-                  <svg class="ai-rack__hanger-svg" viewBox="0 -6 120 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <linearGradient id="realHook-{{ sec_id }}-{{ i }}" x1="50" y1="-5" x2="72" y2="24" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#FFFFFF"/>
-                        <stop offset="45%" stop-color="#9CA3AF"/>
-                        <stop offset="100%" stop-color="#374151"/>
-                      </linearGradient>
-                      <linearGradient id="realBody-{{ sec_id }}-{{ i }}" x1="10" y1="26" x2="110" y2="48" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stop-color="#3A3E47"/>
-                        <stop offset="50%" stop-color="#1E222A"/>
-                        <stop offset="100%" stop-color="#0F1115"/>
-                      </linearGradient>
-                    </defs>
-                    <path d="M 60 20 C 60 11, 70 7, 70 2 C 70 -4, 58 -4, 55 2" stroke="url(#realHook-{{ sec_id }}-{{ i }})" stroke-width="3" stroke-linecap="round" fill="none"/>
-                    <circle cx="60" cy="20" r="2.5" fill="#4B5563"/>
-                    <path d="M 10 44 Q 60 24 110 44 Q 112 45 108 46 Q 60 27 12 46 Q 8 45 10 44 Z" fill="url(#realBody-{{ sec_id }}-{{ i }})"/>
-                    <path d="M 14 43 Q 60 25 106 43" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1" fill="none"/>
-                  </svg>
-                </div>
-
-                <!-- 3D Suspended Garment Card with REAL Product Photo -->
-                <div class="ai-rack__garment-card">
-                  <div class="ai-rack__media-frame">
-                    <img 
-                      src="{{ prod.featured_image | image_url: width: 320 }}" 
-                      alt="{{ prod.title | escape }}" 
-                      loading="lazy" 
-                      class="ai-rack__img ai-rack__img--front"
-                      width="160"
-                      height="215"
-                    >
-                  </div>
-
-                  <!-- Floating Quick View / Shop Now Pill Button -->
-                  <div class="ai-rack__pill-btn">
-                    <span>{{ button_text }}</span>
-                    {% if show_price and prod.price != blank %}
-                      <span class="ai-rack__pill-price">· {{ prod.price | money }}</span>
-                    {% endif %}
-                  </div>
-                </div>
-              </a>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-
-      {% endif %}
+    <!-- Focus view (click a hanger) -->
+    <div class="ai-rack__focus" aria-live="polite">
+      <button type="button" class="ai-rack__close" aria-label="Close">&#10005;</button>
+      <button type="button" class="ai-rack__nav ai-rack__nav--prev" aria-label="Previous">&#8592;</button>
+      <button type="button" class="ai-rack__nav ai-rack__nav--next" aria-label="Next">&#8594;</button>
+      <svg class="ai-rack__f-hanger" viewBox="0 0 100 56" aria-hidden="true">
+        <defs><linearGradient id="rk-f-{{ sec_id }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa0aa"/><stop offset="1" stop-color="#3a3f48"/></linearGradient></defs>
+        <path d="M50 30 L50 22 C50 14 61 12 61 6 C61 1 54 0 51.5 4" fill="none" stroke="#7b818b" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M50 28 L6 50 Q3 52 6 53 L94 53 Q97 52 94 50 Z" fill="url(#rk-f-{{ sec_id }})"/>
+      </svg>
+      <img class="ai-rack__f-img" alt="">
+      <h3 class="ai-rack__f-title"></h3>
+      <div class="ai-rack__toggle" role="group" aria-label="Garment view">
+        <button type="button" data-view="front" class="is-on">Front</button>
+        <button type="button" data-view="back">Back</button>
+      </div>
+      <a class="ai-rack__shop" href="#">{{ button_text }}</a>
     </div>
   </div>
 </div>
 
 <script>
-  (function() {
-    var sectionRoot = document.getElementById('shopify-section-{{ sec_id }}');
-    if (!sectionRoot) return;
+(function () {
+  var root = document.getElementById('ai-rack-{{ sec_id }}');
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = '1';
 
-    var stage = sectionRoot.querySelector('.ai-rack__stage');
-    var items = sectionRoot.querySelectorAll('.ai-rack__item');
+  var scroller = root.querySelector('.ai-rack__scroller');
+  var items = Array.prototype.slice.call(root.querySelectorAll('.ai-rack__item'));
+  if (!items.length) return;
 
-    if (!items.length) return;
+  var focus = root.querySelector('.ai-rack__focus');
+  var img = focus.querySelector('.ai-rack__f-img');
+  var title = focus.querySelector('.ai-rack__f-title');
+  var shop = focus.querySelector('.ai-rack__shop');
+  var toggle = focus.querySelector('.ai-rack__toggle');
+  var current = -1;
 
-    // Mobile / Touch handling: Single tap expands, second tap or pill navigates directly to product
-    var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-
-    if (isTouchDevice) {
-      items.forEach(function(item) {
-        item.addEventListener('click', function(e) {
-          var isActive = item.classList.contains('is-active');
-          var clickedPill = e.target.closest('.ai-rack__pill-btn');
-
-          if (!isActive && !clickedPill) {
-            e.preventDefault();
-            items.forEach(function(other) { other.classList.remove('is-active'); });
-            item.classList.add('is-active');
-
-            if (stage) {
-              var itemRect = item.getBoundingClientRect();
-              var stageRect = stage.getBoundingClientRect();
-              if (itemRect.left < stageRect.left || itemRect.right > stageRect.right) {
-                item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-              }
-            }
+  /* Remove plain studio backgrounds -> transparent cut-out (edge flood-fill, cached) */
+  var cache = {};
+  function cutout(url) {
+    if (cache[url]) return cache[url];
+    cache[url] = new Promise(function (resolve) {
+      var im = new Image(); im.crossOrigin = 'anonymous';
+      im.onload = function () {
+        try {
+          var w = im.naturalWidth, h = im.naturalHeight, c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          var x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0);
+          var id = x.getImageData(0, 0, w, h), d = id.data;
+          function px(i) { return i * 4; }
+          var cs = [0, w - 1, (h - 1) * w, h * w - 1], r = 0, g = 0, b = 0;
+          cs.forEach(function (i) { r += d[px(i)]; g += d[px(i) + 1]; b += d[px(i) + 2]; });
+          r /= 4; g /= 4; b /= 4;
+          if (Math.min(r, g, b) < 200) { resolve(url); return; }    /* not a light studio bg: leave as is */
+          var TOL = 34, seen = new Uint8Array(w * h), stack = [];
+          function isBg(i) { var k = px(i); return d[k + 3] < 8 || (Math.abs(d[k] - r) < TOL && Math.abs(d[k + 1] - g) < TOL && Math.abs(d[k + 2] - b) < TOL); }
+          function push(i) { if (!seen[i] && isBg(i)) { seen[i] = 1; stack.push(i); } }
+          for (var i = 0; i < w; i++) { push(i); push((h - 1) * w + i); }
+          for (var j = 0; j < h; j++) { push(j * w); push(j * w + w - 1); }
+          while (stack.length) {
+            var q = stack.pop(), qx = q % w, qy = (q - qx) / w;
+            if (qx > 0) push(q - 1); if (qx < w - 1) push(q + 1);
+            if (qy > 0) push(q - w); if (qy < h - 1) push(q + w);
           }
-        });
-      });
+          for (var k = 0; k < w * h; k++) {
+            if (seen[k]) d[px(k) + 3] = 0;
+          }
+          /* 1px feather on the cut edge */
+          for (var y = 1; y < h - 1; y++) for (var xx = 1; xx < w - 1; xx++) {
+            var m = y * w + xx;
+            if (!seen[m] && (seen[m - 1] || seen[m + 1] || seen[m - w] || seen[m + w])) d[px(m) + 3] = 150;
+          }
+          x.putImageData(id, 0, 0);
+          resolve(c.toDataURL('image/png'));
+        } catch (e) { resolve(url); }
+      };
+      im.onerror = function () { resolve(url); };
+      im.src = url;
+    });
+    return cache[url];
+  }
+  items.forEach(function (it) {
+    var el = it.querySelector('.ai-rack__garment img');
+    cutout(it.dataset.front).then(function (u) { if (u !== it.dataset.front) { el.src = u; it.dataset.cut = u; } });
+  });
 
-      // Tap outside dismisses active state
-      document.addEventListener('click', function(e) {
-        if (!sectionRoot.contains(e.target)) {
-          items.forEach(function(item) { item.classList.remove('is-active'); });
-        }
-      });
-    }
+  /* Spread the garments across the rail like the reference mockup */
+  function fit() {
+    var w = root.clientWidth - 40, count = items.length;
+    var mobile = window.innerWidth <= 768;
+    var slot = mobile ? 62 : Math.max(52, Math.min(96, w / (count + 1.6)));
+    root.style.setProperty('--slot', slot + 'px');
+    root.style.setProperty('--card', Math.round(slot * (mobile ? 2.25 : 2.15)) + 'px');
+  }
+  fit();
+  var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(fit, 120); });
 
-    // Centering the rack on initial desktop load if wider than screen
-    if (stage && stage.scrollWidth > stage.clientWidth) {
-      stage.scrollLeft = (stage.scrollWidth - stage.clientWidth) / 2;
+  function show(i, swap) {
+    current = (i + items.length) % items.length;
+    var d = items[current].dataset;
+    function apply() {
+      img.src = d.front; img.alt = d.title;
+      cutout(d.front).then(function (u) { if (current > -1 && items[current].dataset === d) img.src = u; });
+      title.textContent = d.title;
+      shop.href = d.url;
+      toggle.style.display = d.back ? '' : 'none';
+      toggle.querySelectorAll('button').forEach(function (b) { b.classList.toggle('is-on', b.dataset.view === 'front'); });
+      img.classList.remove('is-swap');
     }
-  })();
+    if (swap) { img.classList.add('is-swap'); setTimeout(apply, 180); } else { apply(); }
+  }
+  function close() { root.classList.remove('is-focus'); current = -1; }
+
+  items.forEach(function (it, i) {
+    it.addEventListener('click', function (e) {
+      if (e.target.closest('.ai-rack__pill')) return;       /* pill = go straight to product */
+      e.preventDefault();
+      root.classList.add('is-focus'); show(i, false);
+    });
+  });
+  focus.querySelector('.ai-rack__close').addEventListener('click', close);
+  focus.querySelector('.ai-rack__nav--prev').addEventListener('click', function () { show(current - 1, true); });
+  focus.querySelector('.ai-rack__nav--next').addEventListener('click', function () { show(current + 1, true); });
+  toggle.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var d = items[current].dataset, v = b.dataset.view;
+    toggle.querySelectorAll('button').forEach(function (x) { x.classList.toggle('is-on', x === b); });
+    img.classList.add('is-swap');
+    var target = (v === 'back' && d.back) ? d.back : d.front;
+    setTimeout(function () { img.src = target; cutout(target).then(function (u) { if (current > -1 && items[current].dataset === d) img.src = u; }); img.classList.remove('is-swap'); }, 180);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!root.classList.contains('is-focus')) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowRight') show(current + 1, true);
+    if (e.key === 'ArrowLeft') show(current - 1, true);
+  });
+  focus.addEventListener('click', function (e) { if (e.target === focus) close(); });
+
+  if (scroller.scrollWidth > scroller.clientWidth) scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2;
+})();
 </script>
 
 {% schema %}
@@ -710,149 +313,53 @@
   "tag": "section",
   "class": "section-virtual-rack",
   "settings": [
-    {
-      "type": "text",
-      "id": "subheading",
-      "label": "Subheading",
-      "default": "KAPISA EXPERIENCE"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Virtual Rack"
-    },
-    {
-      "type": "richtext",
-      "id": "description",
-      "label": "Description"
-    },
+    { "type": "text", "id": "subheading", "label": "Subheading", "default": "KAPISA EXPERIENCE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Virtual Rack" },
+    { "type": "richtext", "id": "description", "label": "Description" },
     {
       "type": "select",
       "id": "source_type",
       "label": "Product Source",
       "options": [
-        {
-          "value": "blocks",
-          "label": "Manual Blocks"
-        },
-        {
-          "value": "collection",
-          "label": "Collection / Auto Catalog"
-        }
+        { "value": "blocks", "label": "Manual Blocks" },
+        { "value": "collection", "label": "Collection / Auto Catalog" }
       ],
       "default": "collection"
     },
-    {
-      "type": "collection",
-      "id": "collection",
-      "label": "Collection"
-    },
-    {
-      "type": "range",
-      "id": "product_limit",
-      "min": 6,
-      "max": 24,
-      "step": 1,
-      "label": "Number of Hangers on Rack",
-      "default": 18
-    },
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background Color",
-      "default": "#FAF8F5"
-    },
-    {
-      "type": "text",
-      "id": "button_text",
-      "label": "Button Text",
-      "default": "Quick View / Shop Now"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_price",
-      "label": "Show Price in Pill",
-      "default": false
-    },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "product_limit", "min": 6, "max": 30, "step": 1, "label": "Number of Hangers on Rack", "default": 18 },
+    { "type": "checkbox", "id": "repeat_products", "label": "Repeat products to fill the rack", "default": true },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#FAF8F5" },
+    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Quick View / Shop Now" },
+    { "type": "checkbox", "id": "show_price", "label": "Show Price in Pill", "default": false },
     {
       "type": "select",
       "id": "rod_color_preset",
       "label": "Rod Finish",
       "options": [
-        {
-          "value": "dark_chrome",
-          "label": "Dark Gunmetal / Black Chrome"
-        },
-        {
-          "value": "brass_gold",
-          "label": "Brushed Brass / Gold"
-        },
-        {
-          "value": "silver",
-          "label": "Polished Silver / Stainless"
-        }
+        { "value": "dark_chrome", "label": "Dark Gunmetal / Black Chrome" },
+        { "value": "brass_gold", "label": "Brushed Brass / Gold" },
+        { "value": "silver", "label": "Polished Silver / Stainless" }
       ],
       "default": "dark_chrome"
     },
-    {
-      "type": "range",
-      "id": "padding_top",
-      "min": 16,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "label": "Padding Top",
-      "default": 40
-    },
-    {
-      "type": "range",
-      "id": "padding_bottom",
-      "min": 16,
-      "max": 100,
-      "step": 4,
-      "unit": "px",
-      "label": "Padding Bottom",
-      "default": 36
-    }
+    { "type": "range", "id": "padding_top", "min": 16, "max": 100, "step": 4, "unit": "px", "label": "Padding Top", "default": 40 },
+    { "type": "range", "id": "padding_bottom", "min": 16, "max": 100, "step": 4, "unit": "px", "label": "Padding Bottom", "default": 36 }
   ],
   "blocks": [
     {
       "type": "scrub_item",
       "name": "Scrub Hanger",
       "settings": [
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Product"
-        },
-        {
-          "type": "image_picker",
-          "id": "custom_front_image",
-          "label": "Custom Front Image"
-        },
-        {
-          "type": "image_picker",
-          "id": "custom_side_image",
-          "label": "Custom Side Profile Image"
-        },
-        {
-          "type": "color",
-          "id": "garment_color",
-          "label": "Fallback Tint Color"
-        },
-        {
-          "type": "text",
-          "id": "custom_title",
-          "label": "Custom Title Override"
-        }
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "image_picker", "id": "custom_front_image", "label": "Custom Front Image" },
+        { "type": "image_picker", "id": "custom_side_image", "label": "Custom Back Image" },
+        { "type": "text", "id": "custom_title", "label": "Custom Title Override" }
       ]
     }
   ],
   "presets": [
-    {
-      "name": "Virtual Scrubs Rack"
-    }
+    { "name": "Virtual Scrubs Rack" }
   ]
 }
 {% endschema %}
