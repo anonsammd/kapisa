@@ -15,7 +15,7 @@
         "autoplay": true,
         "autoplay_speed": 5000,
         "pause_on_hover": true,
-        "show_navigation": false,
+        "show_navigation": true,
         "eyebrow": "Engineered For Healthcare Heroes",
         "show_eyebrow_line": true,
         "heading": "Move with Confidence.",
@@ -38,8 +38,7 @@
         "bottom_text": "Premium healthcare apparel",
         "show_scroll_indicator": true,
         "scroll_text": "Scroll to explore"
-      },
-      "disabled": true
+      }
     },
     "178911726578348b29": {
       "type": "_blocks",
