@@ -2,6 +2,9 @@
   assign hero_id = 'kapisa-hero-' | append: section.id
   assign media_type = section.settings.media_type | default: 'images'
   assign video = section.settings.video | default: section.settings.video_1
+  assign mobile_video = section.settings.mobile_video
+  assign desktop_video_ratio = video.aspect_ratio | default: 2.33
+  assign mobile_video_ratio = mobile_video.aspect_ratio | default: desktop_video_ratio
 
   assign aspect_ratio_desktop = section.settings.image_1.aspect_ratio | default: 2.33
   if section.settings.mobile_image_1 != blank
@@ -15,7 +18,7 @@
 
 <section
   id="{{ hero_id }}"
-  class="kapisa-hero kapisa-hero--{{ section.settings.height | default: 'small' }} kapisa-hero--mobile-{{ section.settings.mobile_height | default: 'adapt' }}"
+  class="kapisa-hero kapisa-hero--{{ section.settings.height | default: 'small' }} kapisa-hero--mobile-{{ section.settings.mobile_height | default: 'adapt' }}{% if media_type == 'video' or media_type == 'videos' %} kapisa-hero--video{% endif %}"
   data-section-id="{{ section.id }}"
   data-media-type="{{ media_type }}"
   data-speed="{{ section.settings.autoplay_speed | default: 4500 }}"
@@ -24,73 +27,66 @@
   {%- if media_type == 'video' or media_type == 'videos' -%}
     {%- comment -%}
       ============================================================
-      VIDEO HERO — 1 Video playing infinitely on a loop
-      Click anywhere redirects to video_link
+      VIDEO HERO — responsive video variants playing infinitely on a loop
+      Click anywhere redirects to video_link when configured
       ============================================================
     {%- endcomment -%}
     <div class="kapisa-hero__media-container">
       {%- if video != blank or section.settings.external_video_url != blank -%}
-        {%- if section.settings.video_link != blank -%}
-          <a
-            href="{{ section.settings.video_link }}"
-            class="kapisa-hero__media-link"
-            aria-label="Hero link"
+        <div class="kapisa-hero__media-link{% if section.settings.video_link == blank %} is-not-clickable{% endif %}">
+          <video
+            class="kapisa-hero__video kapisa-hero__video--desktop"
+            muted
+            loop
+            playsinline
+            webkit-playsinline
+            disablepictureinpicture
+            disableremoteplayback
+            preload="none"
+            aria-hidden="true"
+            tabindex="-1"
+            {% if section.settings.video_poster != blank %}
+              poster="{{ section.settings.video_poster | image_url: width: 2400 }}"
+            {% elsif video.preview_image != blank %}
+              poster="{{ video.preview_image | image_url: width: 2400 }}"
+            {% endif %}
           >
+            {%- if video != blank -%}
+              {%- for source in video.sources -%}
+                <source src="{{ source.url }}" type="{{ source.mime_type }}">
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if section.settings.external_video_url != blank -%}
+              <source src="{{ section.settings.external_video_url }}" type="video/mp4">
+            {%- endif -%}
+          </video>
+          {%- if mobile_video != blank -%}
             <video
-              class="kapisa-hero__video"
-              autoplay
+              class="kapisa-hero__video kapisa-hero__video--mobile"
               muted
               loop
               playsinline
               webkit-playsinline
               disablepictureinpicture
               disableremoteplayback
-              preload="auto"
+              preload="none"
+              aria-hidden="true"
+              tabindex="-1"
               {% if section.settings.video_poster != blank %}
-                poster="{{ section.settings.video_poster | image_url: width: 2400 }}"
-              {% elsif video.preview_image != blank %}
-                poster="{{ video.preview_image | image_url: width: 2400 }}"
+                poster="{{ section.settings.video_poster | image_url: width: 1200 }}"
+              {% elsif mobile_video.preview_image != blank %}
+                poster="{{ mobile_video.preview_image | image_url: width: 1200 }}"
               {% endif %}
             >
-              {%- if video != blank -%}
-                {%- for source in video.sources -%}
-                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
-                {%- endfor -%}
-              {%- endif -%}
-              {%- if section.settings.external_video_url != blank -%}
-                <source src="{{ section.settings.external_video_url }}" type="video/mp4">
-              {%- endif -%}
+              {%- for source in mobile_video.sources -%}
+                <source src="{{ source.url }}" type="{{ source.mime_type }}">
+              {%- endfor -%}
             </video>
-          </a>
-        {%- else -%}
-          <div class="kapisa-hero__media-link is-not-clickable">
-            <video
-              class="kapisa-hero__video"
-              autoplay
-              muted
-              loop
-              playsinline
-              webkit-playsinline
-              disablepictureinpicture
-              disableremoteplayback
-              preload="auto"
-              {% if section.settings.video_poster != blank %}
-                poster="{{ section.settings.video_poster | image_url: width: 2400 }}"
-              {% elsif video.preview_image != blank %}
-                poster="{{ video.preview_image | image_url: width: 2400 }}"
-              {% endif %}
-            >
-              {%- if video != blank -%}
-                {%- for source in video.sources -%}
-                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
-                {%- endfor -%}
-              {%- endif -%}
-              {%- if section.settings.external_video_url != blank -%}
-                <source src="{{ section.settings.external_video_url }}" type="video/mp4">
-              {%- endif -%}
-            </video>
-          </div>
-        {%- endif -%}
+          {%- endif -%}
+          {%- if section.settings.video_link != blank -%}
+            <a href="{{ section.settings.video_link }}" class="kapisa-hero__media-link-overlay" aria-label="Hero link"></a>
+          {%- endif -%}
+        </div>
       {%- else -%}
         <div class="kapisa-hero__placeholder">
           {{ 'lifestyle-1' | placeholder_svg_tag: 'kapisa-hero__placeholder-svg' }}
@@ -223,6 +219,7 @@
   #{{ hero_id }}.kapisa-hero--large { min-height: 800px; height: 800px; }
   #{{ hero_id }}.kapisa-hero--screen { min-height: 100svh; height: 100svh; }
   #{{ hero_id }}.kapisa-hero--adapt { min-height: 0; height: auto; aspect-ratio: {{ aspect_ratio_desktop }}; }
+  #{{ hero_id }}.kapisa-hero--video { min-height: 0; height: auto; aspect-ratio: var(--kapisa-video-desktop-ratio, {{ desktop_video_ratio }}); }
 
   /* Mobile Heights (<= 749px) */
   @media screen and (max-width: 749px) {
@@ -231,6 +228,11 @@
     #{{ hero_id }}.kapisa-hero--mobile-large { min-height: 520px; height: 520px; aspect-ratio: auto; }
     #{{ hero_id }}.kapisa-hero--mobile-screen { min-height: 100svh; height: 100svh; aspect-ratio: auto; }
     #{{ hero_id }}.kapisa-hero--mobile-adapt { min-height: 0; height: auto; aspect-ratio: {{ aspect_ratio_mobile }}; }
+    #{{ hero_id }}.kapisa-hero--video { min-height: 0; height: auto; aspect-ratio: var(--kapisa-video-mobile-ratio, {{ mobile_video_ratio }}); }
+    {% if mobile_video != blank %}
+      #{{ hero_id }} .kapisa-hero__video--desktop { display: none; }
+      #{{ hero_id }} .kapisa-hero__video--mobile { display: block; }
+    {% endif %}
   }
 
   #{{ hero_id }} .kapisa-hero__slider-container,
@@ -283,6 +285,12 @@
     text-decoration: none;
   }
 
+  #{{ hero_id }} .kapisa-hero__media-link-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
   #{{ hero_id }} .kapisa-hero__picture {
     display: block;
     width: 100%;
@@ -301,6 +309,16 @@
     opacity: 1;
     pointer-events: none;
   }
+
+  #{{ hero_id }} .kapisa-hero__video {
+    position: absolute;
+    inset: 0;
+    object-fit: contain;
+    object-position: center;
+    background: #0e1f3c;
+  }
+
+  #{{ hero_id }} .kapisa-hero__video--mobile { display: none; }
 
   #{{ hero_id }} .kapisa-hero__placeholder {
     display: flex;
@@ -343,36 +361,57 @@
     // VIDEO INITIALIZATION (INFINITE LOOP AUTOPLAY)
     // -----------------------------------------------------------
     if (mediaType === 'video' || mediaType === 'videos') {
-      const video = root.querySelector('.kapisa-hero__video');
-      if (!video) return;
+      const desktopVideo = root.querySelector('.kapisa-hero__video--desktop');
+      const mobileVideo = root.querySelector('.kapisa-hero__video--mobile');
+      if (!desktopVideo) return;
 
-      video.muted = true;
-      video.defaultMuted = true;
-      video.playsInline = true;
-      video.loop = true;
+      const mobileBreakpoint = window.matchMedia('(max-width: 749px)');
+      const getActiveVideo = () => mobileVideo && mobileBreakpoint.matches ? mobileVideo : desktopVideo;
+      const updateVideoRatio = (video) => {
+        if (!video.videoWidth || !video.videoHeight) return;
+        const ratio = `${video.videoWidth} / ${video.videoHeight}`;
+        const ratioProperty = video === mobileVideo
+          ? '--kapisa-video-mobile-ratio'
+          : '--kapisa-video-desktop-ratio';
+        root.style.setProperty(ratioProperty, ratio);
+      };
+      const playActiveVideo = () => {
+        const activeVideo = getActiveVideo();
+        [desktopVideo, mobileVideo].filter(Boolean).forEach((video) => {
+          if (video !== activeVideo) {
+            video.pause();
+            return;
+          }
 
-      const playVideo = () => {
-        const p = video.play();
-        if (p !== undefined) {
-          p.catch(() => {
-            // Autoplay restricted: resume on first user interaction
-            const onInteract = () => {
-              video.play();
-              window.removeEventListener('click', onInteract);
-              window.removeEventListener('touchstart', onInteract);
-            };
-            window.addEventListener('click', onInteract, { once: true });
-            window.addEventListener('touchstart', onInteract, { once: true });
-          });
-        }
+          video.muted = true;
+          video.defaultMuted = true;
+          video.playsInline = true;
+          video.loop = true;
+          const playback = video.play();
+          if (playback !== undefined) {
+            playback.catch(() => {
+              const resumePlayback = () => {
+                if (getActiveVideo() === video) video.play().catch(() => {});
+              };
+              window.addEventListener('pointerdown', resumePlayback, { once: true });
+              window.addEventListener('keydown', resumePlayback, { once: true });
+            });
+          }
+        });
       };
 
-      playVideo();
-
-      video.addEventListener('ended', () => {
-        video.currentTime = 0;
-        video.play();
+      [desktopVideo, mobileVideo].filter(Boolean).forEach((video) => {
+        video.addEventListener('loadedmetadata', () => updateVideoRatio(video), { once: true });
+        if (video.readyState >= 1) updateVideoRatio(video);
       });
+
+      if (mobileBreakpoint.addEventListener) {
+        mobileBreakpoint.addEventListener('change', playActiveVideo);
+      } else {
+        mobileBreakpoint.addListener(playActiveVideo);
+      }
+
+      playActiveVideo();
 
       return;
     }
@@ -569,6 +608,12 @@
       "type": "video",
       "id": "video",
       "label": "Hero video"
+    },
+    {
+      "type": "video",
+      "id": "mobile_video",
+      "label": "Mobile hero video (optional)",
+      "info": "Upload a portrait version for mobile. If omitted, the desktop video is shown without cropping."
     },
     {
       "type": "text",

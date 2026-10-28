@@ -332,6 +332,7 @@
     },
     "virtual_rack_section": {
       "type": "virtual-rack",
+      "disabled": true,
       "settings": {
         "subheading": "KAPISA EXPERIENCE",
         "heading": "Virtual Rack",
