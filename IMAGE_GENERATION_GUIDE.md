@@ -102,3 +102,4 @@ Mid-shot of a male resident adjusting his stethoscope over his navy V-neck scrub
 1. **Format**: Save as `.webp` (or `.png` / `.jpg` optimized under 500 KB per image).
 2. **Naming**: Use descriptive filenames for SEO (e.g. `kapisa-navy-scrub-set-bestseller.webp`, `kapisa-hospital-fleet-outfitting.webp`).
 3. **Alt Text**: Always add descriptive alt text in the Shopify admin (e.g. *"Dr. Aditi Sharma wearing Kapisa Midnight Navy Scrub Top"*).
+

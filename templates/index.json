@@ -3,17 +3,8 @@
     "image_banner": {
       "type": "image-banner",
       "settings": {
-        "media_type": "images",
+        "media_type": "video",
         "video_link": "/collections/all",
-        "image_1": "shopify://shop_images/Gemini_Generated_Image_9bj1n69bj1n69bj1.png",
-        "mobile_image_1": "shopify://shop_images/Gemini_Generated_Image_gj7ov8gj7ov8gj7o.png",
-        "image_link_1": "/collections/all",
-        "image_2": "shopify://shop_images/Gemini_Generated_Image_mkj4uxmkj4uxmkj4.png",
-        "mobile_image_2": "shopify://shop_images/Gemini_Generated_Image_i8fluvi8fluvi8fl.png",
-        "image_link_2": "/collections/all",
-        "image_3": "shopify://shop_images/Gemini_Generated_Image_x3r4xmx3r4xmx3r4.png",
-        "mobile_image_3": "shopify://shop_images/Gemini_Generated_Image_xm3tnuxm3tnuxm3t.png",
-        "image_link_3": "/collections/all",
         "autoplay_speed": 4500,
         "pause_on_hover": false,
         "height": "small",
