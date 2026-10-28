@@ -1,56 +1,555 @@
 {% doc %}
   @prompt
     Build a premium, responsive **Shopify collection product grid** for KAPISA.
-    Includes instant client-side color & facet filtering, seamless URL synchronization,
-    and fallback support for when Search & Discovery is unconfigured.
+    Matches homepage luxury card UI with SIGNATURE FIT badge, 4.9 ★ 16-Hr Rated metric,
+    hover flip image, interactive swatches, clinical fabric pills, and Quick Add.
+    Includes instant client-side color & facet filtering, seamless URL synchronization.
 {% enddoc %}
+
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
 {% style %}
-.kapisa-collection-{{ ai_gen_id }}{display:block;width:100%;background:#FAF7F0;color:#2B2B2E;padding:32px 20px 56px}
-.kapisa-collection-{{ ai_gen_id }}__grid{width:{{ block.settings.desktop_width_percent }}%;max-width:1600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:42px 20px}
-.kapisa-product-{{ ai_gen_id }}{min-width:0;display:flex;flex-direction:column}
-.kapisa-product-{{ ai_gen_id }}__media{position:relative;aspect-ratio:4/5;overflow:hidden;background:#F0EEE9;border-radius:4px}
-.kapisa-product-{{ ai_gen_id }}__image,.kapisa-product-{{ ai_gen_id }}__hover-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 320ms ease,opacity 280ms ease}
-.kapisa-product-{{ ai_gen_id }}__hover-image{opacity:0}
-.kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__image{transform:scale(1.035)}
-.kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__hover-image{opacity:0;transform:scale(1.035)}
-.kapisa-product-{{ ai_gen_id }}__image svg{width:100%;height:100%;object-fit:cover}
-.kapisa-product-{{ ai_gen_id }}__badge{position:absolute;top:12px;left:12px;z-index:2;padding:5px 8px;background:#C9A227;color:#2B2B2E;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:2px}
-.kapisa-product-{{ ai_gen_id }}__quick-add{position:absolute;right:12px;bottom:12px;left:12px;z-index:2;padding:11px 14px;border:0;background:#0E1F3C;color:#fff;font:inherit;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;opacity:0;transform:translateY(12px);transition:opacity 220ms ease,transform 220ms ease;border-radius:2px}
-.kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__quick-add{opacity:1;transform:translateY(0)}
-.kapisa-product-{{ ai_gen_id }}__info{padding-top:13px;flex:1 0 auto;display:flex;flex-direction:column}
-.kapisa-product-{{ ai_gen_id }}__title{display:-webkit-box;overflow:hidden;margin:0 0 6px;color:#2B2B2E;font-size:14px;font-weight:600;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:2}
-.kapisa-product-{{ ai_gen_id }}__title a{color:inherit;text-decoration:none}
-.kapisa-product-{{ ai_gen_id }}__title a:hover{color:#C9A227}
-.kapisa-product-{{ ai_gen_id }}__price{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;color:#0E1F3C;font-size:14px;font-weight:700}
-.kapisa-product-{{ ai_gen_id }}__compare{color:#8FA3B8;text-decoration:line-through;font-weight:400}
-.kapisa-product-{{ ai_gen_id }}__swatches{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-.kapisa-product-{{ ai_gen_id }}__swatch{width:13px;height:13px;border:1px solid rgba(43,43,46,.35);border-radius:50%}
-.kapisa-product-{{ ai_gen_id }}__more{color:#8FA3B8;font-size:11px;line-height:13px}
-.kapisa-collection-{{ ai_gen_id }}__more-wrap{display:flex;justify-content:center;padding-top:52px}
-.kapisa-collection-{{ ai_gen_id }}__more{padding:13px 28px;border:1px solid #0E1F3C;background:transparent;color:#0E1F3C;font:inherit;font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s ease}
-.kapisa-collection-{{ ai_gen_id }}__more:hover{background:#0E1F3C;color:#FFFFFF}
-.kapisa-collection-{{ ai_gen_id }}__more[hidden]{display:none}
-.kapisa-collection-{{ ai_gen_id }}__empty{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:360px;padding:80px 20px;text-align:center;width:100%}
-.kapisa-collection-{{ ai_gen_id }}__empty-icon{width:48px;height:48px;margin-bottom:24px;color:#8FA3B8}
-.kapisa-collection-{{ ai_gen_id }}__empty-icon svg{display:block;width:48px;height:48px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5}
-.kapisa-collection-{{ ai_gen_id }}__empty-title{margin:0;color:#2B2B2E;font-size:18px;font-weight:700;line-height:1.4}
-.kapisa-collection-{{ ai_gen_id }}__empty-text{margin:8px 0 24px;color:#8FA3B8;font-size:14px;line-height:1.5}
-.kapisa-collection-{{ ai_gen_id }}__clear{padding:12px 22px;border:1px solid #C9A227;background:transparent;color:#2B2B2E;font:inherit;font-size:12px;font-weight:600;letter-spacing:.06em;cursor:pointer;text-decoration:none;transition:background .2s ease}
-.kapisa-collection-{{ ai_gen_id }}__clear:hover{background:#C9A227;color:#FFFFFF}
-@media(max-width:989px){.kapisa-collection-{{ ai_gen_id }}__grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:749px){.kapisa-collection-{{ ai_gen_id }}{padding:24px 12px 44px}.kapisa-collection-{{ ai_gen_id }}__grid{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 12px}.kapisa-product-{{ ai_gen_id }}__quick-add{display:none}.kapisa-product-{{ ai_gen_id }}__badge{top:8px;left:8px}.kapisa-collection-{{ ai_gen_id }}__empty{min-height:300px;padding:80px 12px}.kapisa-collection-{{ ai_gen_id }}__empty-title{font-size:17px}}
-@media(prefers-reduced-motion:reduce){.kapisa-product-{{ ai_gen_id }}__image,.kapisa-product-{{ ai_gen_id }}__hover-image,.kapisa-product-{{ ai_gen_id }}__quick-add{transition:none}}
+  .kapisa-collection-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: #FAF7F0;
+    color: #0E1F3C;
+    padding: 36px 24px 64px;
+    box-sizing: border-box;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__grid {
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px 24px;
+  }
+
+  /* LUXURY PRODUCT CARD */
+  .kapisa-product-{{ ai_gen_id }} {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(14, 31, 60, 0.08);
+    box-shadow: 0 10px 30px -10px rgba(14, 31, 60, 0.05);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 45px -12px rgba(14, 31, 60, 0.12);
+    border-color: rgba(201, 162, 39, 0.4);
+  }
+
+  /* MEDIA WRAPPER & HOVER FLIP */
+  .kapisa-product-{{ ai_gen_id }}__media-wrap {
+    position: relative;
+    width: 100%;
+    background: #FFFFFF;
+    overflow: hidden;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__media {
+    position: relative;
+    aspect-ratio: 1 / 1.15;
+    overflow: hidden;
+    background: #F8FAFC;
+    border-radius: 20px 20px 0 0;
+    display: block;
+    width: 100%;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__image,
+  .kapisa-product-{{ ai_gen_id }}__hover-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__hover-image {
+    opacity: 0;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__image {
+    transform: scale(1.05);
+  }
+
+  .kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__hover-image {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* SIGNATURE FIT BADGE */
+  .kapisa-product-{{ ai_gen_id }}__badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    background: rgba(14, 31, 60, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #FAF7F0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__badge-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #C9A227;
+    box-shadow: 0 0 6px rgba(201, 162, 39, 0.8);
+  }
+
+  /* SALE / BESTSELLER BADGE */
+  .kapisa-product-{{ ai_gen_id }}__badge-tag {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    background: #C9A227;
+    color: #0E1F3C;
+    padding: 3.5px 8px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* QUICK VIEW HOVER PILL */
+  .kapisa-product-{{ ai_gen_id }}__quick-view {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+    visibility: hidden;
+    background: #FFFFFF;
+    color: #0E1F3C;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 24px rgba(14, 31, 60, 0.15);
+    white-space: nowrap;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 3;
+    pointer-events: none;
+    text-decoration: none;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__quick-view {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* QUICK ADD BUTTON */
+  .kapisa-product-{{ ai_gen_id }}__quick-add {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    z-index: 4;
+    padding: 10px 14px;
+    border: 0;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.22s ease, transform 0.22s ease, background 0.2s ease;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.18);
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__quick-add:hover {
+    background: #C9A227;
+    color: #0E1F3C;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}:hover .kapisa-product-{{ ai_gen_id }}__quick-add {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* CARD BODY */
+  .kapisa-product-{{ ai_gen_id }}__body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  /* RATING METRIC ROW */
+  .kapisa-product-{{ ai_gen_id }}__meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(245, 166, 35, 0.08);
+    padding: 2.5px 7px;
+    border-radius: 999px;
+    color: #D97706;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__stars svg {
+    width: 10px;
+    height: 10px;
+    fill: currentColor;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__rating-text {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 700;
+    margin-left: 2px;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__shift-rated {
+    font-size: 11px;
+    color: #94A3B8;
+    font-weight: 600;
+  }
+
+  /* TITLE */
+  .kapisa-product-{{ ai_gen_id }}__title {
+    margin: 2px 0 6px;
+    color: #0E1F3C;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__title a:hover {
+    color: #C9A227;
+  }
+
+  /* PRICE & SWATCHES ROW */
+  .kapisa-product-{{ ai_gen_id }}__price-swatch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__price {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: baseline;
+    color: #0E1F3C;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__compare {
+    color: #8FA3B8;
+    text-decoration: line-through;
+    font-weight: 500;
+    font-size: 13px;
+  }
+
+  /* COLOR SWATCHES */
+  .kapisa-product-{{ ai_gen_id }}__swatches {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 18px;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(14, 31, 60, 0.15);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__swatch:hover {
+    transform: scale(1.22);
+    box-shadow: 0 0 0 2px #C9A227;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__more-swatches {
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 1px;
+  }
+
+  /* CLINICAL FEATURE PILLS */
+  .kapisa-product-{{ ai_gen_id }}__features {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #F1F5F9;
+    flex-wrap: wrap;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 7px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #475569;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .kapisa-product-{{ ai_gen_id }}__pill svg {
+    width: 10px;
+    height: 10px;
+    color: #C9A227;
+    flex-shrink: 0;
+  }
+
+  /* LOAD MORE BUTTON */
+  .kapisa-collection-{{ ai_gen_id }}__more-wrap {
+    display: flex;
+    justify-content: center;
+    padding-top: 48px;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__more {
+    padding: 13px 32px;
+    border: 1.5px solid #0E1F3C;
+    background: transparent;
+    color: #0E1F3C;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(14, 31, 60, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__more:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(14, 31, 60, 0.12);
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__more[hidden] {
+    display: none;
+  }
+
+  /* EMPTY STATE */
+  .kapisa-collection-{{ ai_gen_id }}__empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 380px;
+    padding: 80px 20px;
+    text-align: center;
+    width: 100%;
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px dashed rgba(14, 31, 60, 0.15);
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__empty-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 20px;
+    color: #8FA3B8;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__empty-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__empty-title {
+    margin: 0;
+    color: #0E1F3C;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__empty-text {
+    margin: 8px 0 24px;
+    color: #64748B;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__clear {
+    padding: 11px 24px;
+    border: 1px solid #C9A227;
+    background: #C9A227;
+    color: #0E1F3C;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+  }
+
+  .kapisa-collection-{{ ai_gen_id }}__clear:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+  }
+
+  /* RESPONSIVE LAYOUTS */
+  @media (max-width: 1200px) {
+    .kapisa-collection-{{ ai_gen_id }}__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px 18px;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .kapisa-collection-{{ ai_gen_id }} {
+      padding: 16px 12px 48px;
+    }
+
+    .kapisa-collection-{{ ai_gen_id }}__grid {
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 10px;
+    }
+
+    .kapisa-product-{{ ai_gen_id }} {
+      border-radius: 14px;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__media {
+      border-radius: 14px 14px 0 0;
+      aspect-ratio: 1 / 1.18;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__badge {
+      top: 8px;
+      left: 8px;
+      padding: 3px 7px;
+      font-size: 8px;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__body {
+      padding: 10px 10px 12px;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__title {
+      font-size: 13px;
+      margin: 2px 0 4px;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__price {
+      font-size: 13px;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__features {
+      display: none; /* Keep mobile cards clean and compact */
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__quick-view {
+      display: none;
+    }
+
+    .kapisa-product-{{ ai_gen_id }}__quick-add {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kapisa-product-{{ ai_gen_id }},
+    .kapisa-product-{{ ai_gen_id }}__image,
+    .kapisa-product-{{ ai_gen_id }}__hover-image,
+    .kapisa-product-{{ ai_gen_id }}__quick-add,
+    .kapisa-product-{{ ai_gen_id }}__quick-view {
+      transition: none !important;
+    }
+  }
 {% endstyle %}
 
 <kapisa-collection-grid-{{ ai_gen_id }} class="kapisa-collection-{{ ai_gen_id }}" {{ block.shopify_attributes }} data-section-id="{{ section.id }}">
   {% paginate collection.products by block.settings.products_per_page %}
     <div class="kapisa-collection-{{ ai_gen_id }}__empty" data-empty-state style="display: {% if collection.products_count == 0 %}flex{% else %}none{% endif %};">
       <div class="kapisa-collection-{{ ai_gen_id }}__empty-icon" aria-hidden="true">
-        <svg viewBox="0 0 48 48"><circle cx="21" cy="21" r="12"></circle><path d="m30 30 9 9M16 21h10"></path></svg>
+        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="21" cy="21" r="12"></circle>
+          <path d="m30 30 9 9M16 21h10"></path>
+        </svg>
       </div>
-      <h2 class="kapisa-collection-{{ ai_gen_id }}__empty-title">No products match your filters</h2>
-      <p class="kapisa-collection-{{ ai_gen_id }}__empty-text">Try adjusting or clearing your filters.</p>
+      <h2 class="kapisa-collection-{{ ai_gen_id }}__empty-title">No scrubs match your current filters</h2>
+      <p class="kapisa-collection-{{ ai_gen_id }}__empty-text">Try removing some filter choices or adjusting your criteria.</p>
       <a class="kapisa-collection-{{ ai_gen_id }}__clear" href="{{ collection.url }}" data-clear-filters>Clear All Filters</a>
     </div>
 
@@ -102,76 +601,139 @@
           data-price="{{ product.price }}"
           data-available="{{ product.available }}"
         >
-          <div class="kapisa-product-{{ ai_gen_id }}__media">
-            <a href="{{ product.url }}" aria-label="{{ product.title | escape }}">
+          <div class="kapisa-product-{{ ai_gen_id }}__media-wrap">
+            <a href="{{ product.url }}" class="kapisa-product-{{ ai_gen_id }}__media" aria-label="View {{ product.title | escape }}">
               {% if first_image %}
-                <img class="kapisa-product-{{ ai_gen_id }}__image" src="{{ first_image | image_url: width: 900 }}" alt="{{ first_image.alt | default: product.title | escape }}" loading="lazy" width="900" height="1125">
+                <img class="kapisa-product-{{ ai_gen_id }}__image" src="{{ first_image | image_url: width: 720 }}" alt="{{ first_image.alt | default: product.title | escape }}" loading="lazy" width="720" height="828">
               {% else %}
                 <div class="kapisa-product-{{ ai_gen_id }}__image">{{ 'product-apparel-1' | placeholder_svg_tag }}</div>
               {% endif %}
               {% if second_image %}
-                <img class="kapisa-product-{{ ai_gen_id }}__hover-image" src="{{ second_image | image_url: width: 900 }}" alt="{{ second_image.alt | default: product.title | escape }}" loading="lazy" width="900" height="1125">
+                <img class="kapisa-product-{{ ai_gen_id }}__hover-image" src="{{ second_image | image_url: width: 720 }}" alt="{{ second_image.alt | default: product.title | escape }}" loading="lazy" width="720" height="828">
               {% endif %}
+
+              <!-- SIGNATURE FIT BADGE -->
+              <span class="kapisa-product-{{ ai_gen_id }}__badge">
+                <span class="kapisa-product-{{ ai_gen_id }}__badge-dot"></span>
+                Signature Fit
+              </span>
+
+              <!-- TAG / DISCOUNT BADGE -->
+              {% if product.compare_at_price > product.price %}
+                {% assign save_percent = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round %}
+                <span class="kapisa-product-{{ ai_gen_id }}__badge-tag">SAVE {{ save_percent }}%</span>
+              {% elsif badge != blank %}
+                <span class="kapisa-product-{{ ai_gen_id }}__badge-tag">{{ badge }}</span>
+              {% endif %}
+
+              <!-- QUICK VIEW HOVER PILL -->
+              <span class="kapisa-product-{{ ai_gen_id }}__quick-view">Quick View →</span>
             </a>
-            {% if badge != blank %}
-              <span class="kapisa-product-{{ ai_gen_id }}__badge">{{ badge }}</span>
-            {% endif %}
+
+            <!-- QUICK ADD FORM -->
             {% if product.available %}
-              <form method="post" action="{{ routes.cart_add_url }}">
+              <form method="post" action="{{ routes.cart_add_url }}" data-quick-add-form>
                 <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
                 <input type="hidden" name="quantity" value="1">
-                <button class="kapisa-product-{{ ai_gen_id }}__quick-add" type="submit">Quick add</button>
+                <button class="kapisa-product-{{ ai_gen_id }}__quick-add" type="submit">Quick Add</button>
               </form>
             {% endif %}
           </div>
-          <div class="kapisa-product-{{ ai_gen_id }}__info">
-            <h2 class="kapisa-product-{{ ai_gen_id }}__title">
-              <a href="{{ product.url }}">{{ product.title }}</a>
-            </h2>
-            <div class="kapisa-product-{{ ai_gen_id }}__price">
-              <span>{{ product.price | money }}</span>
-              {% if product.compare_at_price > product.price %}
-                <span class="kapisa-product-{{ ai_gen_id }}__compare">{{ product.compare_at_price | money }}</span>
-              {% endif %}
-            </div>
-            {%- liquid
-              assign rel_color_prods = product.metafields.custom.color_family_products.value
-            -%}
-            {% if rel_color_prods != blank %}
-              <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
-                {% for rel in rel_color_prods limit: 5 %}
-                  {% assign rel_c = rel.metafields.custom.color_swatch.value %}
-                  {% if rel_c == blank %}
-                    {% assign r_title = rel.title | downcase %}
-                    {% if r_title contains 'navy' or r_title contains 'blue' %}{% assign rel_c = '#1B3B6F' %}
-                    {% elsif r_title contains 'black' %}{% assign rel_c = '#18191C' %}
-                    {% elsif r_title contains 'green' or r_title contains 'hunter' %}{% assign rel_c = '#1B4942' %}
-                    {% elsif r_title contains 'wine' or r_title contains 'red' or r_title contains 'burgundy' %}{% assign rel_c = '#4A1525' %}
-                    {% elsif r_title contains 'grey' or r_title contains 'slate' %}{% assign rel_c = '#40464D' %}
-                    {% else %}{% assign rel_c = '#1E293B' %}
-                    {% endif %}
-                  {% endif %}
-                  <span class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ rel.title | escape }}" style="background-color: {{ rel_c }};"></span>
+
+          <div class="kapisa-product-{{ ai_gen_id }}__body">
+            <!-- RATING & SHIFT METRIC -->
+            <div class="kapisa-product-{{ ai_gen_id }}__meta-row">
+              <div class="kapisa-product-{{ ai_gen_id }}__stars">
+                {% for s in (1..5) %}
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 {% endfor %}
-                {% if rel_color_prods.size > 5 %}
-                  <span class="kapisa-product-{{ ai_gen_id }}__more">+{{ rel_color_prods.size | minus: 5 }}</span>
+                <span class="kapisa-product-{{ ai_gen_id }}__rating-text">4.9</span>
+              </div>
+              <span class="kapisa-product-{{ ai_gen_id }}__shift-rated">16-Hr Rated</span>
+            </div>
+
+            <!-- PRODUCT TITLE -->
+            <h2 class="kapisa-product-{{ ai_gen_id }}__title">
+              <a href="{{ product.url }}" title="{{ product.title | escape }}">{{ product.title }}</a>
+            </h2>
+
+            <!-- PRICE & COLOR SWATCHES ROW -->
+            <div class="kapisa-product-{{ ai_gen_id }}__price-swatch-row">
+              <div class="kapisa-product-{{ ai_gen_id }}__price">
+                <span>{{ product.price | money }}</span>
+                {% if product.compare_at_price > product.price %}
+                  <span class="kapisa-product-{{ ai_gen_id }}__compare">{{ product.compare_at_price | money }}</span>
                 {% endif %}
               </div>
-            {% else %}
-              {% for option in product.options_with_values %}
-                {% assign opt_name = option.name | downcase %}
-                {% if opt_name contains 'color' or opt_name contains 'colour' %}
-                  <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
-                    {% for value in option.values limit: 5 %}
-                      <span class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ value | escape }}" style="background-color: {{ value | escape }};"></span>
-                    {% endfor %}
-                    {% if option.values.size > 5 %}
-                      <span class="kapisa-product-{{ ai_gen_id }}__more">+{{ option.values.size | minus: 5 }}</span>
+
+              {%- liquid
+                assign rel_color_prods = product.metafields.custom.color_family_products.value
+              -%}
+              {% if rel_color_prods != blank %}
+                <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
+                  {% for rel in rel_color_prods limit: 4 %}
+                    {% assign rel_c = rel.metafields.custom.color_swatch.value %}
+                    {% if rel_c == blank %}
+                      {% assign r_title = rel.title | downcase %}
+                      {% if r_title contains 'navy' or r_title contains 'blue' %}{% assign rel_c = '#1B3B6F' %}
+                      {% elsif r_title contains 'black' %}{% assign rel_c = '#18191C' %}
+                      {% elsif r_title contains 'green' or r_title contains 'hunter' %}{% assign rel_c = '#1B4942' %}
+                      {% elsif r_title contains 'wine' or r_title contains 'red' or r_title contains 'burgundy' %}{% assign rel_c = '#4A1525' %}
+                      {% elsif r_title contains 'grey' or r_title contains 'slate' %}{% assign rel_c = '#40464D' %}
+                      {% else %}{% assign rel_c = '#1E293B' %}
+                      {% endif %}
                     {% endif %}
-                  </div>
-                {% endif %}
-              {% endfor %}
-            {% endif %}
+                    {% assign rel_url = rel.url %}
+                    {% if rel_url == blank %}
+                      {% assign rel_url = '/products/' | append: rel.handle %}
+                    {% endif %}
+                    <a href="{{ rel_url }}" class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ rel.title | escape }}" style="background-color: {{ rel_c }};" aria-label="{{ rel.title | escape }}"></a>
+                  {% endfor %}
+                  {% if rel_color_prods.size > 4 %}
+                    <span class="kapisa-product-{{ ai_gen_id }}__more-swatches">+{{ rel_color_prods.size | minus: 4 }}</span>
+                  {% endif %}
+                </div>
+              {% else %}
+                {% for option in product.options_with_values %}
+                  {% assign opt_name = option.name | downcase %}
+                  {% if opt_name contains 'color' or opt_name contains 'colour' %}
+                    <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
+                      {% for value in option.values limit: 4 %}
+                        {% assign color_clean = value | downcase | strip %}
+                        {% assign bg_color = color_clean %}
+                        {% if color_clean contains 'navy' %}{% assign bg_color = '#1B3B6F' %}
+                        {% elsif color_clean contains 'black' %}{% assign bg_color = '#18191C' %}
+                        {% elsif color_clean contains 'hunter' or color_clean contains 'green' %}{% assign bg_color = '#1B4942' %}
+                        {% elsif color_clean contains 'wine' or color_clean contains 'burgundy' %}{% assign bg_color = '#4A1525' %}
+                        {% elsif color_clean contains 'grey' or color_clean contains 'slate' %}{% assign bg_color = '#40464D' %}
+                        {% elsif color_clean contains 'pastel' or color_clean contains 'lavender' %}{% assign bg_color = '#756B98' %}
+                        {% endif %}
+                        <span class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ value | escape }}" style="background-color: {{ bg_color }};" aria-label="{{ value | escape }}"></span>
+                      {% endfor %}
+                      {% if option.values.size > 4 %}
+                        <span class="kapisa-product-{{ ai_gen_id }}__more-swatches">+{{ option.values.size | minus: 4 }}</span>
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <!-- CLINICAL PERFORMANCE PILLS -->
+            <div class="kapisa-product-{{ ai_gen_id }}__features">
+              <span class="kapisa-product-{{ ai_gen_id }}__pill">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                4-Way Stretch
+              </span>
+              <span class="kapisa-product-{{ ai_gen_id }}__pill">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                Fluid Repellent
+              </span>
+              <span class="kapisa-product-{{ ai_gen_id }}__pill">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+                Anti-Odor
+              </span>
+            </div>
           </div>
         </article>
       {% endfor %}
@@ -181,7 +743,7 @@
   {% endpaginate %}
   
   <div class="kapisa-collection-{{ ai_gen_id }}__more-wrap">
-    <button class="kapisa-collection-{{ ai_gen_id }}__more" type="button" data-load-more {% unless has_next %}hidden{% endunless %}>Load more</button>
+    <button class="kapisa-collection-{{ ai_gen_id }}__more" type="button" data-load-more {% unless has_next %}hidden{% endunless %}>Load more products</button>
   </div>
 </kapisa-collection-grid-{{ ai_gen_id }}>
 
@@ -217,6 +779,9 @@
         });
       }
 
+      // Quick add form AJAX handling
+      this.bindQuickAdd();
+
       // External event listeners from filter bar
       window.addEventListener('kapisa:filter-change', (e) => {
         this.applyActiveFilters(e.detail);
@@ -230,6 +795,46 @@
 
       // Filter immediately on initial page load
       this.filterFromUrl();
+    }
+
+    bindQuickAdd() {
+      this.querySelectorAll('[data-quick-add-form]').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const btn = form.querySelector('button');
+          if (btn.disabled) return;
+          const origText = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = 'Adding...';
+
+          try {
+            const formData = new FormData(form);
+            const res = await fetch('/cart/add.js', {
+              method: 'POST',
+              body: formData,
+              headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+              btn.textContent = 'Added ✓';
+              // Trigger cart update event across theme
+              document.documentElement.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+              window.dispatchEvent(new CustomEvent('kapisa:cart-updated'));
+              setTimeout(() => {
+                btn.textContent = origText;
+                btn.disabled = false;
+              }, 1500);
+            } else {
+              throw new Error('Add failed');
+            }
+          } catch (err) {
+            btn.textContent = 'Error';
+            setTimeout(() => {
+              btn.textContent = origText;
+              btn.disabled = false;
+            }, 1500);
+          }
+        });
+      });
     }
 
     getCards() {
@@ -329,9 +934,10 @@
         // 2. Size matching
         if (matches && sizes.length > 0) {
           const cardSizes = (card.dataset.sizes || '').toLowerCase();
+          const availableSizes = cardSizes.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
           const sizeMatches = sizes.some(targetSize => {
             const clean = targetSize.toLowerCase().trim();
-            return cardSizes.includes(clean + ',') || cardSizes.includes(',' + clean) || cardSizes === clean;
+            return availableSizes.includes(clean);
           });
           if (!sizeMatches) {
             matches = false;
@@ -433,6 +1039,7 @@
           this.initialCards.push(card);
         });
         this.page++;
+        this.bindQuickAdd();
         this.filterFromUrl();
         const nextButton = parsed.querySelector('[data-load-more]');
         if (!nextButton || nextButton.hasAttribute('hidden')) this.button.hidden = true;

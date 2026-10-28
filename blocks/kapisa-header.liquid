@@ -1185,6 +1185,119 @@
     }
 
     /* ---------------------------------------------
+       MOBILE DRAWER QUICK JUMP PILLS
+       --------------------------------------------- */
+    .kapisa-header-{{ ai_gen_id }}__drawer-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -22px 18px;
+      padding: 4px 22px 10px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: #FFFFFF;
+      border: 1px solid rgba(14, 31, 60, 0.12);
+      border-radius: 999px;
+      color: var(--kapisa-navy);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(14, 31, 60, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-pill:active {
+      transform: scale(0.95);
+      background: var(--kapisa-navy);
+      color: #FAF7F0;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-pill.is-gold {
+      background: rgba(201, 162, 39, 0.12);
+      border-color: rgba(201, 162, 39, 0.4);
+      color: #997300;
+    }
+
+    /* ---------------------------------------------
+       DRAWER LIVE CONCIERGE CARD
+       --------------------------------------------- */
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge {
+      margin-top: 22px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #FFFFFF;
+      border: 1px solid rgba(14, 31, 60, 0.08);
+      box-shadow: 0 4px 14px rgba(14, 31, 60, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge-title {
+      font-size: 13px;
+      font-weight: 750;
+      color: var(--kapisa-navy);
+      margin: 0;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #059669;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 6px #10B981;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #0E1F3C;
+      color: #FAF7F0;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .kapisa-header-{{ ai_gen_id }}__drawer-concierge-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* ---------------------------------------------
        MOBILE MENU
        --------------------------------------------- */
 
@@ -2123,6 +2236,24 @@
 
     </div>
 
+    <!-- NATIVE APP QUICK JUMP PILLS -->
+    <div class="kapisa-header-{{ ai_gen_id }}__drawer-pills">
+      <a href="{{ routes.all_products_collection_url }}" class="kapisa-header-{{ ai_gen_id }}__drawer-pill">
+        <span>All Scrubs</span>
+      </a>
+      <a href="{{ routes.collections_url }}/men" class="kapisa-header-{{ ai_gen_id }}__drawer-pill">
+        <span>Men's Wear</span>
+      </a>
+      <a href="{{ routes.collections_url }}/women" class="kapisa-header-{{ ai_gen_id }}__drawer-pill">
+        <span>Women's Wear</span>
+      </a>
+      <a href="{{ routes.collections_url }}/lab-coats" class="kapisa-header-{{ ai_gen_id }}__drawer-pill">
+        <span>Lab Coats</span>
+      </a>
+      <a href="/pages/custom-embroidery" class="kapisa-header-{{ ai_gen_id }}__drawer-pill is-gold">
+        <span>Custom Embroidery</span>
+      </a>
+    </div>
 
     <div class="kapisa-header-{{ ai_gen_id }}__drawer-label">
       {{ block.settings.mobile_menu_heading | escape }}
@@ -2241,7 +2372,7 @@
 
             <a
               class="kapisa-header-{{ ai_gen_id }}__mobile-link"
-              href="/collections/men"
+              href="{{ routes.collections_url }}/men"
             >
               Men
             </a>
@@ -2257,7 +2388,7 @@
 
             <a
               class="kapisa-header-{{ ai_gen_id }}__mobile-link"
-              href="/collections/women"
+              href="{{ routes.collections_url }}/women"
             >
               Women
             </a>
@@ -2358,6 +2489,22 @@
 
       {% endif %}
 
+    </div>
+
+    <!-- LIVE CLINICAL CONCIERGE -->
+    <div class="kapisa-header-{{ ai_gen_id }}__drawer-concierge">
+      <div class="kapisa-header-{{ ai_gen_id }}__drawer-concierge-head">
+        <p class="kapisa-header-{{ ai_gen_id }}__drawer-concierge-title">Clinical Concierge</p>
+        <span class="kapisa-header-{{ ai_gen_id }}__drawer-concierge-status">
+          <span class="kapisa-header-{{ ai_gen_id }}__drawer-concierge-dot"></span>
+          Available
+        </span>
+      </div>
+      <p style="margin: 0; font-size: 11px; color: #64748B; line-height: 1.4;">Direct support for sizing, custom department embroidery, or hospital orders.</p>
+      <a href="https://wa.me/919999999999?text=Hi%20Kapisa%20Healthcare%2C%20I%20have%20an%20inquiry" target="_blank" rel="noopener noreferrer" class="kapisa-header-{{ ai_gen_id }}__drawer-concierge-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+        <span>Message Clinical Concierge</span>
+      </a>
     </div>
 
   </div>

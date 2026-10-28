@@ -1,10 +1,9 @@
 {% comment %}
-  KAPISA — Inline Collection Filter & Sort
-  - Interactive Filter Strip & Dropdowns
-  - Native Shopify collection.filters + Intelligent Fallback filters
-  - Client-side and URL synchronized filtering
-  - Active filter chips with one-click remove & Clear All
-  - Responsive mobile bottom-sheet styling
+  KAPISA — Luxury Inline Collection Filter & Mobile Native Sheet
+  - Modern sticky app-like filter bar with pill active badges
+  - Native bottom-sheet drawer on mobile with swipe/drag aesthetics
+  - Full client-side & URL-synchronized filtering
+  - Preserves all standard Shopify faceted and fallback filtering hooks
 {% endcomment %}
 
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
@@ -13,31 +12,42 @@
   .kapisa-filter-{{ ai_gen_id }} {
     width: 100%;
     background: #FAF7F0;
-    color: #2B2B2E;
-    border-bottom: 1px solid rgba(143, 163, 184, 0.45);
+    color: #0E1F3C;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 45;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}.is-sticky {
+    background: rgba(250, 247, 240, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(14, 31, 60, 0.06);
   }
 
   .kapisa-filter-{{ ai_gen_id }}__inner {
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
-    padding: 18px 28px;
+    padding: 14px 28px;
     box-sizing: border-box;
   }
 
   /* MAIN STRIP */
   .kapisa-filter-{{ ai_gen_id }}__bar {
-    min-height: 48px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 20px;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__left {
     display: flex;
     align-items: center;
-    gap: 22px;
+    gap: 16px;
     min-width: 0;
   }
 
@@ -45,49 +55,60 @@
   .kapisa-filter-{{ ai_gen_id }}__filter-button {
     display: inline-flex;
     align-items: center;
-    gap: 9px;
-    padding: 11px 18px;
-    border: 1px solid #8FA3B8;
-    background: #FAF7F0;
-    color: #2B2B2E;
-    font-size: 14px;
-    font-weight: 600;
+    gap: 8px;
+    padding: 9px 16px;
+    border: 1px solid rgba(14, 31, 60, 0.16);
+    background: #FFFFFF;
+    color: #0E1F3C;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background .2s ease, border-color .2s ease;
+    border-radius: 999px;
+    box-shadow: 0 2px 6px rgba(14, 31, 60, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .kapisa-filter-{{ ai_gen_id }}__filter-button:hover,
   .kapisa-filter-{{ ai_gen_id }}__filter-button.is-active {
-    background: #F0EEE9;
-    border-color: #C9A227;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+    box-shadow: 0 4px 12px rgba(14, 31, 60, 0.12);
   }
 
   .kapisa-filter-{{ ai_gen_id }}__filter-button svg {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: #C9A227;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__filter-button.is-active svg {
+    color: #FAF7F0;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__active-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
     background: #C9A227;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
+    color: #FFFFFF;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__count {
-    color: #8FA3B8;
-    font-size: 14px;
+    color: #64748B;
+    font-size: 13px;
     white-space: nowrap;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: 0.01em;
   }
 
   /* SORT */
@@ -95,38 +116,56 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    flex: 0 0 auto;
-    color: #8FA3B8;
+    flex-shrink: 0;
+    color: #64748B;
     font-size: 13px;
+    font-weight: 600;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__sort-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__sort select {
     appearance: none;
-    border: 0;
-    border-bottom: 1px solid #8FA3B8;
-    background-color: transparent;
-    color: #2B2B2E;
-    padding: 8px 26px 8px 4px;
+    -webkit-appearance: none;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    background-color: #FFFFFF;
+    color: #0E1F3C;
+    padding: 8px 30px 8px 14px;
     font: inherit;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    background-image:
-      linear-gradient(45deg, transparent 50%, #2B2B2E 50%),
-      linear-gradient(135deg, #2B2B2E 50%, transparent 50%);
-    background-position:
-      calc(100% - 11px) 55%,
-      calc(100% - 6px) 55%;
-    background-size: 5px 5px;
-    background-repeat: no-repeat;
+    box-shadow: 0 2px 6px rgba(14, 31, 60, 0.03);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  /* INLINE FILTER AREA */
+  .kapisa-filter-{{ ai_gen_id }}__sort select:focus {
+    outline: none;
+    border-color: #C9A227;
+    box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.2);
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__sort-arrow {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+    width: 10px;
+    height: 10px;
+    color: #64748B;
+  }
+
+  /* DESKTOP INLINE FILTER PANEL */
   .kapisa-filter-{{ ai_gen_id }}__panel {
     display: none;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(143,163,184,.35);
-    animation: kapisaFilterOpen-{{ ai_gen_id }} .18s ease;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(14, 31, 60, 0.08);
+    animation: kapisaFilterOpen-{{ ai_gen_id }} 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .kapisa-filter-{{ ai_gen_id }}__panel.is-open {
@@ -134,7 +173,7 @@
   }
 
   @keyframes kapisaFilterOpen-{{ ai_gen_id }} {
-    from { opacity: 0; transform: translateY(-4px); }
+    from { opacity: 0; transform: translateY(-6px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
@@ -142,7 +181,7 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
   }
 
   /* INDIVIDUAL FILTER GROUP */
@@ -154,47 +193,57 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    min-height: 40px;
-    padding: 9px 14px;
-    border: 1px solid rgba(143,163,184,.7);
-    background: #FAF7F0;
-    color: #2B2B2E;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    background: #FFFFFF;
+    color: #0E1F3C;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 999px;
+    transition: all 0.2s ease;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__group-button:hover,
   .kapisa-filter-{{ ai_gen_id }}__group-button.is-active {
     border-color: #C9A227;
-    background: #F0EEE9;
+    background: #FFFFFF;
+    box-shadow: 0 3px 10px rgba(14, 31, 60, 0.06);
   }
 
   .kapisa-filter-{{ ai_gen_id }}__group-arrow {
-    width: 6px;
-    height: 6px;
-    border-right: 1.5px solid #2B2B2E;
-    border-bottom: 1.5px solid #2B2B2E;
-    transform: rotate(45deg) translateY(-2px);
+    width: 8px;
+    height: 8px;
+    color: #64748B;
     transition: transform 0.2s ease;
   }
 
-  /* FILTER DROPDOWN */
+  .kapisa-filter-{{ ai_gen_id }}__group-button.is-active .kapisa-filter-{{ ai_gen_id }}__group-arrow {
+    transform: rotate(180deg);
+  }
+
+  /* FILTER DROPDOWN (DESKTOP) */
   .kapisa-filter-{{ ai_gen_id }}__dropdown {
     position: absolute;
-    top: calc(100% + 7px);
+    top: calc(100% + 8px);
     left: 0;
     z-index: 60;
-    width: 270px;
-    max-height: 360px;
+    width: 280px;
+    max-height: 380px;
     padding: 16px;
     overflow-y: auto;
-    background: #FAF7F0;
-    border: 1px solid rgba(143,163,184,.55);
-    border-radius: 6px;
-    box-shadow: 0 10px 28px rgba(43,43,46,.12);
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 16px 38px rgba(14, 31, 60, 0.12);
     display: none;
+    animation: kapisaDropdownFade-{{ ai_gen_id }} 0.18s ease;
+  }
+
+  @keyframes kapisaDropdownFade-{{ ai_gen_id }} {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .kapisa-filter-{{ ai_gen_id }}__dropdown.is-open {
@@ -204,7 +253,7 @@
   .kapisa-filter-{{ ai_gen_id }}__options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__option {
@@ -212,9 +261,10 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    min-height: 25px;
-    color: #2B2B2E;
+    min-height: 28px;
+    color: #0E1F3C;
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     user-select: none;
   }
@@ -226,82 +276,140 @@
   }
 
   .kapisa-filter-{{ ai_gen_id }}__checkbox {
-    width: 17px;
-    height: 17px;
-    flex: 0 0 17px;
-    border: 1px solid #8FA3B8;
-    border-radius: 3px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 1.5px solid #CBD5E1;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #FAF7F0;
-    transition: all .15s ease;
+    background: #FFFFFF;
+    transition: all 0.15s ease;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__option input:checked + .kapisa-filter-{{ ai_gen_id }}__checkbox {
-    background: #C9A227;
-    border-color: #C9A227;
+    background: #0E1F3C;
+    border-color: #0E1F3C;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__option input:checked + .kapisa-filter-{{ ai_gen_id }}__checkbox::after {
-    content: '✓';
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: solid #FFFFFF;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
   }
 
   /* COLOR SWATCH */
   .kapisa-filter-{{ ai_gen_id }}__color-swatch {
     width: 20px;
     height: 20px;
-    flex: 0 0 20px;
+    flex-shrink: 0;
     border-radius: 50%;
-    border: 1px solid #8FA3B8;
-    background: #F0EEE9;
-    transition: transform .15s ease;
+    border: 1px solid rgba(14, 31, 60, 0.15);
+    background: #F1F5F9;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__option input:checked + .kapisa-filter-{{ ai_gen_id }}__color-swatch {
     outline: 2px solid #C9A227;
     outline-offset: 2px;
-    transform: scale(1.1);
+    transform: scale(1.12);
   }
 
   /* PRICE */
   .kapisa-filter-{{ ai_gen_id }}__price {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-chip {
+    padding: 5px 9px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-chip:hover,
+  .kapisa-filter-{{ ai_gen_id }}__price-chip.is-active {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-inputs {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 9px;
+    gap: 8px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price-input-wrap span {
+    position: absolute;
+    left: 10px;
+    color: #94A3B8;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__price input {
     width: 100%;
     box-sizing: border-box;
-    padding: 10px;
-    border: 1px solid #8FA3B8;
-    background: transparent;
-    color: #2B2B2E;
+    padding: 8px 8px 8px 24px;
+    border: 1px solid rgba(14, 31, 60, 0.15);
+    background: #F8FAFC;
+    color: #0E1F3C;
     font: inherit;
     font-size: 13px;
-    border-radius: 3px;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__price input:focus {
+    outline: none;
+    border-color: #C9A227;
+    background: #FFFFFF;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__price-apply {
     width: 100%;
-    margin-top: 10px;
-    padding: 10px;
+    margin-top: 4px;
+    padding: 9px;
     border: 0;
     background: #0E1F3C;
-    color: #fff;
+    color: #FAF7F0;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    border-radius: 3px;
-    transition: background .2s ease;
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.15s ease;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__price-apply:hover {
     background: #C9A227;
+    color: #0E1F3C;
   }
 
   /* ACTIVE FILTER CHIPS */
@@ -310,21 +418,22 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 14px;
+    margin-top: 12px;
     padding-top: 10px;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background: #F0EEE9;
-    border: 1px solid rgba(143,163,184,.4);
-    border-radius: 20px;
-    color: #2B2B2E;
+    gap: 6px;
+    padding: 5px 12px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    color: #0E1F3C;
     font-size: 12px;
     font-weight: 600;
+    box-shadow: 0 2px 5px rgba(14, 31, 60, 0.04);
   }
 
   .kapisa-filter-{{ ai_gen_id }}__chip-remove {
@@ -335,60 +444,246 @@
     height: 16px;
     border: 0;
     padding: 0;
-    background: transparent;
-    color: #8FA3B8;
-    font-size: 16px;
+    background: rgba(14, 31, 60, 0.06);
+    border-radius: 50%;
+    color: #64748B;
+    font-size: 13px;
     line-height: 1;
     cursor: pointer;
-    transition: color .15s ease;
+    transition: all 0.15s ease;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__chip-remove:hover {
-    color: #DC2626;
+    background: #DC2626;
+    color: #FFFFFF;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__clear {
-    padding: 6px 8px;
+    padding: 4px 8px;
     border: 0;
     background: transparent;
     color: #C9A227;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: color 0.15s ease;
   }
 
   .kapisa-filter-{{ ai_gen_id }}__clear:hover {
+    color: #0E1F3C;
     text-decoration: underline;
   }
 
-  /* MOBILE */
+  /* MOBILE NATIVE BOTTOM SHEET */
+  .kapisa-filter-{{ ai_gen_id }}__mobile-backdrop {
+    display: none;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__mobile-head {
+    display: none;
+  }
+
+  .kapisa-filter-{{ ai_gen_id }}__mobile-footer {
+    display: none;
+  }
+
   @media (max-width: 749px) {
     .kapisa-filter-{{ ai_gen_id }}__inner {
-      padding: 14px 16px;
+      padding: 10px 16px;
     }
 
     .kapisa-filter-{{ ai_gen_id }}__bar {
-      min-height: 46px;
-      gap: 12px;
+      min-height: 40px;
+      gap: 10px;
     }
 
-    .kapisa-filter-{{ ai_gen_id }}__filter-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .kapisa-filter-{{ ai_gen_id }}__count {
+      font-size: 12px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__sort label {
+      display: none;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__sort select {
+      padding: 6px 26px 6px 12px;
+      font-size: 12px;
+    }
+
+    /* Transform Panel into Native iOS / Android Sheet */
+    .kapisa-filter-{{ ai_gen_id }}__panel {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: rgba(14, 31, 60, 0.45);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__panel.is-open {
+      display: flex;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__mobile-backdrop {
+      display: block;
+      position: absolute;
+      inset: 0;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__sheet-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-height: 82vh;
+      background: #FAF7F0;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -12px 40px rgba(14, 31, 60, 0.22);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: kapisaSheetUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes kapisaSheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    /* Top Drag Handle Notch */
+    .kapisa-filter-{{ ai_gen_id }}__drag-handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 999px;
+      background: #CBD5E1;
+      margin: 10px auto 4px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__mobile-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px 14px;
+      border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__mobile-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0E1F3C;
+      display: flex;
+      align-items: center;
       gap: 8px;
     }
 
+    .kapisa-filter-{{ ai_gen_id }}__mobile-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__mobile-close {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 0;
+      background: rgba(14, 31, 60, 0.06);
+      color: #0E1F3C;
+      cursor: pointer;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__filter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 16px 20px;
+      overflow-y: auto;
+      max-height: calc(82vh - 150px);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__group {
+      width: 100%;
+      border-bottom: 1px solid rgba(14, 31, 60, 0.06);
+      padding-bottom: 14px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__group-button {
+      width: 100%;
+      justify-content: space-between;
+      border: 0;
+      background: transparent;
+      padding: 6px 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
     .kapisa-filter-{{ ai_gen_id }}__dropdown {
-      position: fixed;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      top: auto;
-      width: auto;
-      max-height: 55vh;
+      position: static;
+      display: block !important;
+      width: 100%;
+      max-height: none;
+      padding: 10px 0 4px;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__option {
+      min-height: 36px;
+      padding: 6px 10px;
+      background: #FFFFFF;
+      border: 1px solid rgba(14, 31, 60, 0.08);
       border-radius: 8px;
-      box-shadow: 0 16px 36px rgba(0,0,0,.25);
+    }
+
+    /* Mobile Sheet Footer CTA */
+    .kapisa-filter-{{ ai_gen_id }}__mobile-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+      background: #FFFFFF;
+      border-top: 1px solid rgba(14, 31, 60, 0.08);
+      box-shadow: 0 -4px 16px rgba(14, 31, 60, 0.04);
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__mobile-apply-btn {
+      flex: 1;
+      height: 48px;
+      border: 0;
+      background: #0E1F3C;
+      color: #FAF7F0;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .kapisa-filter-{{ ai_gen_id }}__mobile-apply-btn:active {
+      transform: scale(0.98);
     }
   }
 {% endstyle %}
@@ -407,11 +702,14 @@
           class="kapisa-filter-{{ ai_gen_id }}__filter-button"
           data-filter-toggle
           aria-expanded="false"
+          aria-label="Open filter menu"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M4 6h16M7 12h10M10 18h4"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+            <line x1="11" y1="18" x2="13" y2="18"></line>
           </svg>
-          <span>Filter</span>
+          <span>Filters</span>
           <span class="kapisa-filter-{{ ai_gen_id }}__active-count" data-filter-badge style="display: none;">0</span>
         </button>
 
@@ -422,159 +720,227 @@
 
       <!-- SORT -->
       <div class="kapisa-filter-{{ ai_gen_id }}__sort">
-        <label for="kapisa-sort-{{ ai_gen_id }}">Sort</label>
-        <select id="kapisa-sort-{{ ai_gen_id }}" name="sort_by" data-sort>
-          {% assign current_sort = collection.sort_by | default: collection.default_sort_by %}
-          <option value="best-selling" {% if current_sort == 'best-selling' %}selected{% endif %}>Best Selling</option>
-          <option value="price-ascending" {% if current_sort == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
-          <option value="price-descending" {% if current_sort == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
-          <option value="created-descending" {% if current_sort == 'created-descending' %}selected{% endif %}>Newest</option>
-        </select>
+        <label for="kapisa-sort-{{ ai_gen_id }}">Sort by</label>
+        <div class="kapisa-filter-{{ ai_gen_id }}__sort-wrap">
+          <select id="kapisa-sort-{{ ai_gen_id }}" name="sort_by" data-sort aria-label="Sort products">
+            {% assign current_sort = collection.sort_by | default: collection.default_sort_by %}
+            <option value="best-selling" {% if current_sort == 'best-selling' %}selected{% endif %}>Best Selling</option>
+            <option value="price-ascending" {% if current_sort == 'price-ascending' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price-descending" {% if current_sort == 'price-descending' %}selected{% endif %}>Price: High to Low</option>
+            <option value="created-descending" {% if current_sort == 'created-descending' %}selected{% endif %}>Newest</option>
+          </select>
+          <svg class="kapisa-filter-{{ ai_gen_id }}__sort-arrow" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <!-- INLINE FILTER PANEL -->
+    <!-- FILTER PANEL (DESKTOP INLINE / MOBILE NATIVE BOTTOM SHEET) -->
     <div class="kapisa-filter-{{ ai_gen_id }}__panel" data-filter-panel>
-      <div class="kapisa-filter-{{ ai_gen_id }}__filter-list">
+      <div class="kapisa-filter-{{ ai_gen_id }}__mobile-backdrop" data-sheet-backdrop></div>
+      
+      <div class="kapisa-filter-{{ ai_gen_id }}__sheet-container">
+        <div class="kapisa-filter-{{ ai_gen_id }}__drag-handle"></div>
 
-        {% if collection.filters.size > 0 %}
-          {% comment %} Native Shopify Search & Discovery Filters {% endcomment %}
-          {% for filter in collection.filters %}
+        <div class="kapisa-filter-{{ ai_gen_id }}__mobile-head">
+          <h3 class="kapisa-filter-{{ ai_gen_id }}__mobile-title">
+            <span>Filter & Refine</span>
+            <span class="kapisa-filter-{{ ai_gen_id }}__active-count" data-filter-badge-mobile style="display: none;">0</span>
+          </h3>
+          <div class="kapisa-filter-{{ ai_gen_id }}__mobile-actions">
+            <button type="button" class="kapisa-filter-{{ ai_gen_id }}__clear" data-mobile-clear>Reset</button>
+            <button type="button" class="kapisa-filter-{{ ai_gen_id }}__mobile-close" data-mobile-close aria-label="Close filters">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="kapisa-filter-{{ ai_gen_id }}__filter-list">
+          {% if collection.filters.size > 0 %}
+            {% comment %} Native Shopify Search & Discovery Filters {% endcomment %}
+            {% for filter in collection.filters %}
+              <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
+                <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
+                  <span>{{ filter.label }}</span>
+                  <svg class="kapisa-filter-{{ ai_gen_id }}__group-arrow" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                  </svg>
+                </button>
+
+                <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
+                  {% if filter.type == 'price_range' %}
+                    <div class="kapisa-filter-{{ ai_gen_id }}__price">
+                      <div class="kapisa-filter-{{ ai_gen_id }}__price-presets">
+                        <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="" data-max="2000">Under ₹2k</button>
+                        <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="2000" data-max="3500">₹2k–₹3.5k</button>
+                        <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="3500" data-max="5000">₹3.5k–₹5k</button>
+                        <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="5000" data-max="">₹5k+</button>
+                      </div>
+                      <div class="kapisa-filter-{{ ai_gen_id }}__price-inputs">
+                        <div class="kapisa-filter-{{ ai_gen_id }}__price-input-wrap">
+                          <span>₹</span>
+                          <input type="number" data-price-min placeholder="Min" min="0" aria-label="Minimum price">
+                        </div>
+                        <div class="kapisa-filter-{{ ai_gen_id }}__price-input-wrap">
+                          <span>₹</span>
+                          <input type="number" data-price-max placeholder="Max" min="0" aria-label="Maximum price">
+                        </div>
+                      </div>
+                    </div>
+                    <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-apply" data-apply-price>Apply Price</button>
+                  {% else %}
+                    <div class="kapisa-filter-{{ ai_gen_id }}__options">
+                      {% assign is_color = false %}
+                      {% if filter.label contains 'Color' or filter.label contains 'Colour' %}
+                        {% assign is_color = true %}
+                      {% endif %}
+                      {% for value in filter.values %}
+                        <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                          <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" data-filter-type="{% if is_color %}color{% else %}generic{% endif %}">
+                          {% if is_color %}
+                            <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: {{ value.label | downcase | escape }};"></span>
+                          {% else %}
+                            <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
+                          {% endif %}
+                          <span>{{ value.label }}</span>
+                        </label>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            {% comment %}
+              Intelligent Fallback Filters for Kapisa Medical Apparel
+            {% endcomment %}
+
+            <!-- 1. Colour Filter -->
             <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
               <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
-                <span>{{ filter.label }}</span>
-                <span class="kapisa-filter-{{ ai_gen_id }}__group-arrow"></span>
+                <span>Colour</span>
+                <svg class="kapisa-filter-{{ ai_gen_id }}__group-arrow" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                </svg>
               </button>
-
               <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
-                {% if filter.type == 'price_range' %}
-                  <div class="kapisa-filter-{{ ai_gen_id }}__price">
-                    <input type="number" data-price-min placeholder="Min" min="0">
-                    <input type="number" data-price-max placeholder="Max" min="0">
-                  </div>
-                  <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-apply" data-apply-price>Apply</button>
-                {% else %}
-                  <div class="kapisa-filter-{{ ai_gen_id }}__options">
-                    {% assign is_color = false %}
-                    {% if filter.label contains 'Color' or filter.label contains 'Colour' %}
-                      {% assign is_color = true %}
-                    {% endif %}
-                    {% for value in filter.values %}
-                      <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                        <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" data-filter-type="{% if is_color %}color{% else %}generic{% endif %}">
-                        {% if is_color %}
-                          <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: {{ value.label | downcase | escape }};"></span>
-                        {% else %}
-                          <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
-                        {% endif %}
-                        <span>{{ value.label }}</span>
-                      </label>
-                    {% endfor %}
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-          {% endfor %}
-        {% else %}
-          {% comment %}
-            Intelligent Fallback Filters for Kapisa Medical Apparel
-            Ensures customer can ALWAYS filter even when Search & Discovery is unconfigured
-          {% endcomment %}
-
-          <!-- 1. Colour Filter -->
-          <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
-            <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
-              <span>Colour</span>
-              <span class="kapisa-filter-{{ ai_gen_id }}__group-arrow"></span>
-            </button>
-            <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
-              <div class="kapisa-filter-{{ ai_gen_id }}__options">
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="color" value="Black">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #18191C;"></span>
-                  <span>Black</span>
-                </label>
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="color" value="Blue">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #1B3B6F;"></span>
-                  <span>Navy Blue</span>
-                </label>
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="color" value="Green">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #1B4942;"></span>
-                  <span>Hunter Green</span>
-                </label>
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="color" value="Red">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #4A1525;"></span>
-                  <span>Burgundy / Wine</span>
-                </label>
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="color" value="Grey">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #40464D;"></span>
-                  <span>Slate Grey</span>
-                </label>
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="color" value="Pastel">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #756B98;"></span>
-                  <span>Pastel / Lavender</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2. Size Filter -->
-          <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
-            <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
-              <span>Size</span>
-              <span class="kapisa-filter-{{ ai_gen_id }}__group-arrow"></span>
-            </button>
-            <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
-              <div class="kapisa-filter-{{ ai_gen_id }}__options">
-                {% assign sizes_list = 'XS,S,M,L,XL,2XL' | split: ',' %}
-                {% for sz in sizes_list %}
+                <div class="kapisa-filter-{{ ai_gen_id }}__options">
                   <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                    <input type="checkbox" data-filter-type="size" value="{{ sz }}">
-                    <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
-                    <span>{{ sz }}</span>
+                    <input type="checkbox" data-filter-type="color" value="Black">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #18191C;"></span>
+                    <span>Black</span>
                   </label>
-                {% endfor %}
+                  <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                    <input type="checkbox" data-filter-type="color" value="Blue">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #1B3B6F;"></span>
+                    <span>Navy Blue</span>
+                  </label>
+                  <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                    <input type="checkbox" data-filter-type="color" value="Green">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #1B4942;"></span>
+                    <span>Hunter Green</span>
+                  </label>
+                  <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                    <input type="checkbox" data-filter-type="color" value="Red">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #4A1525;"></span>
+                    <span>Burgundy</span>
+                  </label>
+                  <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                    <input type="checkbox" data-filter-type="color" value="Grey">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #40464D;"></span>
+                    <span>Slate Grey</span>
+                  </label>
+                  <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                    <input type="checkbox" data-filter-type="color" value="Pastel">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__color-swatch" style="background-color: #756B98;"></span>
+                    <span>Pastel Lavender</span>
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- 3. Price Filter -->
-          <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
-            <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
-              <span>Price</span>
-              <span class="kapisa-filter-{{ ai_gen_id }}__group-arrow"></span>
-            </button>
-            <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
-              <div class="kapisa-filter-{{ ai_gen_id }}__price">
-                <input type="number" data-price-min placeholder="Min" min="0">
-                <input type="number" data-price-max placeholder="Max" min="0">
+            <!-- 2. Size Filter -->
+            <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
+              <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
+                <span>Size</span>
+                <svg class="kapisa-filter-{{ ai_gen_id }}__group-arrow" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
+                <div class="kapisa-filter-{{ ai_gen_id }}__options">
+                  {% assign sizes_list = 'XS,S,M,L,XL,2XL' | split: ',' %}
+                  {% for sz in sizes_list %}
+                    <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                      <input type="checkbox" data-filter-type="size" value="{{ sz }}">
+                      <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
+                      <span>{{ sz }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
               </div>
-              <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-apply" data-apply-price>Apply</button>
             </div>
-          </div>
 
-          <!-- 4. Availability Filter -->
-          <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
-            <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
-              <span>Availability</span>
-              <span class="kapisa-filter-{{ ai_gen_id }}__group-arrow"></span>
-            </button>
-            <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
-              <div class="kapisa-filter-{{ ai_gen_id }}__options">
-                <label class="kapisa-filter-{{ ai_gen_id }}__option">
-                  <input type="checkbox" data-filter-type="availability" value="in_stock">
-                  <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
-                  <span>In Stock</span>
-                </label>
+            <!-- 3. Price Filter -->
+            <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
+              <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
+                <span>Price</span>
+                <svg class="kapisa-filter-{{ ai_gen_id }}__group-arrow" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
+                <div class="kapisa-filter-{{ ai_gen_id }}__price">
+                  <div class="kapisa-filter-{{ ai_gen_id }}__price-presets">
+                    <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="" data-max="2000">Under ₹2k</button>
+                    <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="2000" data-max="3500">₹2k–₹3.5k</button>
+                    <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="3500" data-max="5000">₹3.5k–₹5k</button>
+                    <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-chip" data-price-preset data-min="5000" data-max="">₹5k+</button>
+                  </div>
+                  <div class="kapisa-filter-{{ ai_gen_id }}__price-inputs">
+                    <div class="kapisa-filter-{{ ai_gen_id }}__price-input-wrap">
+                      <span>₹</span>
+                      <input type="number" data-price-min placeholder="Min" min="0" aria-label="Minimum price">
+                    </div>
+                    <div class="kapisa-filter-{{ ai_gen_id }}__price-input-wrap">
+                      <span>₹</span>
+                      <input type="number" data-price-max placeholder="Max" min="0" aria-label="Maximum price">
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="kapisa-filter-{{ ai_gen_id }}__price-apply" data-apply-price>Apply Price</button>
               </div>
             </div>
-          </div>
-        {% endif %}
+
+            <!-- 4. Availability Filter -->
+            <div class="kapisa-filter-{{ ai_gen_id }}__group" data-filter-group>
+              <button type="button" class="kapisa-filter-{{ ai_gen_id }}__group-button" data-group-toggle>
+                <span>Availability</span>
+                <svg class="kapisa-filter-{{ ai_gen_id }}__group-arrow" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <div class="kapisa-filter-{{ ai_gen_id }}__dropdown" data-filter-dropdown>
+                <div class="kapisa-filter-{{ ai_gen_id }}__options">
+                  <label class="kapisa-filter-{{ ai_gen_id }}__option">
+                    <input type="checkbox" data-filter-type="availability" value="in_stock">
+                    <span class="kapisa-filter-{{ ai_gen_id }}__checkbox"></span>
+                    <span>In Stock</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- MOBILE FOOTER CTA -->
+        <div class="kapisa-filter-{{ ai_gen_id }}__mobile-footer">
+          <button type="button" class="kapisa-filter-{{ ai_gen_id }}__mobile-apply-btn" data-mobile-apply>
+            <span>Apply Filters</span>
+            <span data-mobile-product-count>({{ collection.products_count }})</span>
+          </button>
+        </div>
 
       </div>
     </div>
@@ -592,28 +958,55 @@
       this.panel = this.querySelector('[data-filter-panel]');
       this.toggle = this.querySelector('[data-filter-toggle]');
       this.badge = this.querySelector('[data-filter-badge]');
+      this.badgeMobile = this.querySelector('[data-filter-badge-mobile]');
       this.groups = this.querySelectorAll('[data-filter-group]');
       this.sort = this.querySelector('[data-sort]');
       this.chipsContainer = this.querySelector('[data-active-chips]');
+      this.mobileClose = this.querySelector('[data-mobile-close]');
+      this.mobileBackdrop = this.querySelector('[data-sheet-backdrop]');
+      this.mobileApply = this.querySelector('[data-mobile-apply]');
+      this.mobileClear = this.querySelector('[data-mobile-clear]');
 
-      // Open/close filter panel
+      // Sticky glass effect on scroll
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 80) {
+          this.classList.add('is-sticky');
+        } else {
+          this.classList.remove('is-sticky');
+        }
+      }, { passive: true });
+
+      // Open filter panel
       this.toggle?.addEventListener('click', () => {
         const isOpen = this.panel.classList.contains('is-open');
-        this.panel.classList.toggle('is-open', !isOpen);
-        this.toggle.classList.toggle('is-active', !isOpen);
-        this.toggle.setAttribute('aria-expanded', String(!isOpen));
+        this.togglePanel(!isOpen);
       });
 
-      // Individual dropdown toggles
+      // Close mobile sheet handlers
+      this.mobileClose?.addEventListener('click', () => this.togglePanel(false));
+      this.mobileBackdrop?.addEventListener('click', () => this.togglePanel(false));
+      this.mobileApply?.addEventListener('click', () => {
+        this.togglePanel(false);
+        this.syncFilters();
+      });
+      this.mobileClear?.addEventListener('click', () => {
+        this.clearAll();
+      });
+
+      // Individual dropdown toggles (Desktop)
       this.groups.forEach(group => {
         const btn = group.querySelector('[data-group-toggle]');
         const dropdown = group.querySelector('[data-filter-dropdown]');
 
         btn?.addEventListener('click', (e) => {
+          if (window.innerWidth <= 749) return; // on mobile, all groups are visible in sheet
           e.stopPropagation();
           const open = dropdown.classList.contains('is-open');
           this.querySelectorAll('[data-filter-dropdown].is-open').forEach(other => {
             if (other !== dropdown) other.classList.remove('is-open');
+          });
+          this.querySelectorAll('[data-group-toggle].is-active').forEach(otherBtn => {
+            if (otherBtn !== btn) otherBtn.classList.remove('is-active');
           });
           dropdown.classList.toggle('is-open', !open);
           btn.classList.toggle('is-active', !open);
@@ -623,16 +1016,18 @@
         const applyPriceBtn = group.querySelector('[data-apply-price]');
         if (applyPriceBtn) {
           applyPriceBtn.addEventListener('click', () => {
-            dropdown.classList.remove('is-open');
-            btn.classList.remove('is-active');
+            if (window.innerWidth > 749) {
+              dropdown.classList.remove('is-open');
+              btn.classList.remove('is-active');
+            }
             this.syncFilters();
           });
         }
       });
 
-      // Close dropdowns on outside click
+      // Close desktop dropdowns on outside click
       document.addEventListener('click', (e) => {
-        if (!this.contains(e.target)) {
+        if (window.innerWidth > 749 && !this.contains(e.target)) {
           this.querySelectorAll('[data-filter-dropdown].is-open').forEach(dd => dd.classList.remove('is-open'));
           this.querySelectorAll('[data-group-toggle].is-active').forEach(b => b.classList.remove('is-active'));
         }
@@ -655,18 +1050,65 @@
         }));
       });
 
+      // Price presets click handlers
+      this.querySelectorAll('[data-price-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const min = btn.dataset.min || '';
+          const max = btn.dataset.max || '';
+          const minInput = this.querySelector('[data-price-min]');
+          const maxInput = this.querySelector('[data-price-max]');
+          if (minInput) minInput.value = min;
+          if (maxInput) maxInput.value = max;
+          this.querySelectorAll('[data-price-preset]').forEach(b => b.classList.toggle('is-active', b === btn));
+          this.syncFilters();
+        });
+      });
+
       // Clear filters listener from grid
       window.addEventListener('kapisa:clear-filters', () => {
         this.resetInputs();
+      });
+
+      // Popstate listener for back/forward navigation
+      window.addEventListener('popstate', () => {
+        this.populateFromUrl();
+      });
+
+      // Filtered state updated from grid
+      window.addEventListener('kapisa:filtered-state-updated', (e) => {
+        const count = e.detail ? e.detail.count : 0;
+        const mobileCountEl = this.querySelector('[data-mobile-product-count]');
+        if (mobileCountEl) {
+          mobileCountEl.textContent = `(${count})`;
+        }
       });
 
       // Read initial state from URL on page load
       this.populateFromUrl();
     }
 
+    togglePanel(open) {
+      if (open) {
+        this.panel.classList.add('is-open');
+        this.toggle.classList.add('is-active');
+        this.toggle.setAttribute('aria-expanded', 'true');
+        if (window.innerWidth <= 749) {
+          document.body.style.overflow = 'hidden';
+        }
+      } else {
+        this.panel.classList.remove('is-open');
+        this.toggle.classList.remove('is-active');
+        this.toggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    }
+
     populateFromUrl() {
       const url = new URL(window.location.href);
       const params = url.searchParams;
+
+      // Reset checkboxes first
+      this.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
 
       // Detect color
       const colors = [];
@@ -688,11 +1130,34 @@
       checkParam('color');
       checkParam('colour');
 
+      // Detect sizes
+      const sizes = [];
+      const checkSizeParam = (paramName) => {
+        params.forEach((val, key) => {
+          if (key === paramName || key.startsWith(paramName)) {
+            val.split(',').forEach(v => {
+              const clean = v.trim().toLowerCase();
+              if (clean && !sizes.includes(clean)) sizes.push(clean);
+            });
+          }
+        });
+      };
+      checkSizeParam('filter.v.option.size');
+      checkSizeParam('size');
+
+      // Detect availability
+      const inStock = params.get('filter.v.availability') === '1' || params.get('availability') === 'in_stock';
+
       // Check corresponding checkboxes
       this.querySelectorAll('input[type="checkbox"]').forEach(input => {
         const val = (input.value || '').trim().toLowerCase();
         const type = input.dataset.filterType;
-        if (type === 'color' && colors.includes(val)) {
+        const name = (input.name || '').toLowerCase();
+        if ((type === 'color' || name.includes('color') || name.includes('colour')) && colors.includes(val)) {
+          input.checked = true;
+        } else if ((type === 'size' || name.includes('size')) && sizes.includes(val)) {
+          input.checked = true;
+        } else if ((type === 'availability' || name.includes('availability')) && inStock && (val === 'in_stock' || val === '1')) {
           input.checked = true;
         }
       });
@@ -702,8 +1167,8 @@
       const maxPrice = params.get('filter.v.price.lte') || params.get('max_price');
       const minInput = this.querySelector('[data-price-min]');
       const maxInput = this.querySelector('[data-price-max]');
-      if (minInput && minPrice) minInput.value = minPrice;
-      if (maxInput && maxPrice) maxInput.value = maxPrice;
+      if (minInput) minInput.value = minPrice || '';
+      if (maxInput) maxInput.value = maxPrice || '';
 
       // Update UI chips & badge
       this.renderChips();
@@ -716,11 +1181,15 @@
 
       this.querySelectorAll('input[type="checkbox"]:checked').forEach(input => {
         const type = input.dataset.filterType;
+        const name = (input.name || '').toLowerCase();
         const val = input.value;
-        if (type === 'color') selectedColors.push(val);
-        else if (type === 'size') selectedSizes.push(val);
-        else if (type === 'availability' && val === 'in_stock') inStock = true;
-        else if (input.name && input.name.includes('color')) selectedColors.push(val);
+        if (type === 'color' || name.includes('color') || name.includes('colour')) {
+          if (!selectedColors.includes(val)) selectedColors.push(val);
+        } else if (type === 'size' || name.includes('size')) {
+          if (!selectedSizes.includes(val)) selectedSizes.push(val);
+        } else if (type === 'availability' || name.includes('availability')) {
+          if (val === 'in_stock' || val === '1') inStock = true;
+        }
       });
 
       const minInput = this.querySelector('[data-price-min]');
@@ -792,8 +1261,8 @@
       const minInput = this.querySelector('[data-price-min]');
       const maxInput = this.querySelector('[data-price-max]');
       if ((minInput && minInput.value) || (maxInput && maxInput.value)) {
-        const minVal = minInput?.value ? `$${minInput.value}` : '$0';
-        const maxVal = maxInput?.value ? `$${maxInput.value}` : 'Any';
+        const minVal = minInput?.value ? `₹${minInput.value}` : '₹0';
+        const maxVal = maxInput?.value ? `₹${maxInput.value}` : 'Any';
         chips.push({
           label: `Price: ${minVal} – ${maxVal}`,
           remove: () => {
@@ -827,10 +1296,15 @@
           this.badge.textContent = chips.length;
           this.badge.style.display = 'inline-flex';
         }
+        if (this.badgeMobile) {
+          this.badgeMobile.textContent = chips.length;
+          this.badgeMobile.style.display = 'inline-flex';
+        }
         if (this.toggle) this.toggle.classList.add('is-active');
       } else {
         this.chipsContainer.style.display = 'none';
         if (this.badge) this.badge.style.display = 'none';
+        if (this.badgeMobile) this.badgeMobile.style.display = 'none';
         if (this.toggle) this.toggle.classList.remove('is-active');
       }
     }

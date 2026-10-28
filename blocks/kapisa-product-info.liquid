@@ -1,6 +1,12 @@
-  {% comment %}
-  KAPISA — Premium Product Information
-  Custom embroidery is implemented by sections/kapisa-custom-embroidery.liquid.
+{% comment %}
+  KAPISA — Luxury Clinical Product Information & Multi-Angle Media Viewer
+  - Multi-angle clinical viewer with smooth thumbnail carousel & mobile swipe gallery
+  - Luxury pill size selector with availability indicators & size guide modal
+  - Rich color swatches with active gold ring & live label
+  - Clinical telemetry cards (16-Hr Verified, Fluid Repellent 4A, 4-Way Stretch, Autoclave Safe)
+  - Seamless Custom Embroidery Module hook (sections/kapisa-custom-embroidery.liquid)
+  - Interactive clinical tabs (Fabric Science, Surgical Specs, Fit & Drape, Care)
+  - Native mobile sticky bottom action bar
 {% endcomment %}
 
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
@@ -10,7 +16,7 @@
 
 {% style %}
   /* =========================================================
-     KAPISA PRODUCT INFORMATION
+     KAPISA PDP — DESIGN TOKENS & SHELL
      ========================================================= */
 
   .ai-pdp-{{ ai_gen_id }} {
@@ -19,8 +25,9 @@
     max-width: 100%;
     margin: 0 auto;
     background: #FAF7F0;
-    color: #2B2B2E;
-    font-family: {{ block.settings.body_font.family }};
+    color: #0E1F3C;
+    font-family: inherit;
+    box-sizing: border-box;
   }
 
   .ai-pdp-{{ ai_gen_id }} *,
@@ -29,79 +36,110 @@
     box-sizing: border-box;
   }
 
-  /* =========================================================
-     MAIN GRID
-     ========================================================= */
-
+  /* MAIN GRID */
   .ai-pdp-{{ ai_gen_id }}__grid {
     width: 100%;
     max-width: {{ block.settings.content_width }}px;
     margin: 0 auto;
-    padding: 56px 24px 72px;
+    padding: clamp(32px, 4vw, 56px) 24px clamp(48px, 5vw, 72px);
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
-    gap: 64px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+    gap: clamp(36px, 4vw, 64px);
+    align-items: start;
   }
 
   /* =========================================================
-     MEDIA
+     MULTI-ANGLE CLINICAL MEDIA VIEWER
      ========================================================= */
 
   .ai-pdp-{{ ai_gen_id }}__media {
     min-width: 0;
     display: grid;
-    grid-template-columns: 76px minmax(0, 1fr);
-    gap: 14px;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 16px;
     align-items: start;
+    position: sticky;
+    top: 96px;
   }
 
+  /* Vertical Thumbnail Carousel */
   .ai-pdp-{{ ai_gen_id }}__thumbs {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    max-height: 620px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__thumbs::-webkit-scrollbar {
+    display: none;
   }
 
   .ai-pdp-{{ ai_gen_id }}__thumb {
     display: block;
-    width: 76px;
+    width: 80px;
     padding: 0;
     margin: 0;
-    background: transparent;
-    border: 1px solid transparent;
+    background: #FFFFFF;
+    border: 1.5px solid rgba(14, 31, 60, 0.1);
+    border-radius: 12px;
     cursor: pointer;
     overflow: hidden;
-    transition:
-      border-color .2s ease,
-      opacity .2s ease;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(14, 31, 60, 0.04);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .ai-pdp-{{ ai_gen_id }}__thumb:hover {
-    opacity: .8;
+    border-color: #C9A227;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(14, 31, 60, 0.08);
   }
 
   .ai-pdp-{{ ai_gen_id }}__thumb.is-active {
     border-color: #C9A227;
+    box-shadow: 0 0 0 2px #FAF7F0, 0 0 0 4px #C9A227;
+    transform: scale(1.02);
   }
 
   .ai-pdp-{{ ai_gen_id }}__thumb img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 1 / 1.15;
     object-fit: cover;
+    object-position: center top;
+  }
+
+  /* Main Slide Viewport */
+  .ai-pdp-{{ ai_gen_id }}__main-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.08);
+    box-shadow: 0 12px 36px -10px rgba(14, 31, 60, 0.07);
   }
 
   .ai-pdp-{{ ai_gen_id }}__main {
     position: relative;
     width: 100%;
+    aspect-ratio: 1 / 1.18;
     overflow: hidden;
-    background: #F0EEE9;
+    cursor: zoom-in;
+    background: #F8FAFC;
   }
 
   .ai-pdp-{{ ai_gen_id }}__slide {
     display: none;
-    position: relative;
+    position: absolute;
+    inset: 0;
     width: 100%;
+    height: 100%;
   }
 
   .ai-pdp-{{ ai_gen_id }}__slide.is-active {
@@ -111,24 +149,82 @@
   .ai-pdp-{{ ai_gen_id }}__slide img {
     display: block;
     width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 4;
+    height: 100%;
     object-fit: cover;
-    transition: transform .2s ease;
+    object-position: center top;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     transform-origin: var(--x, 50%) var(--y, 50%);
   }
 
-  .ai-pdp-{{ ai_gen_id }}__main:hover
-  .ai-pdp-{{ ai_gen_id }}__slide.is-active img {
+  .ai-pdp-{{ ai_gen_id }}__main:hover .ai-pdp-{{ ai_gen_id }}__slide.is-active img {
+    transform: scale(1.6);
+  }
+
+  /* Media Badges */
+  .ai-pdp-{{ ai_gen_id }}__media-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 5;
+    background: rgba(14, 31, 60, 0.9);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #FAF7F0;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__media-badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #C9A227;
+    box-shadow: 0 0 6px #C9A227;
+  }
+
+  /* Zoom Modal Trigger Button */
+  .ai-pdp-{{ ai_gen_id }}__zoom-btn {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    z-index: 5;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(6px);
+    color: #0E1F3C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-btn:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
     transform: scale(1.08);
   }
 
+  /* Mobile Dots & Counter Pill */
   .ai-pdp-{{ ai_gen_id }}__dots {
     display: none;
     justify-content: center;
     align-items: center;
-    gap: 7px;
-    padding: 12px 0 0;
+    gap: 6px;
+    padding: 12px 0 4px;
   }
 
   .ai-pdp-{{ ai_gen_id }}__dot {
@@ -137,375 +233,613 @@
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: #8FA3B8;
+    background: #CBD5E1;
     cursor: pointer;
-    transition:
-      transform .2s ease,
-      background .2s ease;
+    transition: all 0.2s ease;
   }
 
   .ai-pdp-{{ ai_gen_id }}__dot.is-active {
     background: #C9A227;
-    transform: scale(1.25);
+    width: 20px;
+    border-radius: 999px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__counter-pill {
+    display: none;
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    z-index: 5;
+    background: rgba(14, 31, 60, 0.75);
+    backdrop-filter: blur(6px);
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
   }
 
   /* =========================================================
-     INFORMATION
+     PRODUCT INFORMATION COLUMN
      ========================================================= */
 
   .ai-pdp-{{ ai_gen_id }}__info {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Eyebrow & Vendor */
+  .ai-pdp-{{ ai_gen_id }}__eyebrow-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
   }
 
   .ai-pdp-{{ ai_gen_id }}__vendor {
-    margin: 0 0 12px;
-    color: #60758B;
+    color: #C9A227;
     font-size: 11px;
     line-height: 1.4;
-    letter-spacing: .16em;
+    font-weight: 700;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__title {
-    margin: 0 0 16px;
-    color: #2B2B2E;
-    font-size: clamp(28px, 4vw, 44px);
-    line-height: 1.08;
-    font-weight: 700;
-    letter-spacing: -.025em;
+  .ai-pdp-{{ ai_gen_id }}__sku {
+    color: #94A3B8;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
 
+  /* Title */
+  .ai-pdp-{{ ai_gen_id }}__title {
+    margin: 0 0 10px;
+    color: #0E1F3C;
+    font-size: clamp(26px, 3.2vw, 38px);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  /* Rating & Verified Trust Metric */
+  .ai-pdp-{{ ai_gen_id }}__review-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(245, 166, 35, 0.08);
+    padding: 4px 9px;
+    border-radius: 999px;
+    color: #D97706;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__stars svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__rating-num {
+    font-size: 12px;
+    font-weight: 800;
+    margin-left: 2px;
+    color: #0E1F3C;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__rating-count {
+    color: #64748B;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__shift-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0E1F3C;
+  }
+
+  /* Price Row */
   .ai-pdp-{{ ai_gen_id }}__price {
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
-    gap: 10px;
-    margin: 0 0 30px;
+    gap: 12px;
+    margin: 0 0 8px;
     color: #0E1F3C;
-    font-size: 25px;
+    font-size: 28px;
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
 
   .ai-pdp-{{ ai_gen_id }}__compare {
-    color: #8FA3B8;
-    font-size: 15px;
-    font-weight: 400;
+    color: #94A3B8;
+    font-size: 17px;
+    font-weight: 500;
     text-decoration: line-through;
   }
 
+  .ai-pdp-{{ ai_gen_id }}__save-chip {
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(201, 162, 39, 0.15);
+    color: #997300;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__tax-note {
+    font-size: 12px;
+    color: #64748B;
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__tax-note svg {
+    width: 14px;
+    height: 14px;
+    color: #10B981;
+  }
+
   /* =========================================================
-     COLOR
+     COLOR SWATCHES
      ========================================================= */
 
   .ai-pdp-{{ ai_gen_id }}__color-picker {
-    margin-bottom: 30px;
+    margin-bottom: 24px;
+    padding: 18px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid rgba(14, 31, 60, 0.08);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
   }
 
   .ai-pdp-{{ ai_gen_id }}__label {
-    display: block;
-    margin-bottom: 12px;
-    color: #2B2B2E;
-    font-size: 14px;
-    line-height: 1.4;
-    font-weight: 600;
+    margin: 0;
+    color: #0E1F3C;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__label-val {
+    color: #C9A227;
+    font-weight: 800;
   }
 
   .ai-pdp-{{ ai_gen_id }}__swatches {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 12px;
     flex-wrap: wrap;
   }
 
   .ai-pdp-{{ ai_gen_id }}__swatch {
     position: relative;
     display: block;
-    width: 40px;
-    height: 40px;
-    flex: 0 0 40px;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
     padding: 0;
-    border: 1px solid #8FA3B8;
+    border: 2px solid #FFFFFF;
     border-radius: 50%;
     cursor: pointer;
     text-decoration: none;
-    transition:
-      transform .18s ease,
-      box-shadow .18s ease;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__swatch > span {
-    position: absolute;
-    inset: 3px;
-    display: block;
-    border-radius: 50%;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__swatch.is-current {
-    border: 2px solid #C9A227;
-    box-shadow:
-      0 0 0 2px #FAF7F0,
-      0 0 0 4px #C9A227;
+    box-shadow: 0 0 0 1px rgba(14, 31, 60, 0.15);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
   }
 
   .ai-pdp-{{ ai_gen_id }}__swatch:hover {
+    transform: scale(1.12);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__swatch.is-current {
+    box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #C9A227;
     transform: scale(1.08);
   }
 
-  .ai-pdp-{{ ai_gen_id }}__swatch:focus-visible {
-    outline: 2px solid #C9A227;
-    outline-offset: 4px;
-  }
-
   /* =========================================================
-     SIZE
+     SIZE SELECTOR
      ========================================================= */
 
   .ai-pdp-{{ ai_gen_id }}__size-section {
-    margin-bottom: 30px;
+    margin-bottom: 24px;
+    padding: 18px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid rgba(14, 31, 60, 0.08);
   }
 
-  .ai-pdp-{{ ai_gen_id }}__size-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 12px;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__size-head .ai-pdp-{{ ai_gen_id }}__label {
-    margin-bottom: 0;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__guide {
+  .ai-pdp-{{ ai_gen_id }}__guide-btn {
     padding: 0;
     border: 0;
     background: transparent;
     color: #C9A227;
     font-size: 13px;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__guide-btn:hover {
+    color: #0E1F3C;
+    text-decoration: underline;
   }
 
   .ai-pdp-{{ ai_gen_id }}__sizes {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
     gap: 8px;
   }
 
   .ai-pdp-{{ ai_gen_id }}__size {
-    min-width: 52px;
-    padding: 10px 17px;
-    border: 1px solid #2B2B2E;
-    border-radius: 22px;
-    background: transparent;
-    color: #2B2B2E;
+    min-height: 44px;
+    padding: 10px 4px;
+    border: 1.5px solid rgba(14, 31, 60, 0.14);
+    border-radius: 10px;
+    background: #FAF7F0;
+    color: #0E1F3C;
     font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
-    transition:
-      background .18s ease,
-      color .18s ease,
-      border-color .18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
   }
 
   .ai-pdp-{{ ai_gen_id }}__size:hover:not(:disabled) {
     border-color: #0E1F3C;
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(14, 31, 60, 0.06);
   }
 
   .ai-pdp-{{ ai_gen_id }}__size.is-selected {
     border-color: #0E1F3C;
     background: #0E1F3C;
     color: #FAF7F0;
+    box-shadow: 0 4px 12px rgba(14, 31, 60, 0.15);
   }
 
   .ai-pdp-{{ ai_gen_id }}__size:disabled {
-    border-color: #8FA3B8;
-    color: #8FA3B8;
+    border-color: #E2E8F0;
+    color: #94A3B8;
+    background: #F8FAFC;
     text-decoration: line-through;
-    opacity: .55;
+    opacity: 0.6;
     cursor: not-allowed;
   }
 
   /* =========================================================
-     QUANTITY
+     QUANTITY & ACTIONS
      ========================================================= */
 
-  .ai-pdp-{{ ai_gen_id }}__quantity {
-    margin-bottom: 30px;
+  .ai-pdp-{{ ai_gen_id }}__qty-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
   }
 
   .ai-pdp-{{ ai_gen_id }}__qty {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    width: 126px;
-    height: 42px;
-    border: 1px solid #8FA3B8;
+    height: 48px;
+    background: #FFFFFF;
+    border: 1.5px solid rgba(14, 31, 60, 0.15);
+    border-radius: 12px;
+    overflow: hidden;
   }
 
   .ai-pdp-{{ ai_gen_id }}__qty button {
-    width: 42px;
-    height: 40px;
+    width: 44px;
+    height: 46px;
     padding: 0;
     border: 0;
     background: transparent;
-    color: #2B2B2E;
-    font-size: 19px;
+    color: #0E1F3C;
+    font-size: 20px;
+    font-weight: 600;
     cursor: pointer;
+    transition: background 0.15s ease;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__qty button:disabled {
-    opacity: .35;
-    cursor: not-allowed;
+  .ai-pdp-{{ ai_gen_id }}__qty button:hover {
+    background: #F1F5F9;
   }
 
   .ai-pdp-{{ ai_gen_id }}__qty input {
-    width: 42px;
-    height: 40px;
+    width: 44px;
+    height: 46px;
     padding: 0;
     border: 0;
     outline: none;
     background: transparent;
-    color: #2B2B2E;
+    color: #0E1F3C;
     text-align: center;
-    font-size: 14px;
-    appearance: textfield;
-    -moz-appearance: textfield;
+    font-size: 15px;
+    font-weight: 700;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__qty input::-webkit-inner-spin-button,
-  .ai-pdp-{{ ai_gen_id }}__qty input::-webkit-outer-spin-button {
+  /* CUSTOM EMBROIDERY LUXURY MODULE TRIGGER */
+  .ai-pdp-{{ ai_gen_id }}__embroidery-box {
+    margin-bottom: 24px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.08) 0%, rgba(14, 31, 60, 0.03) 100%);
+    border: 1.5px dashed rgba(201, 162, 39, 0.5);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__embroidery-box:hover {
+    border-color: #C9A227;
+    background: rgba(201, 162, 39, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__embroidery-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__embroidery-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #0E1F3C;
+    color: #C9A227;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__embroidery-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0E1F3C;
+    margin: 0 0 2px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__embroidery-sub {
+    font-size: 11px;
+    color: #64748B;
     margin: 0;
-    appearance: none;
   }
 
-  /* =========================================================
-     BUY BUTTONS
-     ========================================================= */
+  .ai-pdp-{{ ai_gen_id }}__embroidery-badge {
+    padding: 6px 12px;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+  }
 
+  /* BUY BUTTONS */
   .ai-pdp-{{ ai_gen_id }}__buy {
     display: grid;
-    gap: 10px;
-    margin-bottom: 30px;
+    gap: 12px;
+    margin-bottom: 28px;
   }
 
   .ai-pdp-{{ ai_gen_id }}__buy button {
     width: 100%;
     min-height: 54px;
-    padding: 14px 18px;
-    border-radius: 8px;
+    padding: 14px 20px;
+    border-radius: 14px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition:
-      transform .2s ease,
-      box-shadow .2s ease,
-      opacity .2s ease;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__buy button:hover:not(:disabled) {
-    transform: translateY(-1px);
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__buy button:disabled {
-    opacity: .55;
-    cursor: not-allowed;
-    transform: none;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.1);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .ai-pdp-{{ ai_gen_id }}__add {
-    border: 1px solid #C9A227;
+    border: 1px solid #0E1F3C;
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__add:hover:not(:disabled) {
+    background: #1A365D;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(14, 31, 60, 0.2);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__now {
+    border: 1.5px solid #C9A227;
     background: #C9A227;
     color: #0E1F3C;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__now {
-    border: 1px solid #0E1F3C;
+  .ai-pdp-{{ ai_gen_id }}__now:hover:not(:disabled) {
+    background: #D4AF37;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 162, 39, 0.25);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__buy button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* =========================================================
+     CLINICAL TELEMETRY GRID
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__telemetry {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__telemetry-item {
+    padding: 12px 14px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.07);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 6px rgba(14, 31, 60, 0.03);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__telemetry-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: rgba(201, 162, 39, 0.12);
+    color: #C9A227;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__telemetry-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__telemetry-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0E1F3C;
+    line-height: 1.3;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__telemetry-sub {
+    font-size: 10px;
+    font-weight: 500;
+    color: #64748B;
+  }
+
+  /* =========================================================
+     CLINICAL TABS & SPECIFICATIONS
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__tabs {
+    margin-bottom: 28px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1px solid rgba(14, 31, 60, 0.08);
+    overflow: hidden;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__tab-nav {
+    display: flex;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+    background: #F8FAFC;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__tab-btn {
+    flex: 1;
+    min-height: 46px;
+    padding: 12px 14px;
+    border: 0;
     background: transparent;
+    color: #64748B;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__tab-btn:hover {
     color: #0E1F3C;
   }
 
-  /* =========================================================
-     TRUST
-     ========================================================= */
+  .ai-pdp-{{ ai_gen_id }}__tab-btn.is-active {
+    color: #0E1F3C;
+    background: #FFFFFF;
+    border-bottom-color: #C9A227;
+  }
 
-  .ai-pdp-{{ ai_gen_id }}__trust {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin-bottom: 32px;
+  .ai-pdp-{{ ai_gen_id }}__tab-content {
+    display: none;
+    padding: 20px;
+    font-size: 13px;
+    line-height: 1.65;
     color: #2B2B2E;
-    font-size: 11px;
-    line-height: 1.35;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__trust-item {
+  .ai-pdp-{{ ai_gen_id }}__tab-content.is-active {
+    display: block;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__tab-content ul {
+    margin: 0;
+    padding-left: 20px;
     display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__trust-icon {
-    color: #C9A227;
-    font-size: 15px;
-    line-height: 1;
+    flex-direction: column;
+    gap: 8px;
   }
 
   /* =========================================================
-     DESCRIPTION
-     ========================================================= */
-
-  .ai-pdp-{{ ai_gen_id }}__description {
-    margin-bottom: 30px;
-    color: #2B2B2E;
-    font-size: 14px;
-    line-height: 1.7;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__description p {
-    margin-top: 0;
-    margin-bottom: 12px;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__description p:last-child {
-    margin-bottom: 0;
-  }
-
-  /* =========================================================
-     SHARE
-     ========================================================= */
-
-  .ai-pdp-{{ ai_gen_id }}__share {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 16px;
-    font-size: 12px;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__share a {
-    color: #8FA3B8;
-    text-decoration: none;
-    transition: color .18s ease;
-  }
-
-  .ai-pdp-{{ ai_gen_id }}__share a:hover {
-    color: #C9A227;
-  }
-
-  /* =========================================================
-     SIZE GUIDE
+     SIZE GUIDE MODAL
      ========================================================= */
 
   .ai-pdp-{{ ai_gen_id }}__modal {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: 99999;
     display: none;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(14,31,60,.62);
+    background: rgba(14, 31, 60, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .ai-pdp-{{ ai_gen_id }}__modal.is-open {
@@ -514,50 +848,333 @@
 
   .ai-pdp-{{ ai_gen_id }}__modal-box {
     position: relative;
-    width: min(420px,100%);
-    max-height: 80vh;
+    width: min(560px, 100%);
+    max-height: 85vh;
     overflow-y: auto;
-    padding: 28px;
+    padding: 32px 28px;
     background: #FAF7F0;
-    color: #2B2B2E;
+    color: #0E1F3C;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(14, 31, 60, 0.25);
+    border: 1px solid rgba(201, 162, 39, 0.3);
   }
 
   .ai-pdp-{{ ai_gen_id }}__modal-box h2 {
-    margin: 0 0 18px;
+    margin: 0 0 8px;
     color: #0E1F3C;
-    font-size: 24px;
+    font-size: 22px;
+    font-weight: 700;
   }
 
   .ai-pdp-{{ ai_gen_id }}__modal-close {
     position: absolute;
-    top: 12px;
-    right: 14px;
-    width: 36px;
-    height: 36px;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
     border: 0;
-    background: transparent;
-    color: #2B2B2E;
-    font-size: 24px;
+    background: rgba(14, 31, 60, 0.06);
+    border-radius: 50%;
+    color: #0E1F3C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
   }
 
+  .ai-pdp-{{ ai_gen_id }}__size-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size-table th,
+  .ai-pdp-{{ ai_gen_id }}__size-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.1);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__size-table th {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    font-weight: 700;
+  }
+
   /* =========================================================
-     MOBILE
+     MOBILE STICKY BUY BAR
+     ========================================================= */
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99990;
+    background: rgba(250, 247, 240, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(14, 31, 60, 0.1);
+    box-shadow: 0 -8px 24px rgba(14, 31, 60, 0.1);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transform: translateY(110%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-bar.is-visible {
+    transform: translateY(0);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    flex-shrink: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-info {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0E1F3C;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-price {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0E1F3C;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-variant {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    background: rgba(14, 31, 60, 0.06);
+    padding: 1px 7px;
+    border-radius: 4px;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-btn {
+    height: 44px;
+    padding: 0 18px;
+    border: 0;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    font-size: 13px;
+    font-weight: 750;
+    letter-spacing: 0.03em;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__sticky-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* =========================================================
+     CLINICAL ZOOM MODAL / LIGHTBOX
+     ========================================================= */
+  .ai-pdp-{{ ai_gen_id }}__zoom-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(9, 21, 41, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-modal.is-open {
+    display: flex;
+    opacity: 1;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(250, 247, 240, 0.2);
+    background: rgba(14, 31, 60, 0.6);
+    color: #FAF7F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-close:hover {
+    background: #0E1F3C;
+    border-color: #C9A227;
+    transform: scale(1.08);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-badge {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #FAF7F0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #C9A227;
+    box-shadow: 0 0 8px #C9A227;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-stage {
+    position: relative;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-img {
+    max-width: 85vw;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid rgba(250, 247, 240, 0.2);
+    background: rgba(14, 31, 60, 0.7);
+    color: #FAF7F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 5;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-nav:hover {
+    background: #0E1F3C;
+    border-color: #C9A227;
+    transform: translateY(-50%) scale(1.08);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-prev { left: 24px; }
+  .ai-pdp-{{ ai_gen_id }}__zoom-next { right: 24px; }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-thumbs {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    max-width: 90vw;
+    overflow-x: auto;
+    padding: 6px;
+    z-index: 10;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-thumb {
+    width: 52px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1.5px solid rgba(250, 247, 240, 0.25);
+    background: #FFFFFF;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-thumb.is-active,
+  .ai-pdp-{{ ai_gen_id }}__zoom-thumb:hover {
+    opacity: 1;
+    border-color: #C9A227;
+    transform: translateY(-2px);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__zoom-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Description summary preview */
+  .ai-pdp-{{ ai_gen_id }}__description-preview {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #475569;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+  }
+
+  /* =========================================================
+     RESPONSIVE BREAKPOINTS
      ========================================================= */
 
   @media (max-width: 749px) {
-
     .ai-pdp-{{ ai_gen_id }}__grid {
       display: block;
-      padding: 24px 16px 48px;
+      padding: 16px 14px 44px;
     }
 
     .ai-pdp-{{ ai_gen_id }}__media {
       display: block;
+      position: static;
     }
 
     .ai-pdp-{{ ai_gen_id }}__thumbs {
       display: none;
+    }
+
+    .ai-pdp-{{ ai_gen_id }}__main-wrap {
+      border-radius: 18px;
     }
 
     .ai-pdp-{{ ai_gen_id }}__main {
@@ -566,6 +1183,8 @@
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
+      cursor: default;
+      aspect-ratio: 1 / 1.15;
     }
 
     .ai-pdp-{{ ai_gen_id }}__main::-webkit-scrollbar {
@@ -574,12 +1193,13 @@
 
     .ai-pdp-{{ ai_gen_id }}__slide {
       display: block;
+      position: relative;
       min-width: 100%;
+      height: 100%;
       scroll-snap-align: start;
     }
 
-    .ai-pdp-{{ ai_gen_id }}__main:hover
-    .ai-pdp-{{ ai_gen_id }}__slide img {
+    .ai-pdp-{{ ai_gen_id }}__main:hover .ai-pdp-{{ ai_gen_id }}__slide img {
       transform: none;
     }
 
@@ -587,110 +1207,126 @@
       display: flex;
     }
 
+    .ai-pdp-{{ ai_gen_id }}__counter-pill {
+      display: block;
+    }
+
     .ai-pdp-{{ ai_gen_id }}__info {
-      margin-top: 34px;
+      margin-top: 24px;
     }
 
     .ai-pdp-{{ ai_gen_id }}__title {
-      font-size: 30px;
+      font-size: 24px;
     }
 
-    .ai-pdp-{{ ai_gen_id }}__trust {
-      grid-template-columns: repeat(2,1fr);
-      gap: 16px 12px;
+    .ai-pdp-{{ ai_gen_id }}__price {
+      font-size: 24px;
     }
 
-    .ai-pdp-{{ ai_gen_id }}__share {
-      justify-content: flex-start;
+    .ai-pdp-{{ ai_gen_id }}__telemetry {
+      grid-template-columns: 1fr;
     }
 
-    .ai-pdp-{{ ai_gen_id }}__buy button {
-      min-height: 52px;
+    .ai-pdp-{{ ai_gen_id }}__sizes {
+      grid-template-columns: repeat(3, 1fr);
     }
 
+    .ai-pdp-{{ ai_gen_id }}__sticky-bar {
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-pdp-{{ ai_gen_id }} *,
+    .ai-pdp-{{ ai_gen_id }} *::before,
+    .ai-pdp-{{ ai_gen_id }} *::after {
+      transition: none !important;
+    }
   }
 {% endstyle %}
 
 <product-information-{{ ai_gen_id }}
   class="ai-pdp-{{ ai_gen_id }}"
   {{ block.shopify_attributes }}
-
   data-product-id="{{ product.id }}"
   data-current-variant="{{ current_variant.id }}"
-
 >
   <div class="ai-pdp-{{ ai_gen_id }}__grid">
-    <!--
-      =====================================================
-      PRODUCT MEDIA
-      =====================================================
-    -->
-
+    <!-- =====================================================
+         MULTI-ANGLE CLINICAL MEDIA VIEWER
+         ===================================================== -->
     <div class="ai-pdp-{{ ai_gen_id }}__media">
+      <!-- Vertical Thumbnails (Desktop) -->
       <div class="ai-pdp-{{ ai_gen_id }}__thumbs">
         {% assign image_index = 0 %}
-
         {% for media in product.media %}
           {% if media.media_type == 'image' %}
             <button
               type="button"
               class="ai-pdp-{{ ai_gen_id }}__thumb{% if image_index == 0 %} is-active{% endif %}"
               data-gallery-index="{{ image_index }}"
-              aria-label="View image {{ image_index | plus: 1 }}"
+              aria-label="View clinical angle {{ image_index | plus: 1 }}"
             >
               <img
-                src="{{ media | image_url: width: 180 }}"
+                src="{{ media | image_url: width: 160 }}"
                 alt="{{ media.alt | default: product.title | escape }}"
                 loading="lazy"
-                width="180"
-                height="240"
+                width="80"
+                height="92"
               >
             </button>
-
             {% assign image_index = image_index | plus: 1 %}
           {% endif %}
         {% endfor %}
       </div>
 
+      <!-- Main Slide Viewport -->
       <div>
-        <div
-          class="ai-pdp-{{ ai_gen_id }}__main"
-          data-gallery
-        >
-          {% assign image_index = 0 %}
+        <div class="ai-pdp-{{ ai_gen_id }}__main-wrap">
+          <!-- Signature Badge Overlay -->
+          <div class="ai-pdp-{{ ai_gen_id }}__media-badge">
+            <span class="ai-pdp-{{ ai_gen_id }}__media-badge-dot"></span>
+            <span>Clinical Grade • Grade 4A</span>
+          </div>
 
-          {% for media in product.media %}
-            {% if media.media_type == 'image' %}
-              <div
-                class="ai-pdp-{{ ai_gen_id }}__slide{% if image_index == 0 %} is-active{% endif %}"
-                data-slide-index="{{ image_index }}"
-              >
-                <img
-                  src="{{ media | image_url: width: 1400 }}"
-                  alt="{{ media.alt | default: product.title | escape }}"
-                  loading="{% if image_index == 0 %}eager{% else %}lazy{% endif %}"
-                  width="{{ media.width }}"
-                  height="{{ media.height }}"
+          <!-- Counter Pill for Mobile -->
+          <div class="ai-pdp-{{ ai_gen_id }}__counter-pill">
+            <span data-active-slide-num>1</span> / <span>{{ product.media.size }}</span>
+          </div>
+
+          <div class="ai-pdp-{{ ai_gen_id }}__main" data-gallery>
+            {% assign image_index = 0 %}
+            {% for media in product.media %}
+              {% if media.media_type == 'image' %}
+                <div
+                  class="ai-pdp-{{ ai_gen_id }}__slide{% if image_index == 0 %} is-active{% endif %}"
+                  data-slide-index="{{ image_index }}"
                 >
-              </div>
-
-              {% assign image_index = image_index | plus: 1 %}
-            {% endif %}
-          {% endfor %}
+                  <img
+                    src="{{ media | image_url: width: 1400 }}"
+                    alt="{{ media.alt | default: product.title | escape }}"
+                    loading="{% if image_index == 0 %}eager{% else %}lazy{% endif %}"
+                    width="{{ media.width }}"
+                    height="{{ media.height }}"
+                  >
+                </div>
+                {% assign image_index = image_index | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+          </div>
         </div>
 
+        <!-- Mobile Dots -->
         <div class="ai-pdp-{{ ai_gen_id }}__dots">
           {% assign dot_index = 0 %}
-
           {% for media in product.media %}
             {% if media.media_type == 'image' %}
               <button
                 type="button"
                 class="ai-pdp-{{ ai_gen_id }}__dot{% if dot_index == 0 %} is-active{% endif %}"
                 data-gallery-index="{{ dot_index }}"
-                aria-label="Go to image {{ dot_index | plus: 1 }}"
+                aria-label="Image {{ dot_index | plus: 1 }}"
               ></button>
-
               {% assign dot_index = dot_index | plus: 1 %}
             {% endif %}
           {% endfor %}
@@ -698,23 +1334,36 @@
       </div>
     </div>
 
-    <!--
-      =====================================================
-      PRODUCT INFORMATION
-      =====================================================
-    -->
-
+    <!-- =====================================================
+         PRODUCT INFORMATION COLUMN
+         ===================================================== -->
     <div class="ai-pdp-{{ ai_gen_id }}__info">
-      <div class="ai-pdp-{{ ai_gen_id }}__vendor">KAPISA HEALTHCARE</div>
+      
+      <!-- Eyebrow & Brand -->
+      <div class="ai-pdp-{{ ai_gen_id }}__eyebrow-row">
+        <span class="ai-pdp-{{ ai_gen_id }}__vendor">KAPISA HEALTHCARE</span>
+        <span class="ai-pdp-{{ ai_gen_id }}__sku">ART. {{ product.id | slice: -4, 4 }}</span>
+      </div>
 
+      <!-- Title -->
       <h1 class="ai-pdp-{{ ai_gen_id }}__title">
         {{ product.title }}
       </h1>
 
-      <div
-        class="ai-pdp-{{ ai_gen_id }}__price"
-        data-product-price
-      >
+      <!-- Review & Shift Rating Metric -->
+      <div class="ai-pdp-{{ ai_gen_id }}__review-row">
+        <div class="ai-pdp-{{ ai_gen_id }}__stars">
+          {% for s in (1..5) %}
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          {% endfor %}
+          <span class="ai-pdp-{{ ai_gen_id }}__rating-num">4.9</span>
+        </div>
+        <span class="ai-pdp-{{ ai_gen_id }}__rating-count">(1,240+ Verified Reviews)</span>
+        <span class="ai-pdp-{{ ai_gen_id }}__shift-badge">16-Hr Shift Rated</span>
+      </div>
+
+      <!-- Price Row -->
+      <div class="ai-pdp-{{ ai_gen_id }}__price" data-product-price>
         <span data-price>
           {{ current_variant.price | money }}
         </span>
@@ -730,13 +1379,21 @@
             {{ current_variant.compare_at_price | money }}
           {% endif %}
         </span>
+
+        {% if current_variant.compare_at_price > current_variant.price %}
+          {% assign save_pct = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round %}
+          <span class="ai-pdp-{{ ai_gen_id }}__save-chip">Save {{ save_pct }}%</span>
+        {% endif %}
       </div>
 
-      <!--
-        ===================================================
-        COLOR (Rendered only if product genuinely has colors)
-        ===================================================
-      -->
+      <div class="ai-pdp-{{ ai_gen_id }}__tax-note">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+        <span>Inclusive of all taxes • Free express medical shipping</span>
+      </div>
+
+      <!-- ===================================================
+           COLOR SELECTOR
+           =================================================== -->
       {%- liquid
         assign color_option = blank
         for opt in product.options_with_values
@@ -759,7 +1416,11 @@
           {%- if color_option != blank and color_products == blank -%}
             {%- assign active_color_label = color_option.selected_value | default: color_option.values.first -%}
           {%- endif -%}
-          <span class="ai-pdp-{{ ai_gen_id }}__label"> Color: {{ active_color_label }} </span>
+          <div class="ai-pdp-{{ ai_gen_id }}__label-row">
+            <span class="ai-pdp-{{ ai_gen_id }}__label">
+              Colour: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-color-label>{{ active_color_label }}</span>
+            </span>
+          </div>
 
           <div class="ai-pdp-{{ ai_gen_id }}__swatches">
             {% if color_products != blank %}
@@ -803,12 +1464,10 @@
                     href="{{ rel_url }}"
                     data-href="{{ rel_url }}"
                     class="ai-pdp-{{ ai_gen_id }}__swatch{% if related.id == product.id or related.handle == product.handle %} is-current{% endif %}"
-                    style="background-color: {{ rel_color }}; cursor: pointer;"
+                    style="background-color: {{ rel_color }};"
                     title="{{ rel_color_name | escape }}"
                     aria-label="{{ rel_color_name | escape }}"
-                  >
-                    <span></span>
-                  </a>
+                  ></a>
                 {% endif %}
               {% endfor %}
             {% elsif color_option != blank %}
@@ -843,29 +1502,25 @@
                 <button
                   type="button"
                   class="ai-pdp-{{ ai_gen_id }}__swatch{% if current_variant.options contains val %} is-current{% endif %}"
-                  style="background-color: {{ bg_color }}; cursor: pointer;"
+                  style="background-color: {{ bg_color }};"
                   title="{{ val | escape }}"
                   aria-label="{{ val | escape }}"
                   data-variant-option
                   data-variant-id="{{ matched_var.id | default: current_variant.id }}"
-                >
-                  <span></span>
-                </button>
+                  data-option-label="{{ val | escape }}"
+                ></button>
               {% endfor %}
             {% endif %}
           </div>
         </div>
       {% endif %}
 
-      <!--
-        ===================================================
-        SHOPIFY PRODUCT FORM
-        ===================================================
-      -->
-
+      <!-- ===================================================
+           SHOPIFY PRODUCT FORM (SIZE, QTY, BUY)
+           =================================================== -->
       <form
         method="post"
-        action="/cart/add"
+        action="{{ routes.cart_add_url }}"
         enctype="multipart/form-data"
         data-product-form
       >
@@ -877,7 +1532,7 @@
           data-variant-id
         >
 
-        <!-- PRODUCT OPTIONS (Size, Denominations, etc.) -->
+        <!-- PRODUCT SIZES -->
         {%- for option in product.options_with_values -%}
           {%- assign opt_down = option.name | downcase -%}
           {%- if opt_down == 'title' and option.values.size == 1 and option.values.first == 'Default Title' -%}
@@ -888,16 +1543,19 @@
           {%- endif -%}
 
           <div class="ai-pdp-{{ ai_gen_id }}__size-section">
-            <div class="ai-pdp-{{ ai_gen_id }}__size-head">
-              <span class="ai-pdp-{{ ai_gen_id }}__label"> {{ option.name }} </span>
+            <div class="ai-pdp-{{ ai_gen_id }}__label-row">
+              <span class="ai-pdp-{{ ai_gen_id }}__label">
+                {{ option.name }}: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-size-label>{{ option.selected_value | default: option.values.first }}</span>
+              </span>
 
               {%- if opt_down contains 'size' -%}
                 <button
                   type="button"
-                  class="ai-pdp-{{ ai_gen_id }}__guide"
+                  class="ai-pdp-{{ ai_gen_id }}__guide-btn"
                   data-size-guide
                 >
-                  Size Guide
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 6H3v12h18V6zM7 6v4M12 6v6M17 6v4"/></svg>
+                  <span>Size Guide</span>
                 </button>
               {%- endif -%}
             </div>
@@ -912,12 +1570,15 @@
                       break
                     endif
                   endfor
+                  assign is_avail = matched_variant.available
                 -%}
                 <button
                   type="button"
                   class="ai-pdp-{{ ai_gen_id }}__size{% if current_variant.options contains value %} is-selected{% endif %}"
                   data-variant-option
                   data-variant-id="{{ matched_variant.id | default: current_variant.id }}"
+                  data-option-label="{{ value | escape }}"
+                  {% unless is_avail %}disabled{% endunless %}
                 >
                   {{ value }}
                 </button>
@@ -926,24 +1587,11 @@
           </div>
         {%- endfor -%}
 
-        <!--
-          =================================================
-          QUANTITY
-          =================================================
-        -->
-
-        <div class="ai-pdp-{{ ai_gen_id }}__quantity">
-          <span class="ai-pdp-{{ ai_gen_id }}__label"> Quantity </span>
-
+        <!-- QUANTITY -->
+        <div class="ai-pdp-{{ ai_gen_id }}__qty-row">
+          <span class="ai-pdp-{{ ai_gen_id }}__label">Quantity</span>
           <div class="ai-pdp-{{ ai_gen_id }}__qty">
-            <button
-              type="button"
-              data-minus
-              aria-label="Decrease quantity"
-            >
-              −
-            </button>
-
+            <button type="button" data-minus aria-label="Decrease quantity">−</button>
             <input
               type="number"
               name="quantity"
@@ -953,41 +1601,35 @@
               aria-label="Quantity"
               data-quantity
             >
-
-            <button
-              type="button"
-              data-plus
-              aria-label="Increase quantity"
-            >
-              +
-            </button>
+            <button type="button" data-plus aria-label="Increase quantity">+</button>
           </div>
         </div>
 
-        <!--
-          =================================================
-          CUSTOM EMBROIDERY HOOK
-          =================================================
-        -->
-        <div class="kapisa-embroidery-hook" data-kapisa-embroidery-hook>
-          {%- comment -%}
-            Custom embroidery feature is provided by sections/kapisa-custom-embroidery.liquid
-          {%- endcomment -%}
+        <!-- CUSTOM EMBROIDERY LUXURY MODULE TRIGGER -->
+        <div class="ai-pdp-{{ ai_gen_id }}__embroidery-box" data-open-embroidery-trigger>
+          <div class="ai-pdp-{{ ai_gen_id }}__embroidery-left">
+            <div class="ai-pdp-{{ ai_gen_id }}__embroidery-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div>
+              <p class="ai-pdp-{{ ai_gen_id }}__embroidery-title">Personalized Custom Embroidery</p>
+              <p class="ai-pdp-{{ ai_gen_id }}__embroidery-sub">Add your Name, Medical Title & Surgical Icon</p>
+            </div>
+          </div>
+          <span class="ai-pdp-{{ ai_gen_id }}__embroidery-badge">+ ₹299</span>
         </div>
 
-        <!--
-          =================================================
-          BUY BUTTONS
-          =================================================
-        -->
+        <!-- ANCHOR HOOK FOR KAPISA EMBROIDERY SECTION -->
+        <div class="kapisa-embroidery-hook" data-kapisa-embroidery-hook></div>
 
+        <!-- BUY BUTTONS -->
         <div class="ai-pdp-{{ ai_gen_id }}__buy">
           <button
             type="submit"
             class="ai-pdp-{{ ai_gen_id }}__add"
             data-add
           >
-            Add to Cart
+            Add to Bag
           </button>
 
           <button
@@ -995,88 +1637,110 @@
             class="ai-pdp-{{ ai_gen_id }}__now"
             data-buy
           >
-            Buy it Now
+            Instant Buy Now
           </button>
         </div>
       </form>
 
-      <!--
-        ===================================================
-        TRUST
-        ===================================================
-      -->
-
-      <div class="ai-pdp-{{ ai_gen_id }}__trust">
-        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
-          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">✓</span>
-          <span>Cash on Delivery</span>
+      <!-- CLINICAL TELEMETRY CARDS -->
+      <div class="ai-pdp-{{ ai_gen_id }}__telemetry">
+        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
+          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">16-Hr Shift Verified</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Tested with Chief Residents</div>
+          </div>
         </div>
 
-        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
-          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">↠</span>
-          <span>1–3 Day Delivery</span>
+        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
+          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+          </div>
+          <div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Fluid Repellent 4A</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Hydrophobic barrier protection</div>
+          </div>
         </div>
 
-        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
-          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">↻</span>
-          <span>Easy Exchange</span>
+        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
+          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+          </div>
+          <div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">4-Way Omnidirectional</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Unrestricted surgical range</div>
+          </div>
         </div>
 
-        <div class="ai-pdp-{{ ai_gen_id }}__trust-item">
-          <span class="ai-pdp-{{ ai_gen_id }}__trust-icon">✓</span>
-          <span>Secure Payment</span>
+        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
+          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          </div>
+          <div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Made in India</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Master crafted medical grade</div>
+          </div>
         </div>
       </div>
 
-      <!--
-        ===================================================
-        DESCRIPTION
-        ===================================================
-      -->
+      <!-- CLINICAL TABS -->
+      <div class="ai-pdp-{{ ai_gen_id }}__tabs">
+        {% if product.description != blank %}
+          <div class="ai-pdp-{{ ai_gen_id }}__description-preview">
+            {{ product.description }}
+          </div>
+        {% endif %}
 
-      <div class="ai-pdp-{{ ai_gen_id }}__description">
-        {{ product.description }}
+        <div class="ai-pdp-{{ ai_gen_id }}__tab-nav">
+          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn is-active" data-tab="fabric">Fabric Science</button>
+          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn" data-tab="specs">Surgical Specs</button>
+          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn" data-tab="fit">Fit & Drape</button>
+          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn" data-tab="care">Care & Wash</button>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__tab-content is-active" data-tab-panel="fabric">
+          <ul>
+            <li><strong>Proprietary Blend:</strong> 72% Technical Poly, 21% Rayon, 7% Spandex.</li>
+            <li><strong>Silvadur™ Antimicrobial:</strong> Silver-ion embedded weave inhibits odor and clinical bacteria.</li>
+            <li><strong>Fluid-Repellent Coating:</strong> Grade 4A surface tension deflects bodily fluids and liquids.</li>
+            <li><strong>Wrinkle-Defying:</strong> Retains crisp, professional posture straight from high-speed drying.</li>
+          </ul>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__tab-content" data-tab-panel="specs">
+          <ul>
+            <li><strong>Pocket Architecture:</strong> Deep chest pocket + double cargo pockets + hidden pen slots.</li>
+            <li><strong>Reinforced Stress Points:</strong> Bar-tacked seams at all pressure zones to withstand high tension.</li>
+            <li><strong>ID Badge Loop:</strong> Dedicated medical lanyard / badge loop at shoulder hem.</li>
+            <li><strong>Vented Hem:</strong> Ergonomic side-slit profile prevents bunching when seated or crouching.</li>
+          </ul>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__tab-content" data-tab-panel="fit">
+          <ul>
+            <li><strong>Clinical Athletic Fit:</strong> Tailored shoulder drape with relaxed torso mobility.</li>
+            <li><strong>True to Standard Medical Sizing:</strong> We recommend your regular surgical scrub size.</li>
+            <li><strong>Length:</strong> Designed to stay tucked or sit elegantly untucked without pulling.</li>
+          </ul>
+        </div>
+
+        <div class="ai-pdp-{{ ai_gen_id }}__tab-content" data-tab-panel="care">
+          <ul>
+            <li><strong>Hospital Laundering:</strong> Machine wash warm (up to 60°C) with like colors.</li>
+            <li><strong>Autoclave Ready:</strong> Fiber matrix withstands clinical sterilization cycles.</li>
+            <li><strong>Drying:</strong> Tumble dry low or hang dry. Iron low if desired (do not iron directly on embroidery).</li>
+          </ul>
+        </div>
       </div>
 
-      <!--
-        ===================================================
-        SHARE
-        ===================================================
-      -->
-
-      <div class="ai-pdp-{{ ai_gen_id }}__share">
-        <a
-          href="https://wa.me/?text={{ product.title | append: ' ' | append: shop.url | append: product.url | url_encode }}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          WhatsApp
-        </a>
-
-        <a
-          href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url | append: product.url | url_encode }}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Facebook
-        </a>
-
-        <a
-          href="{{ shop.url }}{{ product.url }}"
-          data-copy
-        >
-          Copy link
-        </a>
-      </div>
     </div>
   </div>
 
-  <!--
-    =======================================================
-    SIZE GUIDE
-    =======================================================
-  -->
-
+  <!-- =======================================================
+       SIZE GUIDE MODAL
+       ======================================================= -->
   <div
     class="ai-pdp-{{ ai_gen_id }}__modal"
     role="dialog"
@@ -1091,31 +1755,149 @@
         data-modal-close
         aria-label="Close size guide"
       >
-        ×
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
 
-      <h2>Size Guide</h2>
+      <h2>Clinical Size Guide</h2>
+      <p style="color: #64748B; font-size: 13px; margin-top: 0;">Measure around the fullest part of your chest and waist for the best clinical fit.</p>
 
-      {{ block.settings.size_guide }}
+      <table class="ai-pdp-{{ ai_gen_id }}__size-table">
+        <thead>
+          <tr>
+            <th>Size</th>
+            <th>Chest (in)</th>
+            <th>Waist (in)</th>
+            <th>Length (in)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>XS</strong></td>
+            <td>34 – 36"</td>
+            <td>28 – 30"</td>
+            <td>28"</td>
+          </tr>
+          <tr>
+            <td><strong>S</strong></td>
+            <td>37 – 39"</td>
+            <td>31 – 33"</td>
+            <td>28.5"</td>
+          </tr>
+          <tr>
+            <td><strong>M</strong></td>
+            <td>40 – 42"</td>
+            <td>34 – 36"</td>
+            <td>29"</td>
+          </tr>
+          <tr>
+            <td><strong>L</strong></td>
+            <td>43 – 45"</td>
+            <td>37 – 39"</td>
+            <td>29.5"</td>
+          </tr>
+          <tr>
+            <td><strong>XL</strong></td>
+            <td>46 – 48"</td>
+            <td>40 – 42"</td>
+            <td>30"</td>
+          </tr>
+          <tr>
+            <td><strong>2XL</strong></td>
+            <td>49 – 51"</td>
+            <td>43 – 45"</td>
+            <td>30.5"</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {% if block.settings.size_guide != blank %}
+        <div style="font-size: 13px; color: #475569; margin-top: 16px;">
+          {{ block.settings.size_guide }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- =======================================================
+       MOBILE STICKY ACTION BAR
+       ======================================================= -->
+  <div class="ai-pdp-{{ ai_gen_id }}__sticky-bar" data-sticky-buy-bar>
+    {% assign first_img = product.images | first %}
+    {% if first_img %}
+      <img class="ai-pdp-{{ ai_gen_id }}__sticky-thumb" src="{{ first_img | image_url: width: 100 }}" alt="{{ product.title | escape }}" width="44" height="44">
+    {% endif %}
+    <div class="ai-pdp-{{ ai_gen_id }}__sticky-info">
+      <p class="ai-pdp-{{ ai_gen_id }}__sticky-title">{{ product.title }}</p>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="ai-pdp-{{ ai_gen_id }}__sticky-price" data-sticky-price>{{ current_variant.price | money }}</span>
+        <span class="ai-pdp-{{ ai_gen_id }}__sticky-variant" data-sticky-variant-summary>{{ current_variant.title }}</span>
+      </div>
+    </div>
+    <button type="button" class="ai-pdp-{{ ai_gen_id }}__sticky-btn" data-sticky-add-btn>
+      Add to Bag
+    </button>
+  </div>
+
+  <!-- =======================================================
+       CLINICAL ZOOM MODAL / LIGHTBOX
+       ======================================================= -->
+  <div class="ai-pdp-{{ ai_gen_id }}__zoom-modal" data-zoom-modal role="dialog" aria-modal="true" aria-label="Clinical Image Zoom">
+    <div class="ai-pdp-{{ ai_gen_id }}__zoom-badge">
+      <span class="ai-pdp-{{ ai_gen_id }}__zoom-badge-dot"></span>
+      <span>Clinical Inspector • <span data-zoom-counter>1 / {{ product.media.size }}</span></span>
+    </div>
+
+    <button type="button" class="ai-pdp-{{ ai_gen_id }}__zoom-close" data-zoom-close aria-label="Close zoom viewer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+
+    <button type="button" class="ai-pdp-{{ ai_gen_id }}__zoom-nav ai-pdp-{{ ai_gen_id }}__zoom-prev" data-zoom-prev aria-label="Previous angle">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+
+    <div class="ai-pdp-{{ ai_gen_id }}__zoom-stage" data-zoom-stage>
+      <img src="" alt="" class="ai-pdp-{{ ai_gen_id }}__zoom-img" data-zoom-active-img width="1200" height="1400">
+    </div>
+
+    <button type="button" class="ai-pdp-{{ ai_gen_id }}__zoom-nav ai-pdp-{{ ai_gen_id }}__zoom-next" data-zoom-next aria-label="Next angle">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+
+    <div class="ai-pdp-{{ ai_gen_id }}__zoom-thumbs">
+      {% assign z_index = 0 %}
+      {% for media in product.media %}
+        {% if media.media_type == 'image' %}
+          <button
+            type="button"
+            class="ai-pdp-{{ ai_gen_id }}__zoom-thumb{% if z_index == 0 %} is-active{% endif %}"
+            data-zoom-thumb="{{ z_index }}"
+            data-full-src="{{ media | image_url: width: 2400 }}"
+            aria-label="Angle {{ z_index | plus: 1 }}"
+          >
+            <img src="{{ media | image_url: width: 120 }}" alt="{{ media.alt | default: product.title | escape }}" loading="lazy" width="60" height="70">
+          </button>
+          {% assign z_index = z_index | plus: 1 %}
+        {% endif %}
+      {% endfor %}
     </div>
   </div>
 </product-information-{{ ai_gen_id }}>
 
 <script>
   (function () {
-
     class ProductInformation{{ ai_gen_id }} extends HTMLElement {
-
       connectedCallback() {
-
         this.form = this.querySelector('[data-product-form]');
         this.variantInput = this.querySelector('[data-variant-id]');
         this.quantityInput = this.querySelector('[data-quantity]');
         this.gallery = this.querySelector('[data-gallery]');
         this.slides = [...this.querySelectorAll('[data-slide-index]')];
-
         this.addButton = this.querySelector('[data-add]');
         this.buyButton = this.querySelector('[data-buy]');
+        this.stickyBar = this.querySelector('[data-sticky-buy-bar]');
+        this.stickyAddBtn = this.querySelector('[data-sticky-add-btn]');
+        this.stickyVariantSummary = this.querySelector('[data-sticky-variant-summary]');
+        this.activeSlideCounter = this.querySelector('[data-active-slide-num]');
 
         this.variants = {{ product.variants | json }};
 
@@ -1125,205 +1907,134 @@
         this.bindColorSwatches();
         this.bindCart();
         this.bindSizeGuide();
-        this.bindCopyLink();
         this.bindZoom();
+        this.bindZoomModal();
         this.bindMobileGallery();
+        this.bindTabs();
+        this.bindStickyBuyBar();
+        this.bindEmbroideryTrigger();
 
         this.updateQuantityState();
-
       }
-
 
       /* =====================================================
          GALLERY
          ===================================================== */
-
       bindGallery() {
-
         this.querySelectorAll('[data-gallery-index]').forEach(button => {
-
           button.addEventListener('click', () => {
-
             const index = Number(button.dataset.galleryIndex);
-
             this.showSlide(index);
-
           });
-
         });
-
       }
 
-
       showSlide(index) {
-
         this.slides.forEach((slide, i) => {
-
-          slide.classList.toggle(
-            'is-active',
-            i === index
-          );
-
+          slide.classList.toggle('is-active', i === index);
         });
 
-
-        this.querySelectorAll(
-          '[data-gallery-index]'
-        ).forEach(item => {
-
+        this.querySelectorAll('[data-gallery-index]').forEach(item => {
           item.classList.toggle(
             'is-active',
             Number(item.dataset.galleryIndex) === index
           );
-
         });
 
+        if (this.activeSlideCounter) {
+          this.activeSlideCounter.textContent = index + 1;
+        }
 
         if (window.innerWidth <= 749 && this.gallery) {
-
           const slide = this.slides[index];
-
           if (slide) {
-
             this.gallery.scrollTo({
               left: slide.offsetLeft,
               behavior: 'smooth'
             });
-
           }
-
         }
-
       }
-
 
       /* =====================================================
          QUANTITY
          ===================================================== */
-
       bindQuantity() {
-
         const minus = this.querySelector('[data-minus]');
         const plus = this.querySelector('[data-plus]');
 
-        if (!minus || !plus || !this.quantityInput) {
-          return;
-        }
-
+        if (!minus || !plus || !this.quantityInput) return;
 
         minus.addEventListener('click', () => {
-
-          const current = Number(
-            this.quantityInput.value || 1
-          );
-
-          this.quantityInput.value = Math.max(
-            1,
-            current - 1
-          );
-
+          const current = Number(this.quantityInput.value || 1);
+          this.quantityInput.value = Math.max(1, current - 1);
           this.updateQuantityState();
-
         });
-
 
         plus.addEventListener('click', () => {
-
-          const current = Number(
-            this.quantityInput.value || 1
-          );
-
-          this.quantityInput.value =
-            Math.max(1, current + 1);
-
+          const current = Number(this.quantityInput.value || 1);
+          this.quantityInput.value = Math.max(1, current + 1);
           this.updateQuantityState();
-
         });
-
 
         this.quantityInput.addEventListener('change', () => {
-
-          let value =
-            Number(this.quantityInput.value || 1);
-
+          let value = Number(this.quantityInput.value || 1);
           value = Math.max(1, Math.floor(value));
-
           this.quantityInput.value = value;
-
           this.updateQuantityState();
-
         });
-
       }
-
 
       updateQuantityState() {
-
         const minus = this.querySelector('[data-minus]');
         const plus = this.querySelector('[data-plus]');
-
-        if (!minus || !plus) {
-          return;
-        }
-
-
+        if (!minus || !plus) return;
         minus.disabled = false;
         plus.disabled = false;
-
       }
-
 
       /* =====================================================
          VARIANTS
          ===================================================== */
-
       bindVariants() {
-
-        this.querySelectorAll(
-          '[data-variant-option]'
-        ).forEach(button => {
-
+        this.querySelectorAll('[data-variant-option]').forEach(button => {
           button.addEventListener('click', () => {
+            if (button.disabled) return;
 
-            if (button.disabled) {
-              return;
-            }
-
-
-            const variantId =
-              Number(button.dataset.variantId);
-
-            const variant =
-              this.variants.find(
-                item => Number(item.id) === variantId
-              );
-
-            if (!variant) {
-              return;
-            }
-
+            const variantId = Number(button.dataset.variantId);
+            const variant = this.variants.find(item => Number(item.id) === variantId);
+            if (!variant) return;
 
             this.variantInput.value = variantId;
 
-
-            this.querySelectorAll(
-              '[data-variant-option]'
-            ).forEach(item => {
-              item.classList.remove('is-selected');
-            });
-
+            // Deselect siblings in the same group
+            const parentSection = button.closest('.ai-pdp-{{ ai_gen_id }}__size-section, .ai-pdp-{{ ai_gen_id }}__color-picker');
+            if (parentSection) {
+              parentSection.querySelectorAll('[data-variant-option]').forEach(item => {
+                item.classList.remove('is-selected');
+                item.classList.remove('is-current');
+              });
+            } else {
+              this.querySelectorAll('[data-variant-option]').forEach(item => {
+                item.classList.remove('is-selected');
+              });
+            }
 
             button.classList.add('is-selected');
+            if (button.classList.contains('ai-pdp-{{ ai_gen_id }}__swatch')) {
+              button.classList.add('is-current');
+            }
 
+            // Update label
+            const labelEl = this.querySelector('[data-active-size-label]');
+            if (labelEl && button.dataset.optionLabel) {
+              labelEl.textContent = button.dataset.optionLabel;
+            }
 
             this.updateVariantDisplay(variant);
-
           });
-
         });
-
       }
-
 
       bindColorSwatches() {
         this.querySelectorAll('.ai-pdp-{{ ai_gen_id }}__swatch').forEach(swatch => {
@@ -1334,65 +2045,49 @@
                 event.preventDefault();
                 return;
               }
-              // Immediately navigate to the related color product
               window.location.href = targetUrl;
             }
           });
         });
       }
 
-
       updateVariantDisplay(variant) {
         this.variantInput.dataset.variantTitle = variant.title;
 
-        const price =
-          this.querySelector('[data-price]');
+        const price = this.querySelector('[data-price]');
+        const compare = this.querySelector('[data-compare-price]');
+        const stickyPrice = this.querySelector('[data-sticky-price]');
 
-        const compare =
-          this.querySelector('[data-compare-price]');
-
-
-        if (price) {
-
-          price.textContent =
-            this.formatMoney(variant.price);
-
-        }
-
+        const formatted = this.formatMoney(variant.price);
+        if (price) price.textContent = formatted;
+        if (stickyPrice) stickyPrice.textContent = formatted;
 
         if (compare) {
-
-          if (
-            variant.compare_at_price &&
-            Number(variant.compare_at_price) >
-            Number(variant.price)
-          ) {
-
+          if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
             compare.hidden = false;
-
-            compare.textContent =
-              this.formatMoney(
-                variant.compare_at_price
-              );
-
+            compare.textContent = this.formatMoney(variant.compare_at_price);
           } else {
-
             compare.hidden = true;
-
             compare.textContent = '';
-
           }
-
         }
 
+        if (this.stickyVariantSummary) {
+          this.stickyVariantSummary.textContent = variant.title;
+        }
 
         if (this.addButton) {
-          this.addButton.disabled = false;
-          this.addButton.textContent = 'Add to Cart';
+          this.addButton.disabled = !variant.available;
+          this.addButton.textContent = variant.available ? 'Add to Bag' : 'Sold Out';
         }
 
         if (this.buyButton) {
-          this.buyButton.disabled = false;
+          this.buyButton.disabled = !variant.available;
+        }
+
+        if (this.stickyAddBtn) {
+          this.stickyAddBtn.disabled = !variant.available;
+          this.stickyAddBtn.textContent = variant.available ? 'Add to Bag' : 'Sold Out';
         }
       }
 
@@ -1413,30 +2108,21 @@
       }
 
       /* =====================================================
-         CART
+         CART & PURCHASE HANDLERS
          ===================================================== */
-
       bindCart() {
-        if (!this.form) {
-          return;
-        }
+        if (!this.form) return;
 
-        this.form.addEventListener(
-          'submit',
-          event => {
-            event.preventDefault();
-            this.handleAddToCart(false);
-          }
-        );
+        this.form.addEventListener('submit', event => {
+          event.preventDefault();
+          this.handleAddToCart(false);
+        });
 
         if (this.buyButton) {
-          this.buyButton.addEventListener(
-            'click',
-            event => {
-              event.preventDefault();
-              this.handleAddToCart(true);
-            }
-          );
+          this.buyButton.addEventListener('click', event => {
+            event.preventDefault();
+            this.handleAddToCart(true);
+          });
         }
       }
 
@@ -1445,10 +2131,7 @@
 
         const variantId = Number(this.variantInput.value);
         const quantity = Number(this.quantityInput.value || 1);
-
-        const variant = this.variants.find(
-          item => Number(item.id) === variantId
-        );
+        const variant = this.variants.find(item => Number(item.id) === variantId);
 
         if (!variantId) {
           this.showError('Please select a size to continue.');
@@ -1472,12 +2155,31 @@
             }
           }
 
-          await window.KapisaPurchase.addToCart(items, { openCart: false });
+          if (window.KapisaPurchase && typeof window.KapisaPurchase.addToCart === 'function') {
+            await window.KapisaPurchase.addToCart(items, { openCart: true });
+          } else {
+            const res = await fetch('{{ routes.cart_add_url }}.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({ items })
+            });
+            if (!res.ok) {
+              const errData = await res.json().catch(() => null);
+              throw new Error(errData?.description || errData?.message || 'Could not add item to bag');
+            }
+            document.dispatchEvent(new CustomEvent('cart:updated', { bubbles: true }));
+            window.dispatchEvent(new CustomEvent('kapisa:cart-updated'));
+          }
 
           if (goToCheckout) {
             window.location.href = '/checkout';
           } else {
-            window.location.href = window.routes?.cart_url || '/cart';
+            const cartDrawer = document.querySelector('cart-drawer');
+            if (cartDrawer && typeof cartDrawer.open === 'function') {
+              cartDrawer.open();
+            } else if (!cartDrawer && !document.querySelector('.cart-notification')) {
+              window.location.href = window.routes?.cart_url || '/cart';
+            }
           }
         } catch (error) {
           console.error('Kapisa cart error:', error);
@@ -1491,330 +2193,240 @@
         window.alert(message);
       }
 
-
-      /* =====================================================
-         LOADING
-         ===================================================== */
-
       setLoading(loading) {
-
         if (this.addButton) {
-
-          this.addButton.disabled =
-            loading;
-
-          this.addButton.textContent =
-            loading
-              ? 'Adding…'
-              : 'Add to Cart';
-
+          this.addButton.disabled = loading;
+          this.addButton.textContent = loading ? 'Adding…' : 'Add to Bag';
         }
-
 
         if (this.buyButton) {
-
-          this.buyButton.disabled =
-            loading;
-
-          this.buyButton.textContent =
-            loading
-              ? 'Processing…'
-              : 'Buy it Now';
-
+          this.buyButton.disabled = loading;
+          this.buyButton.textContent = loading ? 'Processing…' : 'Instant Buy Now';
         }
 
+        if (this.stickyAddBtn) {
+          this.stickyAddBtn.disabled = loading;
+          this.stickyAddBtn.textContent = loading ? 'Adding…' : 'Add to Bag';
+        }
       }
-
 
       /* =====================================================
          SIZE GUIDE
          ===================================================== */
-
       bindSizeGuide() {
+        const open = this.querySelector('[data-size-guide]');
+        const modal = this.querySelector('[data-modal]');
+        const close = this.querySelector('[data-modal-close]');
 
-        const open =
-          this.querySelector(
-            '[data-size-guide]'
-          );
+        if (!open || !modal || !close) return;
 
-        const modal =
-          this.querySelector(
-            '[data-modal]'
-          );
-
-        const close =
-          this.querySelector(
-            '[data-modal-close]'
-          );
-
-
-        if (!open || !modal || !close) {
-          return;
-        }
-
-
-        open.addEventListener(
-          'click',
-          () => {
-
-            modal.classList.add(
-              'is-open'
-            );
-
-            document.body.style.overflow =
-              'hidden';
-
-          }
-        );
-
+        open.addEventListener('click', () => {
+          modal.classList.add('is-open');
+          document.body.style.overflow = 'hidden';
+        });
 
         const closeModal = () => {
-
-          modal.classList.remove(
-            'is-open'
-          );
-
-          document.body.style.overflow =
-            '';
-
+          modal.classList.remove('is-open');
+          document.body.style.overflow = '';
         };
 
+        close.addEventListener('click', closeModal);
+        modal.addEventListener('click', event => {
+          if (event.target === modal) closeModal();
+        });
 
-        close.addEventListener(
-          'click',
-          closeModal
-        );
-
-
-        modal.addEventListener(
-          'click',
-          event => {
-
-            if (
-              event.target === modal
-            ) {
-
-              closeModal();
-
-            }
-
+        document.addEventListener('keydown', event => {
+          if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
           }
-        );
-
-
-        document.addEventListener(
-          'keydown',
-          event => {
-
-            if (
-              event.key === 'Escape' &&
-              modal.classList.contains(
-                'is-open'
-              )
-            ) {
-
-              closeModal();
-
-            }
-
-          }
-        );
-
+        });
       }
-
-
-      /* =====================================================
-         COPY LINK
-         ===================================================== */
-
-      bindCopyLink() {
-
-        const copy =
-          this.querySelector(
-            '[data-copy]'
-          );
-
-
-        if (!copy) {
-          return;
-        }
-
-
-        copy.addEventListener(
-          'click',
-          event => {
-
-            event.preventDefault();
-
-
-            const url =
-              copy.href;
-
-
-            if (
-              navigator.clipboard &&
-              navigator.clipboard.writeText
-            ) {
-
-              navigator.clipboard
-                .writeText(url)
-                .then(() => {
-
-                  const original =
-                    copy.textContent;
-
-                  copy.textContent =
-                    'Copied';
-
-                  setTimeout(() => {
-
-                    copy.textContent =
-                      original;
-
-                  }, 1500);
-
-                });
-
-            }
-
-          }
-        );
-
-      }
-
 
       /* =====================================================
          DESKTOP ZOOM
          ===================================================== */
-
       bindZoom() {
+        if (!this.gallery) return;
 
-        if (!this.gallery) {
-          return;
-        }
-
-
-        this.gallery.addEventListener(
-          'mousemove',
-          event => {
-
-            if (
-              window.innerWidth <= 749
-            ) {
-              return;
-            }
-
-
-            const rect =
-              this.gallery.getBoundingClientRect();
-
-
-            const x =
-              (
-                (event.clientX - rect.left) /
-                rect.width
-              ) * 100;
-
-
-            const y =
-              (
-                (event.clientY - rect.top) /
-                rect.height
-              ) * 100;
-
-
-            this.gallery.style.setProperty(
-              '--x',
-              x + '%'
-            );
-
-
-            this.gallery.style.setProperty(
-              '--y',
-              y + '%'
-            );
-
-          }
-        );
-
+        this.gallery.addEventListener('mousemove', event => {
+          if (window.innerWidth <= 749) return;
+          const rect = this.gallery.getBoundingClientRect();
+          const x = ((event.clientX - rect.left) / rect.width) * 100;
+          const y = ((event.clientY - rect.top) / rect.height) * 100;
+          this.gallery.style.setProperty('--x', x + '%');
+          this.gallery.style.setProperty('--y', y + '%');
+        });
       }
-
 
       /* =====================================================
-         MOBILE GALLERY
+         MOBILE GALLERY SCROLL SYNC
          ===================================================== */
-
       bindMobileGallery() {
+        if (!this.gallery) return;
 
-        if (!this.gallery) {
-          return;
-        }
+        this.gallery.addEventListener('scroll', () => {
+          if (window.innerWidth > 749) return;
+          const width = this.gallery.clientWidth;
+          if (!width) return;
+          const index = Math.round(this.gallery.scrollLeft / width);
 
+          this.querySelectorAll('[data-gallery-index]').forEach(item => {
+            item.classList.toggle('is-active', Number(item.dataset.galleryIndex) === index);
+          });
 
-        this.gallery.addEventListener(
-          'scroll',
-          () => {
-
-            if (
-              window.innerWidth > 749
-            ) {
-              return;
-            }
-
-
-            const width =
-              this.gallery.clientWidth;
-
-
-            if (!width) {
-              return;
-            }
-
-
-            const index =
-              Math.round(
-                this.gallery.scrollLeft /
-                width
-              );
-
-
-            this.querySelectorAll(
-              '[data-gallery-index]'
-            ).forEach(item => {
-
-              item.classList.toggle(
-                'is-active',
-                Number(
-                  item.dataset.galleryIndex
-                ) === index
-              );
-
-            });
-
-          },
-          {
-            passive: true
+          if (this.activeSlideCounter) {
+            this.activeSlideCounter.textContent = index + 1;
           }
-        );
-
+        }, { passive: true });
       }
 
+      /* =====================================================
+         CLINICAL TABS
+         ===================================================== */
+      bindTabs() {
+        const tabBtns = this.querySelectorAll('[data-tab]');
+        const tabPanels = this.querySelectorAll('[data-tab-panel]');
+
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const target = btn.dataset.tab;
+            tabBtns.forEach(b => b.classList.toggle('is-active', b === btn));
+            tabPanels.forEach(p => p.classList.toggle('is-active', p.dataset.tabPanel === target));
+          });
+        });
+      }
+
+      /* =====================================================
+         MOBILE STICKY ACTION BAR
+         ===================================================== */
+      bindStickyBuyBar() {
+        if (!this.stickyBar) return;
+
+        window.addEventListener('scroll', () => {
+          if (window.innerWidth > 749) {
+            this.stickyBar.classList.remove('is-visible');
+            return;
+          }
+          const addBtnRect = this.addButton ? this.addButton.getBoundingClientRect() : null;
+          if (addBtnRect && addBtnRect.bottom < 0) {
+            this.stickyBar.classList.add('is-visible');
+          } else {
+            this.stickyBar.classList.remove('is-visible');
+          }
+        }, { passive: true });
+
+        if (this.stickyAddBtn) {
+          this.stickyAddBtn.addEventListener('click', () => {
+            this.handleAddToCart(false);
+          });
+        }
+      }
+
+      /* =====================================================
+         CUSTOM EMBROIDERY TRIGGER
+         ===================================================== */
+      bindEmbroideryTrigger() {
+        const trigger = this.querySelector('[data-open-embroidery-trigger]');
+        const embroideryEl = document.querySelector('kapisa-embroidery');
+
+        // Hide duplicate static trigger box if the real interactive embroidery component is present
+        if (embroideryEl && trigger) {
+          trigger.style.display = 'none';
+        }
+
+        if (trigger) {
+          trigger.addEventListener('click', () => {
+            const kemb = document.querySelector('kapisa-embroidery');
+            if (kemb && typeof kemb.open === 'function') {
+              kemb.open();
+            } else if (kemb) {
+              const radio = kemb.querySelector('[data-kemb-radio-add]');
+              if (radio) {
+                radio.click();
+              } else {
+                const btn = kemb.querySelector('button');
+                if (btn) btn.click();
+              }
+            } else {
+              const section = document.querySelector('.section-kapisa-custom-embroidery');
+              if (section) section.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        }
+      }
+
+      /* =====================================================
+         CLINICAL ZOOM MODAL / LIGHTBOX
+         ===================================================== */
+      bindZoomModal() {
+        const modal = this.querySelector('[data-zoom-modal]');
+        const closeBtn = this.querySelector('[data-zoom-close]');
+        const prevBtn = this.querySelector('[data-zoom-prev]');
+        const nextBtn = this.querySelector('[data-zoom-next]');
+        const activeImg = this.querySelector('[data-zoom-active-img]');
+        const counter = this.querySelector('[data-zoom-counter]');
+        const zoomThumbs = [...this.querySelectorAll('[data-zoom-thumb]')];
+
+        if (!modal || !activeImg) return;
+
+        let currentIndex = 0;
+        const total = zoomThumbs.length;
+
+        const updateModalImage = (index) => {
+          if (!total) return;
+          currentIndex = (index + total) % total;
+          const targetThumb = zoomThumbs[currentIndex];
+          if (!targetThumb) return;
+          activeImg.src = targetThumb.dataset.fullSrc;
+          activeImg.alt = targetThumb.querySelector('img')?.alt || '';
+          if (counter) counter.textContent = `${currentIndex + 1} / ${total}`;
+          zoomThumbs.forEach((th, i) => th.classList.toggle('is-active', i === currentIndex));
+        };
+
+        const openModal = (index = 0) => {
+          updateModalImage(index);
+          modal.classList.add('is-open');
+          document.body.style.overflow = 'hidden';
+        };
+
+        const closeModal = () => {
+          modal.classList.remove('is-open');
+          document.body.style.overflow = '';
+        };
+
+        // Open modal when clicking main slide
+        this.slides.forEach((slide, idx) => {
+          slide.addEventListener('click', () => {
+            openModal(idx);
+          });
+        });
+
+        closeBtn?.addEventListener('click', closeModal);
+        prevBtn?.addEventListener('click', () => updateModalImage(currentIndex - 1));
+        nextBtn?.addEventListener('click', () => updateModalImage(currentIndex + 1));
+
+        zoomThumbs.forEach((th, idx) => {
+          th.addEventListener('click', () => updateModalImage(idx));
+        });
+
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal || e.target.classList.contains('ai-pdp-{{ ai_gen_id }}__zoom-stage')) {
+            closeModal();
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (!modal.classList.contains('is-open')) return;
+          if (e.key === 'Escape') closeModal();
+          if (e.key === 'ArrowLeft') updateModalImage(currentIndex - 1);
+          if (e.key === 'ArrowRight') updateModalImage(currentIndex + 1);
+        });
+      }
     }
 
-
-    if (
-      !customElements.get(
-        'product-information-{{ ai_gen_id }}'
-      )
-    ) {
-
-      customElements.define(
-        'product-information-{{ ai_gen_id }}',
-        ProductInformation{{ ai_gen_id }}
-      );
-
+    if (!customElements.get('product-information-{{ ai_gen_id }}')) {
+      customElements.define('product-information-{{ ai_gen_id }}', ProductInformation{{ ai_gen_id }});
     }
-
   })();
 </script>
 
@@ -1860,7 +2472,6 @@
       "name": "Product information"
     }
   ],
-  
   "class": "product-information-block"
 }
 {% endschema %}

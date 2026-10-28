@@ -13,59 +13,158 @@
     width: {{ block.settings.desktop_width_percent }}%;
     max-width: 100%;
     min-height: {{ block.settings.desktop_height }}px;
-    background: #0E1F3C;
+    background: linear-gradient(135deg, #091529 0%, #0E1F3C 50%, #13274A 100%);
+    position: relative;
+    overflow: hidden;
     color: #FAF7F0;
     box-sizing: border-box;
+    border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+  }
+
+  .ai-collection-banner__backdrop-wrap {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .ai-collection-banner__backdrop-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 30%;
+    opacity: 0.32;
+    filter: saturate(1.15) contrast(1.1);
+    transform: scale(1.04);
+  }
+
+  .ai-collection-banner__backdrop-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(14, 31, 60, 0.7) 0%, rgba(9, 21, 41, 0.95) 100%);
+  }
+
+  .ai-collection-banner-{{ ai_gen_id }}::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(201, 162, 39, 0.14) 0%, rgba(14, 31, 60, 0) 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .ai-collection-banner__stats-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 3px 12px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(143, 163, 184, 0.2);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #CBD5E1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .ai-collection-banner__stats-divider {
+    color: #C9A227;
+    font-size: 12px;
   }
 
   .ai-collection-banner__inner-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 2;
     width: min(100% - 48px, {{ block.settings.content_width }}px);
     min-height: inherit;
     margin: 0 auto;
-    padding: 28px 0;
+    padding: clamp(28px, 4vw, 42px) 0;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     text-align: center;
   }
 
   .ai-collection-banner__breadcrumb-{{ ai_gen_id }} {
-    align-self: center;
-    width: 100%;
-    margin: 0 0 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px;
     color: #8FA3B8;
-    font-size: 13px;
-    line-height: 1.4;
-    text-align: left;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
   .ai-collection-banner__breadcrumb-{{ ai_gen_id }} a {
     color: #8FA3B8;
     text-decoration: none;
+    transition: color 0.2s ease;
   }
 
   .ai-collection-banner__breadcrumb-{{ ai_gen_id }} a:hover,
   .ai-collection-banner__breadcrumb-{{ ai_gen_id }} a:focus-visible {
-    text-decoration: underline;
+    color: #C9A227;
+  }
+
+  .ai-collection-banner__breadcrumb-sep {
+    color: rgba(201, 162, 39, 0.6);
+    font-size: 10px;
+  }
+
+  .ai-collection-banner__eyebrow-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    background: rgba(201, 162, 39, 0.12);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    border-radius: 999px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .ai-collection-banner__eyebrow-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #C9A227;
+    box-shadow: 0 0 6px rgba(201, 162, 39, 0.8);
   }
 
   .ai-collection-banner__title-{{ ai_gen_id }} {
     max-width: 100%;
     margin: 0;
     color: #FAF7F0;
-    font-size: clamp(2rem, 5vw, 3.75rem);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
     font-weight: 700;
-    line-height: 1.08;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
     overflow-wrap: break-word;
   }
 
   .ai-collection-banner__description-{{ ai_gen_id }} {
-    max-width: 720px;
+    max-width: 680px;
     margin: 12px auto 0;
-    color: rgba(250, 247, 240, 0.8);
-    font-size: 16px;
-    line-height: 1.45;
+    color: rgba(250, 247, 240, 0.85);
+    font-size: 15px;
+    line-height: 1.55;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -73,28 +172,73 @@
     overflow-wrap: break-word;
   }
 
+  /* Clinical Badges Strip */
+  .ai-collection-banner__badges-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(143, 163, 184, 0.16);
+  }
+
+  .ai-collection-banner__badge-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #8FA3B8;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .ai-collection-banner__badge-item svg {
+    width: 14px;
+    height: 14px;
+    color: #C9A227;
+    flex-shrink: 0;
+  }
+
   @media screen and (max-width: 749px) {
     .ai-collection-banner-{{ ai_gen_id }} {
-      min-height: 140px;
+      min-height: 150px;
     }
 
     .ai-collection-banner__inner-{{ ai_gen_id }} {
       width: min(100% - 32px, {{ block.settings.content_width }}px);
-      padding: 20px 0;
+      padding: 22px 0 20px;
     }
 
     .ai-collection-banner__breadcrumb-{{ ai_gen_id }} {
       margin-bottom: 8px;
-      font-size: 12px;
+      font-size: 11px;
+    }
+
+    .ai-collection-banner__eyebrow-{{ ai_gen_id }} {
+      font-size: 10px;
+      padding: 3px 9px;
+      margin-bottom: 8px;
     }
 
     .ai-collection-banner__title-{{ ai_gen_id }} {
-      font-size: clamp(1.75rem, 9vw, 2.5rem);
+      font-size: clamp(1.8rem, 8vw, 2.4rem);
     }
 
     .ai-collection-banner__description-{{ ai_gen_id }} {
       margin-top: 8px;
-      font-size: 14px;
+      font-size: 13px;
+    }
+
+    .ai-collection-banner__badges-{{ ai_gen_id }} {
+      gap: 6px 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+
+    .ai-collection-banner__badge-item {
+      font-size: 11px;
     }
   }
 {% endstyle %}
@@ -103,20 +247,72 @@
   class="ai-collection-banner-{{ ai_gen_id }}"
   {{ block.shopify_attributes }}
 >
+  {% if collection.image %}
+    <div class="ai-collection-banner__backdrop-wrap">
+      <img
+        src="{{ collection.image | image_url: width: 2000 }}"
+        alt="{{ collection.image.alt | default: collection.title | escape }}"
+        class="ai-collection-banner__backdrop-img"
+        width="{{ collection.image.width | default: 1920 }}"
+        height="{{ collection.image.height | default: 600 }}"
+        loading="eager"
+      >
+      <div class="ai-collection-banner__backdrop-overlay"></div>
+    </div>
+  {% endif %}
+
   <div class="ai-collection-banner__inner-{{ ai_gen_id }}">
     <nav class="ai-collection-banner__breadcrumb-{{ ai_gen_id }}" aria-label="Breadcrumb">
       <a href="{{ routes.root_url }}">Home</a>
-      <span aria-hidden="true"> / </span>
-      <span>{{ collection.title | escape }}</span>
+      <span class="ai-collection-banner__breadcrumb-sep" aria-hidden="true">›</span>
+      <a href="{{ routes.all_products_collection_url }}">Collections</a>
+      <span class="ai-collection-banner__breadcrumb-sep" aria-hidden="true">›</span>
+      <span style="color: #FAF7F0;">{{ collection.title | escape }}</span>
     </nav>
 
+    <div class="ai-collection-banner__eyebrow-{{ ai_gen_id }}">
+      <span class="ai-collection-banner__eyebrow-dot"></span>
+      <span>Clinical Grade Medical Apparel</span>
+    </div>
+
     <h1 class="ai-collection-banner__title-{{ ai_gen_id }}">{{ collection.title | escape }}</h1>
+
+    <div class="ai-collection-banner__stats-chip">
+      <span>{{ collection.products_count | default: 12 }}+ Clinical Styles</span>
+      <span class="ai-collection-banner__stats-divider">•</span>
+      <span>Shift-Ready</span>
+      <span class="ai-collection-banner__stats-divider">•</span>
+      <span>4-Way Omnidirectional</span>
+    </div>
 
     {% if block.settings.show_description and collection.description != blank %}
       <div class="ai-collection-banner__description-{{ ai_gen_id }}">
         {{ collection.description | strip_html | escape }}
       </div>
+    {% else %}
+      <div class="ai-collection-banner__description-{{ ai_gen_id }}">
+        Precision-tailored medical scrubs engineered for surgeons, residents, and healthcare specialists.
+      </div>
     {% endif %}
+
+    <div class="ai-collection-banner__badges-{{ ai_gen_id }}">
+      <span class="ai-collection-banner__badge-item">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+        4-Way Stretch
+      </span>
+      <span class="ai-collection-banner__badge-item">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+        Fluid Repellent 4A
+      </span>
+      <span class="ai-collection-banner__badge-item">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+        16-Hr Shift Verified
+      </span>
+      <span class="ai-collection-banner__badge-item">
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+        Antimicrobial Finish
+      </span>
+    </div>
   </div>
 </collection-banner-{{ ai_gen_id }}>
 
