@@ -487,9 +487,16 @@
     }
 
     cards.forEach(card => {
-      card.addEventListener('click', () => {
+      const selectCard = () => {
         cards.forEach(c => c.classList.remove('is-selected'));
         card.classList.add('is-selected');
+      };
+      card.addEventListener('click', selectCard);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectCard();
+        }
       });
     });
   })();

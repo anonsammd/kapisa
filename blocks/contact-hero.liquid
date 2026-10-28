@@ -253,6 +253,9 @@
     const deptBtns = root.querySelectorAll('.ai-contact-hero__dept-btn-{{ ai_gen_id }}');
     deptBtns.forEach(btn => {
       btn.addEventListener('click', () => {
+        deptBtns.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+
         const target = btn.dataset.target;
         let el = null;
         if (target === 'bulk-calculator') {
@@ -271,7 +274,7 @@
             document.querySelector('#contact-form-tab-trigger').click();
           }
         } else if (target === 'faq-section') {
-          el = document.querySelector('helpful-information-block') || document.querySelector('[class*="ai-helpful-info"]');
+          el = document.querySelector('#kapisa-contact-faq') || document.querySelector('helpful-information-block') || document.querySelector('[class*="ai-helpful-info"]');
         }
 
         if (el) {

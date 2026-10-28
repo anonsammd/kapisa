@@ -319,7 +319,7 @@
   }
 {% endstyle %}
 
-<helpful-information-{{ ai_gen_id }} class="ai-helpful-info-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+<helpful-information-{{ ai_gen_id }} class="ai-helpful-info-{{ ai_gen_id }}" id="kapisa-contact-faq" {{ block.shopify_attributes }}>
   <div class="ai-helpful-info-{{ ai_gen_id }}__inner">
     
     <div class="ai-helpful-info-{{ ai_gen_id }}__header">
@@ -419,23 +419,45 @@
           });
         });
 
-        // Search Filter
+        // Search Filter with Clean Reset and Escape Support
         if (searchInput) {
-          searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
+          const resetSearch = () => {
             items.forEach((item) => {
-              const text = item.textContent.toLowerCase();
-              const match = !query || text.includes(query);
-              item.style.display = match ? 'block' : 'none';
-              if (query && match) {
-                const btn = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__trigger');
-                const reg = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__answer');
-                if (btn && reg) {
-                  btn.setAttribute('aria-expanded', 'true');
-                  reg.setAttribute('aria-hidden', 'false');
-                }
+              item.style.display = 'block';
+              const btn = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__trigger');
+              const reg = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__answer');
+              if (btn && reg) {
+                btn.setAttribute('aria-expanded', 'false');
+                reg.setAttribute('aria-hidden', 'true');
               }
             });
+          };
+
+          searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+              resetSearch();
+              return;
+            }
+            items.forEach((item) => {
+              const text = item.textContent.toLowerCase();
+              const match = text.includes(query);
+              item.style.display = match ? 'block' : 'none';
+              const btn = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__trigger');
+              const reg = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__answer');
+              if (btn && reg) {
+                btn.setAttribute('aria-expanded', match ? 'true' : 'false');
+                reg.setAttribute('aria-hidden', match ? 'false' : 'true');
+              }
+            });
+          });
+
+          searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+              searchInput.value = '';
+              resetSearch();
+              searchInput.blur();
+            }
           });
         }
 

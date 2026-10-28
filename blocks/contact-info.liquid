@@ -290,11 +290,49 @@
   }
 
   .ai-contact-hub-{{ ai_gen_id }}__slider {
+    -webkit-appearance: none;
+    appearance: none;
     width: 100%;
-    accent-color: #0E1F3C;
-    cursor: pointer;
     height: 8px;
     border-radius: 4px;
+    background: #E2E8F0;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .ai-contact-hub-{{ ai_gen_id }}__slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #0E1F3C;
+    border: 2px solid #C9A227;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(14, 31, 60, 0.25);
+    transition: transform 150ms ease, background 150ms ease;
+  }
+
+  .ai-contact-hub-{{ ai_gen_id }}__slider::-webkit-slider-thumb:hover,
+  .ai-contact-hub-{{ ai_gen_id }}__slider:focus-visible::-webkit-slider-thumb {
+    transform: scale(1.15);
+    background: #C9A227;
+  }
+
+  .ai-contact-hub-{{ ai_gen_id }}__slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #0E1F3C;
+    border: 2px solid #C9A227;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(14, 31, 60, 0.25);
+    transition: transform 150ms ease, background 150ms ease;
+  }
+
+  .ai-contact-hub-{{ ai_gen_id }}__slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
+    background: #C9A227;
   }
 
   .ai-contact-hub-{{ ai_gen_id }}__slider-ticks {
@@ -304,6 +342,13 @@
     font-size: 11px;
     color: #8FA3B8;
     font-weight: 600;
+  }
+
+  @media screen and (max-width: 480px) {
+    .ai-contact-hub-{{ ai_gen_id }}__slider-ticks {
+      font-size: 9.5px;
+      gap: 2px;
+    }
   }
 
   /* Customizer Checkboxes */
@@ -807,7 +852,8 @@
           <button type="button" class="ai-contact-hub-{{ ai_gen_id }}__topic-chip" data-topic="General Clinical Support">General Support</button>
         </div>
 
-        {%- form 'contact', id: 'ContactForm' -%}
+        {%- assign contact_form_id = 'ContactForm-' | append: ai_gen_id -%}
+        {%- form 'contact', id: contact_form_id -%}
           {%- if form.posted_successfully? -%}
             <div class="ai-contact-hub-{{ ai_gen_id }}__alert ai-contact-hub-{{ ai_gen_id }}__alert--success" role="status" tabindex="-1">
               <strong>Thank you for contacting Kapisa Healthcare.</strong> Your message has been routed to our senior concierge team. We will review your requirements and respond promptly.
@@ -887,24 +933,48 @@
       tab.addEventListener('click', () => switchPanel(tab.dataset.panel));
     });
 
-    // Copy Button Logic
+    // Copy Button Logic with Robust Fallback
     const copyBtns = root.querySelectorAll('.ai-contact-hub-{{ ai_gen_id }}__copy-btn');
+    function executeCopy(text, btn) {
+      function showSuccess() {
+        const original = btn.textContent;
+        btn.textContent = '✓ Copied';
+        btn.style.borderColor = '#059669';
+        btn.style.color = '#059669';
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 2000);
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(showSuccess).catch(() => fallback(text));
+      } else {
+        fallback(text);
+      }
+
+      function fallback(str) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = str;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (ok) showSuccess();
+        } catch (e) {}
+      }
+    }
+
     copyBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const text = btn.dataset.copy;
-        if (text && navigator.clipboard) {
-          navigator.clipboard.writeText(text).then(() => {
-            const original = btn.textContent;
-            btn.textContent = '✓ Copied';
-            btn.style.borderColor = '#059669';
-            btn.style.color = '#059669';
-            setTimeout(() => {
-              btn.textContent = original;
-              btn.style.borderColor = '';
-              btn.style.color = '';
-            }, 2000);
-          });
-        }
+        if (text) executeCopy(text, btn);
       });
     });
 
@@ -965,6 +1035,9 @@
     if (optEmb) optEmb.addEventListener('change', updateCalculator);
     if (optNames) optNames.addEventListener('change', updateCalculator);
 
+    // Initialize calculator immediately so state is synchronized
+    updateCalculator();
+
     // Apply Quote to Contact Form
     const applyQuoteBtn = document.getElementById('apply-quote-btn-{{ ai_gen_id }}');
     const formTopicInput = document.getElementById('form-topic-input-{{ ai_gen_id }}');
@@ -993,6 +1066,9 @@
         });
 
         switchPanel('form');
+        if (panelForm) {
+          panelForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         formBody.focus();
       });
     }

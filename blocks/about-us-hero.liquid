@@ -702,7 +702,7 @@
       orproof: "<strong>Surgeon Field Tested:</strong> Validated by over 250 verified surgeons across trauma, cardiothoracic, and orthopaedic operating rooms for seam durability and cooling equilibrium."
     };
 
-    chips.forEach(chip => {
+    chips.forEach((chip, idx) => {
       chip.addEventListener('click', () => {
         chips.forEach(c => {
           c.classList.remove('is-active');
@@ -719,19 +719,32 @@
           tooltip.classList.add('is-visible');
         }
       });
+
+      chip.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' && idx < chips.length - 1) {
+          chips[idx + 1].focus();
+          chips[idx + 1].click();
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          chips[idx - 1].focus();
+          chips[idx - 1].click();
+        }
+      });
     });
 
-    // Modal logic
+    // Modal logic with accessible focus management
     const modal = document.getElementById('weave-modal-{{ ai_gen_id }}');
     const openBtn = document.getElementById('inspect-trigger-{{ ai_gen_id }}');
     const openBtn2 = document.getElementById('open-weave-btn-{{ ai_gen_id }}');
     const closeBtn = document.getElementById('modal-close-{{ ai_gen_id }}');
     const doneBtn = document.getElementById('modal-done-btn-{{ ai_gen_id }}');
+    let lastFocusedTrigger = null;
 
-    function openModal() {
+    function openModal(e) {
       if (modal) {
+        lastFocusedTrigger = e ? e.currentTarget : null;
         modal.classList.add('is-open');
         document.body.style.overflow = 'hidden';
+        if (closeBtn) closeBtn.focus();
       }
     }
 
@@ -739,6 +752,9 @@
       if (modal) {
         modal.classList.remove('is-open');
         document.body.style.overflow = '';
+        if (lastFocusedTrigger) {
+          lastFocusedTrigger.focus();
+        }
       }
     }
 

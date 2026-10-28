@@ -312,6 +312,11 @@
     .ai-our-story__stepper-{{ ai_gen_id }} {
       margin-bottom: 28px;
     }
+    .ai-our-story__progress-track-{{ ai_gen_id }} {
+      top: 20px;
+      left: 24px;
+      right: 24px;
+    }
     .ai-our-story__step-node-{{ ai_gen_id }} {
       width: 40px;
       height: 40px;
@@ -525,6 +530,12 @@
         progressFill.style.width = (idx / (steps.length - 1) * 100) + '%';
       }
 
+      const panel = document.getElementById('story-panel-{{ ai_gen_id }}');
+      if (panel) {
+        panel.style.transition = 'opacity 180ms ease';
+        panel.style.opacity = '0.5';
+      }
+
       const item = data[idx];
       if (item) {
         if (phaseEl) phaseEl.textContent = item.phase;
@@ -540,6 +551,10 @@
         if (quoteEl) {
           quoteEl.innerHTML = item.quote + '<cite class="ai-our-story__quote-author-{{ ai_gen_id }}">' + item.author + '</cite>';
         }
+      }
+
+      if (panel) {
+        setTimeout(() => { panel.style.opacity = '1'; }, 50);
       }
     }
 

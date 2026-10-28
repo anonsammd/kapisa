@@ -388,16 +388,19 @@
     const lightboxImg = document.getElementById('lightbox-img-{{ ai_gen_id }}');
     const lightboxCap = document.getElementById('lightbox-cap-{{ ai_gen_id }}');
     const closeBtn = document.getElementById('lightbox-close-{{ ai_gen_id }}');
+    let lastActiveItem = null;
 
     function openLightbox(item) {
       const img = item.querySelector('.ai-editorial-gallery-{{ ai_gen_id }}__image');
       const cap = item.querySelector('.ai-editorial-gallery-{{ ai_gen_id }}__caption');
       if (img && lightbox && lightboxImg) {
+        lastActiveItem = item;
         lightboxImg.src = img.src;
         lightboxImg.alt = img.alt || '';
         if (lightboxCap) lightboxCap.textContent = cap ? cap.textContent : '';
         lightbox.classList.add('is-open');
         document.body.style.overflow = 'hidden';
+        if (closeBtn) closeBtn.focus();
       }
     }
 
@@ -405,6 +408,7 @@
       if (lightbox) {
         lightbox.classList.remove('is-open');
         document.body.style.overflow = '';
+        if (lastActiveItem) lastActiveItem.focus();
       }
     }
 

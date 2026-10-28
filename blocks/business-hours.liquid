@@ -374,20 +374,51 @@
       GMT: { weekday: "2:00 PM – 10:00 PM", weekend: "Closed" }
     };
 
+    // Cache merchant configured hours on load so EST restores exact customizer settings
+    const baseHours = {
+      mon: document.getElementById('day-mon-{{ ai_gen_id }}') ? document.getElementById('day-mon-{{ ai_gen_id }}').textContent.trim() : '9:00 AM – 5:00 PM',
+      tue: document.getElementById('day-tue-{{ ai_gen_id }}') ? document.getElementById('day-tue-{{ ai_gen_id }}').textContent.trim() : '9:00 AM – 5:00 PM',
+      wed: document.getElementById('day-wed-{{ ai_gen_id }}') ? document.getElementById('day-wed-{{ ai_gen_id }}').textContent.trim() : '9:00 AM – 5:00 PM',
+      thu: document.getElementById('day-thu-{{ ai_gen_id }}') ? document.getElementById('day-thu-{{ ai_gen_id }}').textContent.trim() : '9:00 AM – 5:00 PM',
+      fri: document.getElementById('day-fri-{{ ai_gen_id }}') ? document.getElementById('day-fri-{{ ai_gen_id }}').textContent.trim() : '9:00 AM – 5:00 PM',
+      sat: document.getElementById('day-sat-{{ ai_gen_id }}') ? document.getElementById('day-sat-{{ ai_gen_id }}').textContent.trim() : 'Closed',
+      sun: document.getElementById('day-sun-{{ ai_gen_id }}') ? document.getElementById('day-sun-{{ ai_gen_id }}').textContent.trim() : 'Closed'
+    };
+
     tzBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         tzBtns.forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
 
         const tz = btn.dataset.tz;
-        if (tzData[tz]) {
+        if (tz === 'EST') {
+          // Restore exact merchant configured values
+          ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].forEach(d => {
+            const el = document.getElementById('day-' + d + '-{{ ai_gen_id }}');
+            if (el && baseHours[d]) el.textContent = baseHours[d];
+          });
+        } else if (tzData[tz]) {
           ['mon', 'tue', 'wed', 'thu', 'fri'].forEach(d => {
             const el = document.getElementById('day-' + d + '-{{ ai_gen_id }}');
-            if (el) el.textContent = tzData[tz].weekday;
+            if (el) {
+              const orig = baseHours[d].toLowerCase();
+              if (orig === 'closed') {
+                el.textContent = 'Closed';
+              } else {
+                el.textContent = tzData[tz].weekday;
+              }
+            }
           });
           ['sat', 'sun'].forEach(d => {
             const el = document.getElementById('day-' + d + '-{{ ai_gen_id }}');
-            if (el) el.textContent = tzData[tz].weekend;
+            if (el) {
+              const orig = baseHours[d].toLowerCase();
+              if (orig === 'closed') {
+                el.textContent = 'Closed';
+              } else {
+                el.textContent = baseHours[d] + ' (' + tz + ')';
+              }
+            }
           });
         }
       });

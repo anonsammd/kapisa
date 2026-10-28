@@ -236,8 +236,10 @@
 
 <script>
   (function() {
-    const topicChips = document.querySelectorAll('.kapisa-contact-topic-chip');
-    const topicInput = document.getElementById('ContactForm-topic-input');
+    const root = document.querySelector('.section-{{ section.id }}-padding') || document.querySelector('.kapisa-contact-form-section');
+    if (!root) return;
+    const topicChips = root.querySelectorAll('.kapisa-contact-topic-chip');
+    const topicInput = root.querySelector('#ContactForm-topic-input');
     if (topicChips.length && topicInput) {
       topicChips.forEach(chip => {
         chip.addEventListener('click', () => {
