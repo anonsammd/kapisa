@@ -1,6 +1,6 @@
 {% doc %}
-  Ultra-modern clinician social proof showcase featuring 3-up elevated review cards,
-  verified doctor badges, specialty filters, and luxury typography.
+  Ultra-modern clinician social proof showcase featuring interactive specialty filters,
+  3-up elevated review cards, verified doctor badges, and luxury typography.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
@@ -63,21 +63,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    margin-top: 20px;
+    gap: 10px;
+    margin-top: 24px;
     flex-wrap: wrap;
   }
 
   .ai-testimonials-{{ ai_gen_id }}__filter-btn {
     background: #FFFFFF;
-    border: 1px solid rgba(14, 31, 60, 0.1);
+    border: 1px solid rgba(14, 31, 60, 0.12);
     color: #475569;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 20px;
     border-radius: 999px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px rgba(14, 31, 60, 0.04);
   }
 
   .ai-testimonials-{{ ai_gen_id }}__filter-btn.is-active,
@@ -85,7 +86,8 @@
     background: #0E1F3C;
     color: #FAF7F0;
     border-color: #0E1F3C;
-    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.15);
+    box-shadow: 0 6px 18px rgba(14, 31, 60, 0.2);
+    transform: translateY(-2px);
   }
 
   /* Multi-Card Elevated Showcase */
@@ -105,13 +107,17 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, opacity 0.3s ease;
   }
 
   .ai-testimonials-{{ ai_gen_id }}__card:hover {
     transform: translateY(-8px);
     border-color: rgba(201, 162, 39, 0.4);
     box-shadow: 0 25px 50px -15px rgba(14, 31, 60, 0.12);
+  }
+
+  .ai-testimonials-{{ ai_gen_id }}__card.is-hidden {
+    display: none !important;
   }
 
   .ai-testimonials-{{ ai_gen_id }}__card-top {
@@ -259,93 +265,160 @@
       <h2 class="ai-testimonials-{{ ai_gen_id }}__heading">{{ block.settings.heading | default: 'Trusted by 10,000+ Healthcare Heroes' }}</h2>
       <p class="ai-testimonials-{{ ai_gen_id }}__subtitle">{{ block.settings.subtitle | default: 'Real feedback from surgeons, chief residents, and emergency trauma nurses working 14+ hour shifts.' }}</p>
 
+      <!-- Interactive Specialty Filter Tabs -->
       <div class="ai-testimonials-{{ ai_gen_id }}__filters" role="tablist">
-        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn is-active">All Verified Reviews</button>
-        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn">Surgeons</button>
-        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn">Chief Residents</button>
-        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn">Specialist Nurses</button>
+        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn is-active" data-cat="all" role="tab" aria-selected="true">All Verified Reviews</button>
+        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn" data-cat="surgeons" role="tab" aria-selected="false">Surgeons</button>
+        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn" data-cat="residents" role="tab" aria-selected="false">Chief Residents</button>
+        <button type="button" class="ai-testimonials-{{ ai_gen_id }}__filter-btn" data-cat="nurses" role="tab" aria-selected="false">Specialist Nurses</button>
       </div>
     </div>
 
     <div class="ai-testimonials-{{ ai_gen_id }}__grid">
       
-      <!-- Card 1 -->
-      {% if block.settings.testimonial_1_enabled %}
-        <article class="ai-testimonials-{{ ai_gen_id }}__card">
-          <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
-            <span class="ai-testimonials-{{ ai_gen_id }}__badge">
-              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Verified Clinician
-            </span>
-            <div class="ai-testimonials-{{ ai_gen_id }}__stars">
-              {% for i in (1..5) %}
-                <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              {% endfor %}
-            </div>
+      <!-- Review 1: Surgeon -->
+      <article class="ai-testimonials-{{ ai_gen_id }}__card" data-cat="surgeons">
+        <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
+          <span class="ai-testimonials-{{ ai_gen_id }}__badge">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Verified Surgeon
+          </span>
+          <div class="ai-testimonials-{{ ai_gen_id }}__stars">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
           </div>
-          <p class="ai-testimonials-{{ ai_gen_id }}__quote">{{ block.settings.testimonial_1_quote | default: "The 4-way stretch and pocket depth make 16-hour shifts so much more comfortable. The custom chest embroidery looks exceptionally sharp and prestigious." }}</p>
-          <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
-            <div class="ai-testimonials-{{ ai_gen_id }}__avatar">AS</div>
-            <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
-              <span class="ai-testimonials-{{ ai_gen_id }}__name">{{ block.settings.testimonial_1_author | default: "DR. ADITI SHARMA" }}</span>
-              <span class="ai-testimonials-{{ ai_gen_id }}__role">Interventional Cardiologist</span>
-              <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ 16-Hr ICU Shift Tested</span>
-            </div>
+        </div>
+        <p class="ai-testimonials-{{ ai_gen_id }}__quote">{{ block.settings.testimonial_1_quote | default: "The 4-way stretch and pocket depth make 16-hour shifts so much more comfortable. The custom chest embroidery looks exceptionally sharp and prestigious." }}</p>
+        <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
+          <div class="ai-testimonials-{{ ai_gen_id }}__avatar">AS</div>
+          <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
+            <span class="ai-testimonials-{{ ai_gen_id }}__name">{{ block.settings.testimonial_1_author | default: "DR. ADITI SHARMA" }}</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__role">Interventional Cardiologist</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ 16-Hr ICU Shift Tested</span>
           </div>
-        </article>
-      {% endif %}
+        </div>
+      </article>
 
-      <!-- Card 2 -->
-      {% if block.settings.testimonial_2_enabled %}
-        <article class="ai-testimonials-{{ ai_gen_id }}__card">
-          <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
-            <span class="ai-testimonials-{{ ai_gen_id }}__badge">
-              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Verified Clinician
-            </span>
-            <div class="ai-testimonials-{{ ai_gen_id }}__stars">
-              {% for i in (1..5) %}
-                <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              {% endfor %}
-            </div>
+      <!-- Review 2: Chief Resident & Surgeon -->
+      <article class="ai-testimonials-{{ ai_gen_id }}__card" data-cat="residents surgeons">
+        <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
+          <span class="ai-testimonials-{{ ai_gen_id }}__badge">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Verified Chief Resident
+          </span>
+          <div class="ai-testimonials-{{ ai_gen_id }}__stars">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
           </div>
-          <p class="ai-testimonials-{{ ai_gen_id }}__quote">{{ block.settings.testimonial_2_quote | default: "Breathable, lightweight, and zero fabric fading even after dozens of autoclave wash cycles. Easily the finest scrub set I have ever owned." }}</p>
-          <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
-            <div class="ai-testimonials-{{ ai_gen_id }}__avatar">RD</div>
-            <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
-              <span class="ai-testimonials-{{ ai_gen_id }}__name">{{ block.settings.testimonial_2_author | default: "DR. RAHUL DESHMUKH" }}</span>
-              <span class="ai-testimonials-{{ ai_gen_id }}__role">Chief Resident Surgeon</span>
-              <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ Operating Theater Grade</span>
-            </div>
+        </div>
+        <p class="ai-testimonials-{{ ai_gen_id }}__quote">{{ block.settings.testimonial_2_quote | default: "Breathable, lightweight, and zero fabric fading even after dozens of autoclave wash cycles. Easily the finest scrub set I have ever owned." }}</p>
+        <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
+          <div class="ai-testimonials-{{ ai_gen_id }}__avatar">RD</div>
+          <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
+            <span class="ai-testimonials-{{ ai_gen_id }}__name">{{ block.settings.testimonial_2_author | default: "DR. RAHUL DESHMUKH" }}</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__role">Chief Resident Surgeon</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ Operating Theater Grade</span>
           </div>
-        </article>
-      {% endif %}
+        </div>
+      </article>
 
-      <!-- Card 3 -->
-      {% if block.settings.testimonial_3_enabled %}
-        <article class="ai-testimonials-{{ ai_gen_id }}__card">
-          <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
-            <span class="ai-testimonials-{{ ai_gen_id }}__badge">
-              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Verified Clinician
-            </span>
-            <div class="ai-testimonials-{{ ai_gen_id }}__stars">
-              {% for i in (1..5) %}
-                <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              {% endfor %}
-            </div>
+      <!-- Review 3: Specialist Nurse -->
+      <article class="ai-testimonials-{{ ai_gen_id }}__card" data-cat="nurses">
+        <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
+          <span class="ai-testimonials-{{ ai_gen_id }}__badge">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Verified Specialist Nurse
+          </span>
+          <div class="ai-testimonials-{{ ai_gen_id }}__stars">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
           </div>
-          <p class="ai-testimonials-{{ ai_gen_id }}__quote">{{ block.settings.testimonial_3_quote | default: "It genuinely feels like premium activewear while looking impeccably sharp and clinical. Our entire surgical department made the switch to Kapisa." }}</p>
-          <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
-            <div class="ai-testimonials-{{ ai_gen_id }}__avatar">ML</div>
-            <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
-              <span class="ai-testimonials-{{ ai_gen_id }}__name">{{ block.settings.testimonial_3_author | default: "MAYA LEWIS" }}</span>
-              <span class="ai-testimonials-{{ ai_gen_id }}__role">ICU Specialist Nurse</span>
-              <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ Emergency Trauma Verified</span>
-            </div>
+        </div>
+        <p class="ai-testimonials-{{ ai_gen_id }}__quote">{{ block.settings.testimonial_3_quote | default: "It genuinely feels like premium activewear while looking impeccably sharp and clinical. Our entire surgical department made the switch to Kapisa." }}</p>
+        <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
+          <div class="ai-testimonials-{{ ai_gen_id }}__avatar">ML</div>
+          <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
+            <span class="ai-testimonials-{{ ai_gen_id }}__name">{{ block.settings.testimonial_3_author | default: "MAYA LEWIS" }}</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__role">ICU Specialist Nurse</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ Emergency Trauma Verified</span>
           </div>
-        </article>
-      {% endif %}
+        </div>
+      </article>
+
+      <!-- Review 4: Surgeon (Pediatric Surgery) -->
+      <article class="ai-testimonials-{{ ai_gen_id }}__card" data-cat="surgeons">
+        <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
+          <span class="ai-testimonials-{{ ai_gen_id }}__badge">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Verified Surgeon
+          </span>
+          <div class="ai-testimonials-{{ ai_gen_id }}__stars">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
+          </div>
+        </div>
+        <p class="ai-testimonials-{{ ai_gen_id }}__quote">"Zero fabric resistance when reaching across the surgical table during 6-hour neuro procedures. The silver-infused weave keeps you feeling completely fresh."</p>
+        <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
+          <div class="ai-testimonials-{{ ai_gen_id }}__avatar">VS</div>
+          <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
+            <span class="ai-testimonials-{{ ai_gen_id }}__name">DR. VIKRAM SINGHAL</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__role">Senior Consultant Neurosurgeon</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ Class 1 Sterile OR Tested</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Review 5: Chief Resident (Internal Medicine) -->
+      <article class="ai-testimonials-{{ ai_gen_id }}__card" data-cat="residents">
+        <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
+          <span class="ai-testimonials-{{ ai_gen_id }}__badge">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Verified Chief Resident
+          </span>
+          <div class="ai-testimonials-{{ ai_gen_id }}__stars">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
+          </div>
+        </div>
+        <p class="ai-testimonials-{{ ai_gen_id }}__quote">"Running up and down between the ICU, wards, and ER on a 24-hour call, these are the only scrubs that do not wrinkle, sag, or trap body heat."</p>
+        <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
+          <div class="ai-testimonials-{{ ai_gen_id }}__avatar">NP</div>
+          <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
+            <span class="ai-testimonials-{{ ai_gen_id }}__name">DR. NEHA PATEL</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__role">Chief Resident, Internal Medicine</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ 24-Hr On-Call Verified</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Review 6: Specialist Nurse (Trauma Care) -->
+      <article class="ai-testimonials-{{ ai_gen_id }}__card" data-cat="nurses">
+        <div class="ai-testimonials-{{ ai_gen_id }}__card-top">
+          <span class="ai-testimonials-{{ ai_gen_id }}__badge">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Verified Specialist Nurse
+          </span>
+          <div class="ai-testimonials-{{ ai_gen_id }}__stars">
+            {% for i in (1..5) %}
+              <svg viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
+          </div>
+        </div>
+        <p class="ai-testimonials-{{ ai_gen_id }}__quote">"The deep zippered pockets comfortably fit my stethoscope, phone, and medical shears without weighing down the top. Hands down the highest quality scrub in India."</p>
+        <div class="ai-testimonials-{{ ai_gen_id }}__author-wrap">
+          <div class="ai-testimonials-{{ ai_gen_id }}__avatar">PN</div>
+          <div class="ai-testimonials-{{ ai_gen_id }}__author-info">
+            <span class="ai-testimonials-{{ ai_gen_id }}__name">PRIYA NAIR</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__role">Emergency Trauma Charge Nurse</span>
+            <span class="ai-testimonials-{{ ai_gen_id }}__dept-pill">✦ Level 1 Trauma Center</span>
+          </div>
+        </div>
+      </article>
 
     </div>
 
@@ -356,11 +429,41 @@
 (function() {
   class HealthcareTestimonials{{ ai_gen_id }} extends HTMLElement {
     connectedCallback() {
-      const buttons = this.querySelectorAll('.ai-testimonials-{{ ai_gen_id }}__filter-btn');
+      const root = this;
+      const buttons = root.querySelectorAll('.ai-testimonials-{{ ai_gen_id }}__filter-btn');
+      const cards = root.querySelectorAll('.ai-testimonials-{{ ai_gen_id }}__card');
+
       buttons.forEach(btn => {
         btn.addEventListener('click', () => {
-          buttons.forEach(b => b.classList.remove('is-active'));
+          buttons.forEach(b => {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
           btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+
+          const cat = btn.dataset.cat;
+
+          cards.forEach(card => {
+            const cardCat = card.dataset.cat || '';
+            const match = (cat === 'all' || cardCat.includes(cat));
+
+            if (match) {
+              card.classList.remove('is-hidden');
+              requestAnimationFrame(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+              });
+            } else {
+              card.style.opacity = '0';
+              card.style.transform = 'translateY(12px) scale(0.96)';
+              setTimeout(() => {
+                if (!match) {
+                  card.classList.add('is-hidden');
+                }
+              }, 250);
+            }
+          });
         });
       });
     }

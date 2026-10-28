@@ -7,7 +7,7 @@
 {% style %}
   .ai-features-{{ ai_gen_id }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
     max-width: 100%;
     background: {{ block.settings.background_color | default: '#0E1F3C' }};
     color: {{ block.settings.text_color | default: '#F8F5ED' }};
@@ -32,7 +32,7 @@
   }
 
   .ai-features-{{ ai_gen_id }}__inner {
-    width: min({{ block.settings.content_width | default: 1280 }}px, calc(100% - 48px));
+    width: min({{ block.settings.content_width | default: 1200 }}px, calc(100% - 48px));
     margin: 0 auto;
     position: relative;
     z-index: 1;
@@ -67,9 +67,9 @@
   }
 
   .ai-features-{{ ai_gen_id }}__heading {
-    margin: 0 0 16px;
+    margin: 0 0 18px;
     color: {{ block.settings.text_color | default: '#F8F5ED' }};
-    font-size: clamp(30px, 3.8vw, 50px);
+    font-size: clamp(30px, 3.8vw, 48px);
     line-height: 1.08;
     letter-spacing: -0.035em;
     font-weight: 800;
@@ -82,10 +82,11 @@
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.06);
-    padding: 5px;
+    padding: 6px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   }
 
   .ai-features-{{ ai_gen_id }}__mode-btn {
@@ -93,19 +94,23 @@
     border: none;
     color: rgba(248, 245, 237, 0.7);
     font-size: 12px;
-    font-weight: 600;
-    padding: 7px 18px;
+    font-weight: 700;
+    padding: 9px 20px;
     border-radius: 999px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .ai-features-{{ ai_gen_id }}__mode-btn.is-active,
   .ai-features-{{ ai_gen_id }}__mode-btn:hover {
     background: {{ block.settings.accent_color | default: '#C9A227' }};
     color: #0E1F3C;
-    box-shadow: 0 4px 14px rgba(201, 162, 39, 0.35);
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.4);
+    transform: translateY(-1px);
   }
 
   /* Grid Layout */
@@ -136,22 +141,18 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .ai-features-{{ ai_gen_id }}__stage:hover img {
-    transform: scale(1.03);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
   }
 
   .ai-features-{{ ai_gen_id }}__stage-badge {
     position: absolute;
     top: 20px;
     left: 20px;
-    background: rgba(14, 31, 60, 0.85);
+    background: rgba(14, 31, 60, 0.88);
     backdrop-filter: blur(10px);
-    padding: 6px 14px;
+    padding: 7px 16px;
     border-radius: 999px;
-    border: 1px solid rgba(201, 162, 39, 0.3);
+    border: 1px solid rgba(201, 162, 39, 0.35);
     font-size: 11px;
     font-weight: 700;
     color: #FAF7F0;
@@ -159,13 +160,14 @@
     text-transform: uppercase;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     z-index: 2;
+    transition: all 0.3s ease;
   }
 
   .ai-features-{{ ai_gen_id }}__stage-badge-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: {{ block.settings.accent_color | default: '#C9A227' }};
     box-shadow: 0 0 10px {{ block.settings.accent_color | default: '#C9A227' }};
@@ -183,10 +185,10 @@
   }
 
   .ai-features-{{ ai_gen_id }}__hotspot-pin {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background: rgba(201, 162, 39, 0.9);
+    background: rgba(201, 162, 39, 0.95);
     border: 2px solid #FFFFFF;
     box-shadow: 0 0 20px rgba(201, 162, 39, 0.8);
     display: flex;
@@ -227,6 +229,45 @@
   .ai-features-{{ ai_gen_id }}__hotspot[data-target="2"] { top: 40%; left: 54%; }
   .ai-features-{{ ai_gen_id }}__hotspot[data-target="3"] { top: 62%; left: 38%; }
   .ai-features-{{ ai_gen_id }}__hotspot[data-target="4"] { top: 78%; left: 62%; }
+
+  /* Live Telemetry Meter inside stage */
+  .ai-features-{{ ai_gen_id }}__telemetry {
+    position: absolute;
+    bottom: 18px;
+    left: 18px;
+    right: 18px;
+    background: rgba(14, 31, 60, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    border-radius: 16px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    z-index: 2;
+  }
+
+  .ai-features-{{ ai_gen_id }}__telemetry-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .ai-features-{{ ai_gen_id }}__telemetry-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94A3B8;
+    font-weight: 700;
+  }
+
+  .ai-features-{{ ai_gen_id }}__telemetry-val {
+    font-size: 13px;
+    font-weight: 800;
+    color: #FAF7F0;
+    letter-spacing: -0.01em;
+  }
 
   /* Interactive Cards Stack */
   .ai-features-{{ ai_gen_id }}__cards {
@@ -311,6 +352,7 @@
     color: {{ block.settings.accent_color | default: '#C9A227' }};
     border: 1px solid rgba(201, 162, 39, 0.25);
     white-space: nowrap;
+    transition: all 0.3s ease;
   }
 
   .ai-features-{{ ai_gen_id }}__card-desc {
@@ -319,6 +361,7 @@
     line-height: 1.5;
     color: {{ block.settings.muted_text_color | default: '#CBD5E1' }};
     padding-left: 52px;
+    transition: all 0.3s ease;
   }
 
   /* Clinical Proof Ribbon (New transition between features and testimonials) */
@@ -334,7 +377,7 @@
   }
 
   .ai-features-{{ ai_gen_id }}__proof-inner {
-    width: min({{ block.settings.content_width | default: 1280 }}px, calc(100% - 32px));
+    width: min({{ block.settings.content_width | default: 1200 }}px, calc(100% - 32px));
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -427,13 +470,19 @@
         <span class="ai-features-{{ ai_gen_id }}__eyebrow-badge">PROPRIETARY LAB KNIT</span>
         <span>{{ block.settings.eyebrow | default: 'Performance Fabric Anatomy' }}</span>
       </div>
-      <h2 class="ai-features-{{ ai_gen_id }}__heading">{{ block.settings.heading | default: 'Engineered for 16-Hour Shifts' }}</h2>
+      <h2 class="ai-features-{{ ai_gen_id }}__heading">{{ block.settings.heading | default: 'Engineered for Long Shifts' }}</h2>
 
       <!-- Shift Mode Switcher -->
       <div class="ai-features-{{ ai_gen_id }}__modes" role="tablist" aria-label="Clinical Shift Mode">
-        <button type="button" class="ai-features-{{ ai_gen_id }}__mode-btn is-active" data-mode="icu" role="tab" aria-selected="true">ICU & Critical Care</button>
-        <button type="button" class="ai-features-{{ ai_gen_id }}__mode-btn" data-mode="or" role="tab" aria-selected="false">Surgical Theater</button>
-        <button type="button" class="ai-features-{{ ai_gen_id }}__mode-btn" data-mode="er" role="tab" aria-selected="false">ER Rapid Response</button>
+        <button type="button" class="ai-features-{{ ai_gen_id }}__mode-btn is-active" data-mode="icu" role="tab" aria-selected="true">
+          <span>ICU & Critical Care</span>
+        </button>
+        <button type="button" class="ai-features-{{ ai_gen_id }}__mode-btn" data-mode="or" role="tab" aria-selected="false">
+          <span>Surgical Theater</span>
+        </button>
+        <button type="button" class="ai-features-{{ ai_gen_id }}__mode-btn" data-mode="er" role="tab" aria-selected="false">
+          <span>ER Rapid Response</span>
+        </button>
       </div>
     </div>
 
@@ -450,7 +499,7 @@
 
         <div class="ai-features-{{ ai_gen_id }}__stage-badge">
           <span class="ai-features-{{ ai_gen_id }}__stage-badge-dot"></span>
-          <span>Interactive Garment Explorer</span>
+          <span class="ai-features-{{ ai_gen_id }}__stage-badge-text">ICU Protocol: 16-Hr Shift Active</span>
         </div>
 
         <!-- 4 Interactive Hotspot Pins -->
@@ -466,6 +515,22 @@
         <button type="button" class="ai-features-{{ ai_gen_id }}__hotspot" data-target="4" aria-label="Inspect Fade Resistance">
           <span class="ai-features-{{ ai_gen_id }}__hotspot-pin">04</span>
         </button>
+
+        <!-- Live Telemetry Readout -->
+        <div class="ai-features-{{ ai_gen_id }}__telemetry">
+          <div class="ai-features-{{ ai_gen_id }}__telemetry-item">
+            <span class="ai-features-{{ ai_gen_id }}__telemetry-label">Shift Duration</span>
+            <span class="ai-features-{{ ai_gen_id }}__telemetry-val" data-t1>16.4 Hrs Continuous</span>
+          </div>
+          <div class="ai-features-{{ ai_gen_id }}__telemetry-item">
+            <span class="ai-features-{{ ai_gen_id }}__telemetry-label">Fluid Repellency</span>
+            <span class="ai-features-{{ ai_gen_id }}__telemetry-val" data-t2>Grade 4A Barrier</span>
+          </div>
+          <div class="ai-features-{{ ai_gen_id }}__telemetry-item">
+            <span class="ai-features-{{ ai_gen_id }}__telemetry-label">Flex Index</span>
+            <span class="ai-features-{{ ai_gen_id }}__telemetry-val" data-t3>99.4% Elastic Rebound</span>
+          </div>
+        </div>
       </div>
 
       <!-- Right: Interactive Fabric Science Cards -->
@@ -478,11 +543,11 @@
               <div class="ai-features-{{ ai_gen_id }}__card-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M7 8l-3 4 3 4M17 8l3 4-3 4"/><path d="M8 5h8M8 19h8"/></svg>
               </div>
-              <h3 class="ai-features-{{ ai_gen_id }}__card-title">{{ block.settings.item_1_title | default: '4-Way QuadFlex™' }}</h3>
+              <h3 class="ai-features-{{ ai_gen_id }}__card-title" data-title="1">{{ block.settings.item_1_title | default: '4-Way QuadFlex™' }}</h3>
             </div>
             <span class="ai-features-{{ ai_gen_id }}__card-stat" data-stat="1">360° Omnidirectional Stretch</span>
           </div>
-          <p class="ai-features-{{ ai_gen_id }}__card-desc">{{ block.settings.item_1_description | default: 'Seamless movement engineered for long rounds, patient transfers, and constant bending with zero fabric resistance.' }}</p>
+          <p class="ai-features-{{ ai_gen_id }}__card-desc" data-desc="1">{{ block.settings.item_1_description | default: 'Seamless movement engineered for long rounds, patient transfers, and constant bending with zero fabric resistance.' }}</p>
         </div>
 
         <!-- Card 2 -->
@@ -492,11 +557,11 @@
               <div class="ai-features-{{ ai_gen_id }}__card-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v5c0 4.5-3 7.8-7 10-4-2.2-7-5.5-7-10V6l7-3z"/><path d="m9 12 2 2 4-4"/></svg>
               </div>
-              <h3 class="ai-features-{{ ai_gen_id }}__card-title">{{ block.settings.item_2_title | default: 'SilverIon™ Anti-Odor' }}</h3>
+              <h3 class="ai-features-{{ ai_gen_id }}__card-title" data-title="2">{{ block.settings.item_2_title | default: 'SilverIon™ Anti-Odor' }}</h3>
             </div>
             <span class="ai-features-{{ ai_gen_id }}__card-stat" data-stat="2">99.8% Freshness Guard</span>
           </div>
-          <p class="ai-features-{{ ai_gen_id }}__card-desc">{{ block.settings.item_2_description | default: 'Antimicrobial yarn infused with pure silver ions actively suppresses odor-causing bacteria shift after shift.' }}</p>
+          <p class="ai-features-{{ ai_gen_id }}__card-desc" data-desc="2">{{ block.settings.item_2_description | default: 'Antimicrobial yarn infused with pure silver ions actively suppresses odor-causing bacteria shift after shift.' }}</p>
         </div>
 
         <!-- Card 3 -->
@@ -506,11 +571,11 @@
               <div class="ai-features-{{ ai_gen_id }}__card-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10c2 0 2-3 0-3H9M3 12h15c2 0 2-3 0-3h-2M3 16h10c2 0 2-3 0-3H9"/></svg>
               </div>
-              <h3 class="ai-features-{{ ai_gen_id }}__card-title">{{ block.settings.item_3_title | default: 'AirBreeze™ Micro-Knit' }}</h3>
+              <h3 class="ai-features-{{ ai_gen_id }}__card-title" data-title="3">{{ block.settings.item_3_title | default: 'AirBreeze™ Micro-Knit' }}</h3>
             </div>
             <span class="ai-features-{{ ai_gen_id }}__card-stat" data-stat="3">0.2s Moisture Dispersal</span>
           </div>
-          <p class="ai-features-{{ ai_gen_id }}__card-desc">{{ block.settings.item_3_description | default: 'Hyper-breathable micro-pore structure regulates your body temperature under intense OR theater lighting.' }}</p>
+          <p class="ai-features-{{ ai_gen_id }}__card-desc" data-desc="3">{{ block.settings.item_3_description | default: 'Hyper-breathable micro-pore structure regulates your body temperature under intense OR theater lighting.' }}</p>
         </div>
 
         <!-- Card 4 -->
@@ -520,11 +585,11 @@
               <div class="ai-features-{{ ai_gen_id }}__card-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 14.14 14.14"/></svg>
               </div>
-              <h3 class="ai-features-{{ ai_gen_id }}__card-title">{{ block.settings.item_4_title | default: 'DuraColor™ FadeGuard' }}</h3>
+              <h3 class="ai-features-{{ ai_gen_id }}__card-title" data-title="4">{{ block.settings.item_4_title | default: 'DuraColor™ FadeGuard' }}</h3>
             </div>
             <span class="ai-features-{{ ai_gen_id }}__card-stat" data-stat="4">100+ Autoclave Washes</span>
           </div>
-          <p class="ai-features-{{ ai_gen_id }}__card-desc">{{ block.settings.item_4_description | default: 'Molecular dye lock technology preserves pristine rich color depth through industrial medical laundry cycles.' }}</p>
+          <p class="ai-features-{{ ai_gen_id }}__card-desc" data-desc="4">{{ block.settings.item_4_description | default: 'Molecular dye lock technology preserves pristine rich color depth through industrial medical laundry cycles.' }}</p>
         </div>
 
       </div>
@@ -567,6 +632,11 @@
       const hotspots = root.querySelectorAll('.ai-features-{{ ai_gen_id }}__hotspot');
       const cards = root.querySelectorAll('.ai-features-{{ ai_gen_id }}__card');
       const modeBtns = root.querySelectorAll('.ai-features-{{ ai_gen_id }}__mode-btn');
+      const stageBadgeText = root.querySelector('.ai-features-{{ ai_gen_id }}__stage-badge-text');
+
+      const t1 = root.querySelector('[data-t1]');
+      const t2 = root.querySelector('[data-t2]');
+      const t3 = root.querySelector('[data-t3]');
 
       // Sync Hotspot & Card clicks
       function activateIndex(idx) {
@@ -584,11 +654,50 @@
         c.addEventListener('mouseenter', () => activateIndex(c.dataset.index));
       });
 
-      // Shift Mode Switcher stats update
-      const modeStats = {
-        icu: ["360° Omnidirectional Stretch", "99.8% Freshness Guard", "0.2s Moisture Dispersal", "100+ Autoclave Washes"],
-        or: ["Reinforced Chest & Flex Zone", "Sterile Theater Grade", "Anti-Fog Breathable Weave", "Chlorine & Heat Proof"],
-        er: ["Instant Kinetic Recovery", "Fluid & Stain Repellent", "Zero Heat Trapping", "Double-Stitched Pockets"]
+      // Shift Mode Comprehensive Dynamic Switcher
+      const modeData = {
+        icu: {
+          badge: 'ICU Protocol: 16-Hr Shift Active',
+          t1: '16.4 Hrs Continuous',
+          t2: 'Grade 4A Barrier',
+          t3: '99.4% Elastic Rebound',
+          stats: ['360° Omnidirectional Stretch', '99.8% Freshness Guard', '0.2s Moisture Dispersal', '100+ Autoclave Washes'],
+          titles: ['4-Way QuadFlex™', 'SilverIon™ Anti-Odor', 'AirBreeze™ Micro-Knit', 'DuraColor™ FadeGuard'],
+          descs: [
+            'Seamless movement engineered for long rounds, patient transfers, and constant bending with zero fabric resistance.',
+            'Antimicrobial yarn infused with pure silver ions actively suppresses odor-causing bacteria shift after shift.',
+            'Hyper-breathable micro-pore structure regulates your body temperature under intense OR theater lighting.',
+            'Molecular dye lock technology preserves pristine rich color depth through industrial medical laundry cycles.'
+          ]
+        },
+        or: {
+          badge: 'Surgical Theater: Class 1 Sterile Barrier',
+          t1: '12.8 Hrs Standing',
+          t2: 'Impervious Saline Shield',
+          t3: '0.00 kV Anti-Static',
+          stats: ['Reinforced Raglan Sleeve', 'Sterile Halogen Cool', 'Fluid & Saline Shield', '134°C Steam Certified'],
+          titles: ['Zero-Distraction Collar', 'Hypoallergenic Weave', 'Dual-Flow Thermal Vents', '134°C Autoclave Seal'],
+          descs: [
+            'Ergonomic shoulder and neck ergonomics designed to eliminate chafing under surgical masks and lead aprons.',
+            'Certified non-shedding micro-fibers keep the operating theater sterile and particulate-free.',
+            'Under-arm micro-perforations accelerate cooling by 4.8°C under intense high-heat surgical halogen lamps.',
+            'Hospital-grade industrial steam sterilization guaranteed without thread shrinking or structural degradation.'
+          ]
+        },
+        er: {
+          badge: 'ER Rapid Response: High-Velocity Flex',
+          t1: '24-Hr Readiness',
+          t2: 'High-Impact Ripstop',
+          t3: '< 0.1s Kinetic Recovery',
+          stats: ['High-Velocity Rebound', 'Triple-Stitch Bar Tack', 'Rapid Spill Deflection', '6-Slot Tool Grid'],
+          titles: ['Kinetic Recovery Flex', 'Triple-Seam Durability', 'Rapid Stain Release', 'Tactical Gear Utility'],
+          descs: [
+            'Instant fabric recovery allows explosive mobility during codes, CPR, and fast-paced emergency trauma care.',
+            'Heavy-duty reinforced bartack stitching prevents seam blowout at pocket corners and high-friction stress points.',
+            'Fluorocarbon-free hydrophobic outer finish causes blood, liquids, and medications to bead and wipe away instantly.',
+            'Deep, reinforced pockets designed to comfortably carry shears, stethoscopes, pens, and hospital pagers without sagging.'
+          ]
+        }
       };
 
       modeBtns.forEach(btn => {
@@ -600,11 +709,24 @@
           btn.classList.add('is-active');
           btn.setAttribute('aria-selected', 'true');
 
-          const stats = modeStats[btn.dataset.mode];
-          if (stats) {
-            stats.forEach((st, i) => {
+          const m = modeData[btn.dataset.mode];
+          if (m) {
+            if (stageBadgeText) stageBadgeText.textContent = m.badge;
+            if (t1) t1.textContent = m.t1;
+            if (t2) t2.textContent = m.t2;
+            if (t3) t3.textContent = m.t3;
+
+            m.stats.forEach((st, i) => {
               const el = root.querySelector(`[data-stat="${i+1}"]`);
               if (el) el.textContent = st;
+            });
+            m.titles.forEach((tit, i) => {
+              const el = root.querySelector(`[data-title="${i+1}"]`);
+              if (el) el.textContent = tit;
+            });
+            m.descs.forEach((dsc, i) => {
+              const el = root.querySelector(`[data-desc="${i+1}"]`);
+              if (el) el.textContent = dsc;
             });
           }
         });
