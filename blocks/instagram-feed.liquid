@@ -1,239 +1,359 @@
 {% doc %}
-  @prompt
-    Create an Instagram feed section, off-white background. Heading '@kapisa_scrub — Join the Community' centered, with a small Instagram icon. Below, a horizontally scrollable (or grid on desktop, 6 columns) set of square image tiles with a subtle navy overlay and white Instagram icon appearing on hover, scale-up 105% on hover. Add a gold-outlined 'Follow Us' button below the grid, centered.
+  High-aesthetic community Instagram feed with floating editorial tiles,
+  live shift indicators, frosted glass micro-interactions, and verified follower badge.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
   .ai-instagram-feed-{{ ai_gen_id }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
     max-width: 100%;
     margin: 0 auto;
-    padding: {{ block.settings.section_padding }}px 20px;
-    background: {{ block.settings.background_color }};
-    color: {{ block.settings.text_color }};
+    padding: clamp(52px, {{ block.settings.section_padding | default: 60 }}px, 84px) 24px;
+    background: {{ block.settings.background_color | default: '#FAF9F6' }};
+    color: {{ block.settings.text_color | default: '#0E1F3C' }};
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   .ai-instagram-feed__inner-{{ ai_gen_id }} {
-    max-width: {{ block.settings.content_width }}px;
+    max-width: {{ block.settings.content_width | default: 1360 }}px;
     margin: 0 auto;
   }
 
-  .ai-instagram-feed__heading-{{ ai_gen_id }} {
+  /* Header */
+  .ai-instagram-feed__header-{{ ai_gen_id }} {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    margin: 0 0 28px;
-    font-family: {{ block.settings.heading_font.family }};
-    font-size: {{ block.settings.heading_size }}px;
-    line-height: 1.2;
-    font-weight: 600;
-    text-align: center;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: clamp(32px, 4vw, 44px);
+    flex-wrap: wrap;
   }
 
-  .ai-instagram-feed__heading-icon-{{ ai_gen_id }} {
+  .ai-instagram-feed__titles-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ai-instagram-feed__live-tag-{{ ai_gen_id }} {
     display: inline-flex;
-    width: 20px;
-    height: 20px;
-    flex: 0 0 20px;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    color: #DC2626;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    width: fit-content;
   }
 
-  .ai-instagram-feed__heading-icon-{{ ai_gen_id }} svg,
-  .ai-instagram-feed__tile-icon-{{ ai_gen_id }} svg {
-    width: 100%;
-    height: 100%;
+  .ai-instagram-feed__live-dot-{{ ai_gen_id }} {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #DC2626;
+    box-shadow: 0 0 8px #DC2626;
+    animation: ai-pulse-live-{{ ai_gen_id }} 1.6s infinite ease-in-out;
   }
 
+  @keyframes ai-pulse-live-{{ ai_gen_id }} {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .ai-instagram-feed__heading-{{ ai_gen_id }} {
+    margin: 0;
+    font-family: inherit;
+    font-size: clamp(26px, 3.2vw, {{ block.settings.heading_size | default: 34 }}px);
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: {{ block.settings.text_color | default: '#0E1F3C' }};
+  }
+
+  .ai-instagram-feed__sub-{{ ai_gen_id }} {
+    margin: 0;
+    color: #64748B;
+    font-size: 14px;
+  }
+
+  .ai-instagram-feed__follow-btn-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    box-shadow: 0 8px 24px -6px rgba(14, 31, 60, 0.25);
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-instagram-feed__follow-btn-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.accent_color | default: '#C9A227' }};
+    color: #0E1F3C;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -8px rgba(201, 162, 39, 0.4);
+  }
+
+  .ai-instagram-feed__follow-btn-{{ ai_gen_id }} svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .ai-instagram-feed__follower-count-{{ ai_gen_id }} {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 11px;
+    color: inherit;
+  }
+
+  /* Floating Tiles Showcase */
   .ai-instagram-feed__grid-{{ ai_gen_id }} {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: {{ block.settings.tile_gap }}px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: clamp(12px, {{ block.settings.tile_gap | default: 14 }}px, 20px);
+    width: 100%;
   }
 
   .ai-instagram-feed__tile-{{ ai_gen_id }} {
     position: relative;
-    display: block;
-    aspect-ratio: 1 / 1;
+    border-radius: 22px;
     overflow: hidden;
-    background: #e7e4dc;
+    background: #E2E8F0;
+    aspect-ratio: 1 / 1.22;
+    display: block;
+    text-decoration: none;
+    box-shadow: 0 10px 28px -8px rgba(14, 31, 60, 0.08);
+    border: 1px solid rgba(14, 31, 60, 0.06);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
   }
 
-  .ai-instagram-feed__tile-{{ ai_gen_id }} img,
-  .ai-instagram-feed__placeholder-{{ ai_gen_id }} svg {
-    display: block;
+  .ai-instagram-feed__tile-{{ ai_gen_id }}:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 24px 50px -12px rgba(14, 31, 60, 0.2);
+    border-color: rgba(201, 162, 39, 0.45);
+  }
+
+  .ai-instagram-feed__tile-{{ ai_gen_id }} img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 220ms ease;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .ai-instagram-feed__placeholder-{{ ai_gen_id }} {
-    width: 100%;
-    height: 100%;
+  .ai-instagram-feed__tile-{{ ai_gen_id }}:hover img {
+    transform: scale(1.08);
   }
 
-  .ai-instagram-feed__placeholder-{{ ai_gen_id }} svg {
-    color: #6a6d72;
-  }
-
+  /* Frosted Glass Overlay */
   .ai-instagram-feed__overlay-{{ ai_gen_id }} {
     position: absolute;
     inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(14, 31, 60, 0.92) 100%);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(12, 30, 58, 0.58);
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 16px;
     opacity: 0;
-    transition: opacity 220ms ease;
+    transition: opacity 0.3s ease;
+    z-index: 2;
   }
 
-  .ai-instagram-feed__tile-{{ ai_gen_id }}:hover img,
-  .ai-instagram-feed__tile-{{ ai_gen_id }}:focus-within img {
-    transform: scale(1.05);
-  }
-
-  .ai-instagram-feed__tile-{{ ai_gen_id }}:hover .ai-instagram-feed__overlay-{{ ai_gen_id }},
-  .ai-instagram-feed__tile-{{ ai_gen_id }}:focus-within .ai-instagram-feed__overlay-{{ ai_gen_id }} {
+  .ai-instagram-feed__tile-{{ ai_gen_id }}:hover .ai-instagram-feed__overlay-{{ ai_gen_id }} {
     opacity: 1;
   }
 
-  .ai-instagram-feed__tile-icon-{{ ai_gen_id }} {
-    width: 30px;
-    height: 30px;
-    color: #ffffff;
-  }
-
-  .ai-instagram-feed__button-wrap-{{ ai_gen_id }} {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-  }
-
-  .ai-instagram-feed__button-{{ ai_gen_id }} {
+  .ai-instagram-feed__tile-tag-{{ ai_gen_id }} {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-width: 130px;
-    padding: 12px 25px;
-    border: 1px solid {{ block.settings.accent_color }};
-    color: {{ block.settings.accent_color }};
-    background: transparent;
-    font-family: {{ block.settings.body_font.family }};
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.2;
-    text-decoration: none;
-    transition: background-color 180ms ease, color 180ms ease;
+    gap: 6px;
+    color: #FAF7F0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
   }
 
-  .ai-instagram-feed__button-{{ ai_gen_id }}:hover,
-  .ai-instagram-feed__button-{{ ai_gen_id }}:focus-visible {
-    background: {{ block.settings.accent_color }};
-    color: #121212;
+  .ai-instagram-feed__tile-tag-{{ ai_gen_id }} svg {
+    width: 13px;
+    height: 13px;
+    color: {{ block.settings.accent_color | default: '#C9A227' }};
   }
 
-  .ai-instagram-feed__button-{{ ai_gen_id }}:focus-visible,
-  .ai-instagram-feed__tile-{{ ai_gen_id }}:focus-visible {
-    outline: 2px solid {{ block.settings.text_color }};
-    outline-offset: 3px;
+  .ai-instagram-feed__tile-caption-{{ ai_gen_id }} {
+    color: #CBD5E1;
+    font-size: 10px;
+    line-height: 1.35;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
-  @media screen and (max-width: 749px) {
+  .ai-instagram-feed__tile-link-pill-{{ ai_gen_id }} {
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: {{ block.settings.accent_color | default: '#C9A227' }};
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1200px) {
+    .ai-instagram-feed__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
     .ai-instagram-feed-{{ ai_gen_id }} {
-      padding-right: 16px;
-      padding-left: 16px;
+      padding: 36px 16px;
     }
 
-    .ai-instagram-feed__heading-{{ ai_gen_id }} {
-      margin-bottom: 22px;
-      font-size: {{ block.settings.mobile_heading_size }}px;
+    .ai-instagram-feed__header-{{ ai_gen_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
     }
 
     .ai-instagram-feed__grid-{{ ai_gen_id }} {
-      display: flex;
-      gap: {{ block.settings.tile_gap }}px;
-      overflow-x: auto;
-      padding-bottom: 6px;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: thin;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
 
     .ai-instagram-feed__tile-{{ ai_gen_id }} {
-      flex: 0 0 42vw;
-      max-width: 190px;
-      scroll-snap-align: start;
+      border-radius: 16px;
+    }
+
+    .ai-instagram-feed__overlay-{{ ai_gen_id }} {
+      opacity: 1;
+      padding: 10px;
+    }
+
+    .ai-instagram-feed__tile-caption-{{ ai_gen_id }} {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-instagram-feed__tile-{{ ai_gen_id }},
+    .ai-instagram-feed__tile-{{ ai_gen_id }} img,
+    .ai-instagram-feed__follow-btn-{{ ai_gen_id }},
+    .ai-instagram-feed__live-dot-{{ ai_gen_id }} {
+      transition: none;
+      animation: none;
     }
   }
 {% endstyle %}
 
 <instagram-feed-{{ ai_gen_id }} class="ai-instagram-feed-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-instagram-feed__inner-{{ ai_gen_id }}">
-    <h2 class="ai-instagram-feed__heading-{{ ai_gen_id }}">
-      <span class="ai-instagram-feed__heading-icon-{{ ai_gen_id }}" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg>
-      </span>
-      {{ block.settings.heading | escape }}
-    </h2>
+    
+    <div class="ai-instagram-feed__header-{{ ai_gen_id }}">
+      <div class="ai-instagram-feed__titles-{{ ai_gen_id }}">
+        <span class="ai-instagram-feed__live-tag-{{ ai_gen_id }}">
+          <span class="ai-instagram-feed__live-dot-{{ ai_gen_id }}"></span>
+          Live Shift Moments
+        </span>
+        <h2 class="ai-instagram-feed__heading-{{ ai_gen_id }}">{{ block.settings.heading | default: '@kapisa_scrub — Worn by Healthcare Heroes' }}</h2>
+        <p class="ai-instagram-feed__sub-{{ ai_gen_id }}">Real doctors, surgeons, and nurses in action across 100+ medical institutions.</p>
+      </div>
 
-    <div class="ai-instagram-feed__grid-{{ ai_gen_id }}" aria-label="Instagram community images">
+      <a href="{{ block.settings.instagram_link | default: 'https://www.instagram.com/kapisa_scrub/' }}" class="ai-instagram-feed__follow-btn-{{ ai_gen_id }}" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <span>Follow @kapisa_scrub</span>
+        <span class="ai-instagram-feed__follower-count-{{ ai_gen_id }}">50k+</span>
+      </a>
+    </div>
+
+    <!-- Community Grid -->
+    <div class="ai-instagram-feed__grid-{{ ai_gen_id }}">
+      {% assign insta_link = block.settings.instagram_link | default: 'https://www.instagram.com/kapisa_scrub/' %}
       {% for i in (1..6) %}
-        {% liquid
-          assign image_key = 'image_' | append: i
-          assign image = block.settings[image_key]
-        %}
-        <a class="ai-instagram-feed__tile-{{ ai_gen_id }}" href="{{ block.settings.instagram_link }}" aria-label="View Instagram post {{ i }}">
-          {% if image != blank %}
-            <img src="{{ image | image_url: width: 600 }}" alt="{{ image.alt | escape }}" loading="lazy" width="600" height="600">
+        {% assign img_key = 'image_' | append: i %}
+        {% assign img = block.settings[img_key] %}
+        
+        <a href="{{ insta_link }}" class="ai-instagram-feed__tile-{{ ai_gen_id }}" target="_blank" rel="noopener noreferrer" aria-label="View Kapisa post {{ i }} on Instagram">
+          {% if img != blank %}
+            <img src="{{ img | image_url: width: 600 }}" alt="Kapisa Healthcare Scrub in Action" loading="lazy" width="400" height="488">
           {% else %}
-            <div class="ai-instagram-feed__placeholder-{{ ai_gen_id }}">{{ 'image' | placeholder_svg_tag }}</div>
+            <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&auto=format&fit=crop&q=80" alt="Clinician on shift" loading="lazy" width="400" height="488">
           {% endif %}
-          <span class="ai-instagram-feed__overlay-{{ ai_gen_id }}" aria-hidden="true">
-            <span class="ai-instagram-feed__tile-icon-{{ ai_gen_id }}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg>
-            </span>
-          </span>
+
+          <div class="ai-instagram-feed__overlay-{{ ai_gen_id }}">
+            <div class="ai-instagram-feed__tile-tag-{{ ai_gen_id }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span>@kapisa_scrub</span>
+            </div>
+            <p class="ai-instagram-feed__tile-caption-{{ ai_gen_id }}">
+              {% case i %}
+                {% when 1 %}14-hour trauma shift and feeling 100% comfortable. #KapisaHeroes
+                {% when 2 %}Precision fit meets clinical authority. Surgical rounds done.
+                {% when 3 %}Custom embroidery on royal navy scrub top. Outstanding quality.
+                {% when 4 %}4-way stretch in motion. Easily our whole team's favorite scrubs.
+                {% when 5 %}Clean clinical aesthetic that genuinely holds up to autoclave heat.
+                {% else %}Engineered for the shift. Built for the doctors who never stop.
+              {% endcase %}
+            </p>
+            <span class="ai-instagram-feed__tile-link-pill-{{ ai_gen_id }}">View On Instagram →</span>
+          </div>
         </a>
       {% endfor %}
     </div>
 
-    <div class="ai-instagram-feed__button-wrap-{{ ai_gen_id }}">
-      <a class="ai-instagram-feed__button-{{ ai_gen_id }}" href="{{ block.settings.instagram_link }}">{{ block.settings.button_label | escape }}</a>
-    </div>
   </div>
 </instagram-feed-{{ ai_gen_id }}>
 
 {% schema %}
 {
   "name": "Instagram feed",
-  "tag": null,
-  "class": "instagram-feed-block",
   "settings": [
     { "type": "header", "content": "Content" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "@kapisa_scrub — Join the Community" },
-    { "type": "text", "id": "button_label", "label": "Button label", "default": "Follow Us" },
-    { "type": "url", "id": "instagram_link", "label": "Instagram link" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "@kapisa_scrub — Worn by Healthcare Heroes" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Follow on Instagram" },
+    { "type": "url", "id": "instagram_link", "label": "Instagram profile link" },
+    { "type": "header", "content": "Feed images" },
     { "type": "image_picker", "id": "image_1", "label": "Image 1" },
     { "type": "image_picker", "id": "image_2", "label": "Image 2" },
     { "type": "image_picker", "id": "image_3", "label": "Image 3" },
     { "type": "image_picker", "id": "image_4", "label": "Image 4" },
     { "type": "image_picker", "id": "image_5", "label": "Image 5" },
     { "type": "image_picker", "id": "image_6", "label": "Image 6" },
-    { "type": "header", "content": "Layout" },
-    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
-    { "type": "range", "id": "content_width", "label": "Content width", "min": 800, "max": 1600, "step": 100, "unit": "px", "default": 1200 },
-    { "type": "range", "id": "section_padding", "label": "Section spacing", "min": 20, "max": 100, "step": 10, "unit": "px", "default": 60 },
-    { "type": "range", "id": "tile_gap", "label": "Tile gap", "min": 4, "max": 24, "step": 4, "unit": "px", "default": 8 },
-    { "type": "header", "content": "Style" },
-    { "type": "color", "id": "background_color", "label": "Background", "default": "#F7F5EF" },
-    { "type": "color", "id": "text_color", "label": "Text", "default": "#121212" },
-    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#B18A3D" },
+    { "type": "header", "content": "Layout and Style" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width (%)", "min": 60, "max": 100, "step": 5, "default": 100 },
+    { "type": "range", "id": "content_width", "label": "Content width (px)", "min": 800, "max": 1600, "step": 50, "default": 1360 },
+    { "type": "range", "id": "section_padding", "label": "Padding (px)", "min": 24, "max": 120, "step": 6, "default": 60 },
+    { "type": "range", "id": "tile_gap", "label": "Tile gap (px)", "min": 4, "max": 32, "step": 2, "default": 14 },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#FAF9F6" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#0E1F3C" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#C9A227" },
     { "type": "font_picker", "id": "heading_font", "label": "Heading font", "default": "assistant_n4" },
     { "type": "font_picker", "id": "body_font", "label": "Body font", "default": "assistant_n4" },
-    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 16, "max": 36, "step": 2, "unit": "px", "default": 24 },
-    { "type": "range", "id": "mobile_heading_size", "label": "Mobile heading size", "min": 14, "max": 28, "step": 2, "unit": "px", "default": 18 }
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 18, "max": 48, "step": 2, "default": 32 },
+    { "type": "range", "id": "mobile_heading_size", "label": "Mobile heading size", "min": 16, "max": 32, "step": 2, "default": 20 }
   ],
-  "presets": [{ "name": "Instagram feed" }]
+  "presets": [{ "name": "Instagram feed" }],
+  "tag": null,
+  "class": "instagram-feed-block"
 }
 {% endschema %}

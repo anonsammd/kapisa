@@ -1,306 +1,459 @@
 {% doc %}
-  @prompt
-    Create a bulk order CTA banner, full-width, split into two halves: left half navy 
-    #0E1F3C background with off-white heading 'Outfitting a Hospital or Clinic?' and short supporting line about bulk pricing and custom embroidery for teams, gold 
-    #C9A227 button 'Enquire for Bulk Orders'. Right half: image of a group of healthcare staff in matching Kapisa scrubs. No rounded corners on this section — full-bleed edge to edge for a bold banner feel.
+  Enterprise institutional fleet and hospital outfitting suite with interactive
+  volume tier switcher, live embroidery badge preview, and bespoke concierge perks.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
   .ai-bulk-order-banner-{{ ai_gen_id }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
     max-width: 100%;
-    background: {{ block.settings.background_color }};
-    color: {{ block.settings.heading_color }};
+    background: {{ block.settings.background_color | default: '#FAF9F6' }};
+    padding: clamp(36px, 5vw, 64px) 24px;
+    box-sizing: border-box;
+    position: relative;
     overflow: hidden;
   }
 
   .ai-bulk-order-banner-{{ ai_gen_id }}__inner {
+    max-width: 1360px;
+    margin: 0 auto;
+    border-radius: 32px;
+    background: radial-gradient(circle at 80% 20%, #162c4e 0%, #081528 70%);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    box-shadow: 0 30px 80px -20px rgba(14, 31, 60, 0.35);
+    overflow: hidden;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: {{ block.settings.banner_height }}px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: stretch;
+    position: relative;
   }
 
+  /* Ambient Gold Mesh */
+  .ai-bulk-order-banner-{{ ai_gen_id }}__inner::before {
+    content: "";
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.15) 0%, transparent 70%);
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Left: Concierge Content */
   .ai-bulk-order-banner-{{ ai_gen_id }}__content {
+    padding: clamp(36px, 5vw, 64px);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
-    padding: 56px 7vw;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: rgba(201, 162, 39, 0.15);
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    color: {{ block.settings.button_color | default: '#C9A227' }};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    width: fit-content;
+    margin-bottom: 18px;
   }
 
   .ai-bulk-order-banner-{{ ai_gen_id }}__heading {
     margin: 0 0 16px;
-    color: {{ block.settings.heading_color }};
-    font-size: {{ block.settings.heading_size }}px;
+    color: #FAF7F0;
+    font-size: clamp(28px, 3.5vw, {{ block.settings.heading_size | default: 46 }}px);
     line-height: 1.1;
-    max-width: 560px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
   }
 
   .ai-bulk-order-banner-{{ ai_gen_id }}__text {
-    margin: 0 0 28px;
-    color: {{ block.settings.body_color }};
-    font-size: {{ block.settings.body_size }}px;
-    line-height: 1.55;
-    max-width: 500px;
+    margin: 0 0 24px;
+    color: #CBD5E1;
+    font-size: clamp(14px, 1.3vw, 16px);
+    line-height: 1.6;
+    max-width: 560px;
+  }
+
+  /* Team Tier Switcher */
+  .ai-bulk-order-banner-{{ ai_gen_id }}__tiers {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #E2E8F0;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn.is-active,
+  .ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn:hover {
+    background: {{ block.settings.button_color | default: '#C9A227' }};
+    color: #0E1F3C;
+    border-color: {{ block.settings.button_color | default: '#C9A227' }};
+    box-shadow: 0 4px 16px rgba(201, 162, 39, 0.35);
+  }
+
+  /* Tier Perks Box */
+  .ai-bulk-order-banner-{{ ai_gen_id }}__perks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    margin-bottom: 28px;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__perk-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #F8FAFC;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__perk-item svg {
+    width: 16px;
+    height: 16px;
+    color: {{ block.settings.button_color | default: '#C9A227' }};
+    flex-shrink: 0;
+  }
+
+  /* Action Buttons */
+  .ai-bulk-order-banner-{{ ai_gen_id }}__cta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
   .ai-bulk-order-banner-{{ ai_gen_id }}__button {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-height: 48px;
-    padding: 13px 24px;
-    background: {{ block.settings.button_color }};
-    color: {{ block.settings.button_text_color }};
-    border: 1px solid {{ block.settings.button_color }};
-    border-radius: 0;
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.2;
+    gap: 10px;
+    padding: 15px 28px;
+    border-radius: 999px;
+    background: {{ block.settings.button_color | default: '#C9A227' }};
+    color: {{ block.settings.button_text_color | default: '#0E1F3C' }};
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
     text-decoration: none;
-    text-align: center;
-    transition: filter 0.2s ease;
+    box-shadow: 0 10px 28px -6px rgba(201, 162, 39, 0.45);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .ai-bulk-order-banner-{{ ai_gen_id }}__button:hover {
-    filter: brightness(0.88);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px -8px rgba(201, 162, 39, 0.6);
+    filter: brightness(1.05);
   }
 
-  .ai-bulk-order-banner-{{ ai_gen_id }}__button:focus-visible {
-    outline: 3px solid {{ block.settings.focus_color }};
-    outline-offset: 3px;
+  .ai-bulk-order-banner-{{ ai_gen_id }}__support-link {
+    color: #FAF7F0;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
   }
 
-  .ai-bulk-order-banner-{{ ai_gen_id }}__media,
-  .ai-bulk-order-banner-{{ ai_gen_id }}__placeholder {
-    min-height: 100%;
-    width: 100%;
+  .ai-bulk-order-banner-{{ ai_gen_id }}__support-link:hover {
+    opacity: 1;
+    color: {{ block.settings.button_color | default: '#C9A227' }};
   }
 
-  .ai-bulk-order-banner-{{ ai_gen_id }}__media {
-    display: block;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .ai-bulk-order-banner-{{ ai_gen_id }}__placeholder {
+  /* Right: Live Interactive Mockup Visual */
+  .ai-bulk-order-banner-{{ ai_gen_id }}__visual-wrap {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    background: #d9dde3;
-    color: #273142;
+    padding: 32px 32px 32px 0;
   }
 
-  .ai-bulk-order-banner-{{ ai_gen_id }}__placeholder svg {
+  .ai-bulk-order-banner-{{ ai_gen_id }}__visual-card {
+    position: relative;
     width: 100%;
     height: 100%;
-    max-width: 480px;
-    max-height: 480px;
+    min-height: 420px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
   }
 
-  .ai-bulk-order-banner-{{ ai_gen_id }}__empty-state {
+  .ai-bulk-order-banner-{{ ai_gen_id }}__visual-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__visual-card:hover img {
+    transform: scale(1.04);
+  }
+
+  /* Floating Embroidery Name Preview */
+  .ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-badge {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    width: calc(100% - 40px);
-    transform: translateX(-50%);
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #273142;
-    font-size: 13px;
-    text-align: center;
+    bottom: 24px;
+    left: 20px;
+    right: 20px;
+    background: rgba(14, 31, 60, 0.9);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    border-radius: 18px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   }
 
-  @media screen and (max-width: 749px) {
+  .ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: {{ block.settings.button_color | default: '#C9A227' }};
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-text {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #FAF7F0;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-tag {
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(5, 150, 105, 0.2);
+    color: #34D399;
+    border: 1px solid rgba(5, 150, 105, 0.4);
+  }
+
+  @media (max-width: 991px) {
     .ai-bulk-order-banner-{{ ai_gen_id }}__inner {
       grid-template-columns: 1fr;
     }
 
+    .ai-bulk-order-banner-{{ ai_gen_id }}__visual-wrap {
+      padding: 0 32px 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ai-bulk-order-banner-{{ ai_gen_id }} {
+      padding: 24px 12px;
+    }
+
+    .ai-bulk-order-banner-{{ ai_gen_id }}__inner {
+      border-radius: 24px;
+    }
+
     .ai-bulk-order-banner-{{ ai_gen_id }}__content {
-      min-height: 330px;
-      padding: 40px 28px;
+      padding: 28px 20px;
     }
 
-    .ai-bulk-order-banner-{{ ai_gen_id }}__media,
-    .ai-bulk-order-banner-{{ ai_gen_id }}__placeholder {
-      min-height: 280px;
-      height: 280px;
+    .ai-bulk-order-banner-{{ ai_gen_id }}__visual-wrap {
+      padding: 0 20px 28px;
     }
 
-    .ai-bulk-order-banner-{{ ai_gen_id }}__heading {
-      font-size: {{ block.settings.heading_size | times: 0.78 }}px;
+    .ai-bulk-order-banner-{{ ai_gen_id }}__button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-bulk-order-banner-{{ ai_gen_id }}__button,
+    .ai-bulk-order-banner-{{ ai_gen_id }}__visual-card img {
+      transition: none;
     }
   }
 {% endstyle %}
 
-<div class="ai-bulk-order-banner-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+<bulk-order-banner-{{ ai_gen_id }} class="ai-bulk-order-banner-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-bulk-order-banner-{{ ai_gen_id }}__inner">
+    
+    <!-- Left: Concierge Content -->
     <div class="ai-bulk-order-banner-{{ ai_gen_id }}__content">
-      {% if block.settings.heading != blank %}
-        <h2 class="ai-bulk-order-banner-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
-      {% endif %}
-      {% if block.settings.supporting_text != blank %}
-        <p class="ai-bulk-order-banner-{{ ai_gen_id }}__text">{{ block.settings.supporting_text | escape }}</p>
-      {% endif %}
-      {% if block.settings.button_link != blank and block.settings.button_label != blank %}
-        <a class="ai-bulk-order-banner-{{ ai_gen_id }}__button" href="{{ block.settings.button_link }}">
-          {{ block.settings.button_label | escape }}
-        </a>
-      {% endif %}
-    </div>
-    <div>
-      {% if block.settings.image != blank %}
-        <img
-          class="ai-bulk-order-banner-{{ ai_gen_id }}__media"
-          src="{{ block.settings.image | image_url: width: 1600 }}"
-          alt="{{ block.settings.image.alt | default: 'Healthcare staff wearing matching scrubs' | escape }}"
-          loading="lazy"
-          width="{{ block.settings.image.width }}"
-          height="{{ block.settings.image.height }}"
-        >
-      {% else %}
-        <div class="ai-bulk-order-banner-{{ ai_gen_id }}__placeholder">
-          {{ 'image' | placeholder_svg_tag }}
-          <div class="ai-bulk-order-banner-{{ ai_gen_id }}__empty-state">Add an image of healthcare staff in matching scrubs</div>
+      <span class="ai-bulk-order-banner-{{ ai_gen_id }}__badge">
+        ✦ INSTITUTIONAL FLEET OUTFITTING
+      </span>
+      <h2 class="ai-bulk-order-banner-{{ ai_gen_id }}__heading">{{ block.settings.heading | default: 'Outfitting a Hospital, Clinic or College?' }}</h2>
+      <p class="ai-bulk-order-banner-{{ ai_gen_id }}__text">{{ block.settings.supporting_text | default: 'Custom embroidery, institutional tiered pricing, and dedicated fit sessions for teams of 10 to 1,000+.' }}</p>
+
+      <!-- Team Tier Switcher -->
+      <div class="ai-bulk-order-banner-{{ ai_gen_id }}__tiers" role="tablist">
+        <button type="button" class="ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn is-active" data-tier="1">Clinic (10–49 Sets)</button>
+        <button type="button" class="ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn" data-tier="2">Hospital Dept (50–249 Sets)</button>
+        <button type="button" class="ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn" data-tier="3">Institution (250+ Sets)</button>
+      </div>
+
+      <!-- Perks Box (Dynamically updates with tier) -->
+      <div class="ai-bulk-order-banner-{{ ai_gen_id }}__perks">
+        <div class="ai-bulk-order-banner-{{ ai_gen_id }}__perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span class="ai-bulk-order-banner-{{ ai_gen_id }}__perk-text-1">Complimentary Name & Hospital Logo Embroidery Digitizing</span>
         </div>
-      {% endif %}
+        <div class="ai-bulk-order-banner-{{ ai_gen_id }}__perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span class="ai-bulk-order-banner-{{ ai_gen_id }}__perk-text-2">Tiered Volume Pricing with Dedicated Size Try-On Kit</span>
+        </div>
+        <div class="ai-bulk-order-banner-{{ ai_gen_id }}__perk-item">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span class="ai-bulk-order-banner-{{ ai_gen_id }}__perk-text-3">Direct Executive Concierge Support & 48-Hour Quote Turnaround</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="ai-bulk-order-banner-{{ ai_gen_id }}__cta-row">
+        <a href="{{ block.settings.button_link | default: '/pages/contact' }}" class="ai-bulk-order-banner-{{ ai_gen_id }}__button">
+          <span>{{ block.settings.button_label | default: 'Enquire for Bulk Orders →' }}</span>
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
+        </a>
+        <a href="{{ block.settings.button_link | default: '/pages/contact' }}" class="ai-bulk-order-banner-{{ ai_gen_id }}__support-link">
+          <span>Schedule Concierge Call</span>
+          <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 10l5 5 5-5"/></svg>
+        </a>
+      </div>
     </div>
+
+    <!-- Right: Live Mockup Visual -->
+    <div class="ai-bulk-order-banner-{{ ai_gen_id }}__visual-wrap">
+      <div class="ai-bulk-order-banner-{{ ai_gen_id }}__visual-card">
+        {% if block.settings.image != blank %}
+          <img src="{{ block.settings.image | image_url: width: 1200 }}" alt="{{ block.settings.image.alt | default: 'Kapisa Medical Bulk Orders' | escape }}" loading="lazy" width="600" height="700">
+        {% else %}
+          <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&auto=format&fit=crop&q=80" alt="Medical team scrubs" loading="lazy" width="600" height="700">
+        {% endif %}
+
+        <!-- Floating Live Embroidery Preview Badge -->
+        <div class="ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-badge">
+          <span class="ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-label">✦ Precision Monogram Sample</span>
+          <div class="ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-text">
+            <span>Dr. A. Sharma, MD — Dept. of Surgery</span>
+            <span class="ai-bulk-order-banner-{{ ai_gen_id }}__embroidery-tag">Autoclave Safe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-</div>
+</bulk-order-banner-{{ ai_gen_id }}>
+
+<script>
+(function() {
+  class BulkOrderBanner{{ ai_gen_id }} extends HTMLElement {
+    connectedCallback() {
+      const root = this;
+      const tierBtns = root.querySelectorAll('.ai-bulk-order-banner-{{ ai_gen_id }}__tier-btn');
+      const perk1 = root.querySelector('.ai-bulk-order-banner-{{ ai_gen_id }}__perk-text-1');
+      const perk2 = root.querySelector('.ai-bulk-order-banner-{{ ai_gen_id }}__perk-text-2');
+      const perk3 = root.querySelector('.ai-bulk-order-banner-{{ ai_gen_id }}__perk-text-3');
+
+      const tierData = {
+        '1': [
+          'Complimentary Name & Hospital Logo Embroidery Digitizing',
+          'Tiered Volume Pricing with Dedicated Size Try-On Kit',
+          'Direct Executive Concierge Support & 48-Hour Quote Turnaround'
+        ],
+        '2': [
+          '20% Institutional Tier Discount + Free Shipping Across India',
+          'Custom Hospital Logo Digitizing with Thread Matching to Your Brand',
+          'Dedicated Fit Specialist for Your Entire Clinical Staff'
+        ],
+        '3': [
+          'Bespoke Color Batching & Dedicated Custom Embroidery Production Run',
+          'Priority Annual Replenishment Lock-In at Guaranteed Lowest Rate',
+          'Full On-Site Fit Sessions & Personal Account Director'
+        ]
+      };
+
+      tierBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          tierBtns.forEach(b => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+
+          const t = btn.dataset.tier;
+          if (tierData[t]) {
+            if (perk1) perk1.textContent = tierData[t][0];
+            if (perk2) perk2.textContent = tierData[t][1];
+            if (perk3) perk3.textContent = tierData[t][2];
+          }
+        });
+      });
+    }
+  }
+  if (!customElements.get('bulk-order-banner-{{ ai_gen_id }}')) {
+    customElements.define('bulk-order-banner-{{ ai_gen_id }}', BulkOrderBanner{{ ai_gen_id }});
+  }
+})();
+</script>
 
 {% schema %}
 {
   "name": "Bulk order banner",
   "settings": [
-    {
-      "type": "header",
-      "content": "Content"
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Outfitting a Hospital or Clinic?"
-    },
-    {
-      "type": "textarea",
-      "id": "supporting_text",
-      "label": "Supporting text",
-      "default": "Get bulk pricing and custom embroidery for your healthcare team."
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Button label",
-      "default": "Enquire for Bulk Orders"
-    },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Button link"
-    },
-    {
-      "type": "image_picker",
-      "id": "image",
-      "label": "Staff image"
-    },
-    {
-      "type": "header",
-      "content": "Layout"
-    },
-    {
-      "type": "range",
-      "id": "desktop_width_percent",
-      "label": "Desktop width",
-      "min": 50,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "default": 100
-    },
-    {
-      "type": "range",
-      "id": "banner_height",
-      "label": "Banner height",
-      "min": 300,
-      "max": 700,
-      "step": 20,
-      "unit": "px",
-      "default": 500
-    },
-    {
-      "type": "header",
-      "content": "Colors"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background",
-      "default": "#0E1F3C"
-    },
-    {
-      "type": "color",
-      "id": "heading_color",
-      "label": "Heading",
-      "default": "#F8F5EC"
-    },
-    {
-      "type": "color",
-      "id": "body_color",
-      "label": "Body text",
-      "default": "#F8F5EC"
-    },
-    {
-      "type": "color",
-      "id": "button_color",
-      "label": "Button",
-      "default": "#C9A227"
-    },
-    {
-      "type": "color",
-      "id": "button_text_color",
-      "label": "Button text",
-      "default": "#0E1F3C"
-    },
-    {
-      "type": "color",
-      "id": "focus_color",
-      "label": "Focus outline",
-      "default": "#F8F5EC"
-    },
-    {
-      "type": "header",
-      "content": "Typography"
-    },
-    {
-      "type": "range",
-      "id": "heading_size",
-      "label": "Heading size",
-      "min": 28,
-      "max": 64,
-      "step": 2,
-      "unit": "px",
-      "default": 46
-    },
-    {
-      "type": "range",
-      "id": "body_size",
-      "label": "Body size",
-      "min": 14,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "default": 18
-    }
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Outfitting a Hospital, Clinic or College?" },
+    { "type": "textarea", "id": "supporting_text", "label": "Supporting text", "default": "Custom embroidery, institutional tiered pricing, and dedicated fit sessions for teams of 10 to 1,000+." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Enquire for Bulk Orders →" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "image_picker", "id": "image", "label": "Visual image" },
+    { "type": "header", "content": "Layout and Style" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width (%)", "min": 60, "max": 100, "step": 5, "default": 100 },
+    { "type": "range", "id": "banner_height", "label": "Minimum height (px)", "min": 300, "max": 650, "step": 25, "default": 450 },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#FAF9F6" },
+    { "type": "color", "id": "heading_color", "label": "Heading color", "default": "#FAF7F0" },
+    { "type": "color", "id": "body_color", "label": "Body color", "default": "#CBD5E1" },
+    { "type": "color", "id": "button_color", "label": "Button color", "default": "#C9A227" },
+    { "type": "color", "id": "button_text_color", "label": "Button text color", "default": "#0E1F3C" },
+    { "type": "color", "id": "focus_color", "label": "Focus color", "default": "#f8f5ec" },
+    { "type": "range", "id": "heading_size", "label": "Heading size", "min": 24, "max": 64, "step": 2, "default": 46 },
+    { "type": "range", "id": "body_size", "label": "Body size", "min": 14, "max": 22, "step": 1, "default": 16 }
   ],
-  "presets": [
-    {
-      "name": "Bulk order banner"
-    }
-  ],
+  "presets": [{ "name": "Bulk order banner" }],
   "tag": null,
   "class": "bulk-order-banner-block"
 }
