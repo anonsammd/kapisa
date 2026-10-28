@@ -237,13 +237,97 @@
   }
 
   @media (max-width: 1024px) {
+    .ai-testimonials-{{ ai_gen_id }} {
+      padding: clamp(36px, 5vw, 56px) 0;
+      overflow-x: hidden;
+      max-width: 100vw;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__inner {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__header {
+      padding: 0 20px;
+      margin-bottom: 20px;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__heading {
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__subtitle {
+      font-size: 13.5px;
+    }
+
+    /* Swipeable Specialty Filter Pills */
+    .ai-testimonials-{{ ai_gen_id }}__filters {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      justify-content: flex-start;
+      padding: 4px 20px 14px;
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 16px;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__filter-btn {
+      flex: 0 0 auto;
+      font-size: 12px;
+      padding: 7px 16px;
+      white-space: nowrap;
+    }
+
+    /* Horizontal Swipeable Row / App-like Carousel */
     .ai-testimonials-{{ ai_gen_id }}__grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding: 8px 20px 24px;
+      gap: 14px;
+      margin: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__card {
+      flex: 0 0 85%;
+      max-width: 330px;
+      min-width: 280px;
+      scroll-snap-align: start;
+      border-radius: 20px;
+      padding: 22px 20px;
+      box-sizing: border-box;
+      box-shadow: 0 10px 28px rgba(14, 31, 60, 0.08);
+      transform: none !important;
     }
 
     .ai-testimonials-{{ ai_gen_id }}__card:hover {
       transform: none;
+    }
+
+    .ai-testimonials-{{ ai_gen_id }}__quote {
+      font-size: 13.5px;
+      line-height: 1.55;
+      margin-bottom: 16px;
     }
   }
 
@@ -443,6 +527,8 @@
           btn.setAttribute('aria-selected', 'true');
 
           const cat = btn.dataset.cat;
+          const grid = root.querySelector('.ai-testimonials-{{ ai_gen_id }}__grid');
+          if (grid) grid.scrollTo({ left: 0, behavior: 'smooth' });
 
           cards.forEach(card => {
             const cardCat = card.dataset.cat || '';

@@ -2400,17 +2400,39 @@
     </a>
 
 
+    <!-- ALL COLLECTIONS -->
+
+    <a
+      class="kapisa-header-{{ ai_gen_id }}__bottom-link"
+      href="{{ block.settings.mobile_collections_link | default: routes.collections_url }}"
+      data-bottom-collections
+    >
+
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect>
+        <rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect>
+        <rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect>
+        <rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect>
+      </svg>
+
+      <span>
+        {{ block.settings.mobile_collections_label | default: 'Collections' | escape }}
+      </span>
+
+    </a>
+
+
     <!-- SHOP -->
 
     <a
       class="kapisa-header-{{ ai_gen_id }}__bottom-link"
       href="{{ block.settings.mobile_shop_link | default: routes.all_products_collection_url }}"
+      data-bottom-shop
     >
 
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 5h16"></path>
-        <path d="M6 5v15h12V5"></path>
-        <path d="M9 3h6"></path>
+        <path d="M6 8h12l1 12H5L6 8Z"></path>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2"></path>
       </svg>
 
       <span>
@@ -2418,59 +2440,6 @@
       </span>
 
     </a>
-
-
-    <!-- WISHLIST -->
-
-    {% if block.settings.enable_wishlist %}
-
-      <a
-        class="kapisa-header-{{ ai_gen_id }}__bottom-link"
-        href="{{ block.settings.wishlist_page_url | default: '/pages/wishlist' }}"
-        data-bottom-wishlist
-      >
-
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M20.8 8.8c0 5.5-8.8 10.2-8.8 10.2S3.2 14.3 3.2 8.8A4.8 4.8 0 0 1 12 6.1a4.8 4.8 0 0 1 8.8 2.7Z"></path>
-        </svg>
-
-        <span>
-          {{ block.settings.mobile_wishlist_label | escape }}
-        </span>
-
-        <span
-          class="kapisa-header-{{ ai_gen_id }}__mobile-badge kapisa-header-{{ ai_gen_id }}__mobile-wishlist-badge"
-          data-mobile-wishlist-count
-          hidden
-        >
-          0
-        </span>
-
-      </a>
-
-    {% else %}
-
-      <!-- If wishlist is disabled, keep five useful destinations -->
-
-      <a
-        class="kapisa-header-{{ ai_gen_id }}__bottom-link"
-        href="{{ block.settings.mobile_collections_link | default: routes.collections_url }}"
-      >
-
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="4" y="4" width="6" height="6" rx="1"></rect>
-          <rect x="14" y="4" width="6" height="6" rx="1"></rect>
-          <rect x="4" y="14" width="6" height="6" rx="1"></rect>
-          <rect x="14" y="14" width="6" height="6" rx="1"></rect>
-        </svg>
-
-        <span>
-          {{ block.settings.mobile_collections_label | escape }}
-        </span>
-
-      </a>
-
-    {% endif %}
 
 
     <!-- CART -->
