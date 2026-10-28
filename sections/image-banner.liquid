@@ -375,6 +375,15 @@
     background: #0e1f3c;
   }
 
+  /* Desktop Video Only: Anchor to top so typography ("6 POCKETS. ZERO COMPROMISE.") and model head are 100% visible with zero top cropping */
+  @media screen and (min-width: 750px) {
+    #{{ hero_id }} .kapisa-hero__video,
+    #{{ hero_id }} .kapisa-hero__video--desktop {
+      object-fit: cover !important;
+      object-position: {% if section.settings.image_position != blank and section.settings.image_position != 'center center' %}{{ section.settings.image_position }}{% else %}center top{% endif %} !important;
+    }
+  }
+
   #{{ hero_id }} .kapisa-hero__video--mobile {
     display: none;
   }
