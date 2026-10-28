@@ -251,15 +251,17 @@
   #{{ hero_id }}.kapisa-hero--screen { min-height: 100svh; height: 100svh; }
   #{{ hero_id }}.kapisa-hero--adapt { min-height: 0; height: auto; aspect-ratio: {{ aspect_ratio_desktop }}; }
 
-  /* Video Hero Adaptive Heights */
+  /* Video Hero Adaptive Heights - auto-adapts to full video aspect ratio so neither top nor bottom is cropped */
   #{{ hero_id }}.kapisa-hero--video {
-    min-height: 480px;
+    min-height: 0 !important;
+    height: auto !important;
+    aspect-ratio: var(--kapisa-video-desktop-ratio, {{ desktop_video_ratio }}) !important;
   }
-  {% if section.settings.height == 'adapt' %}
+  {% if section.settings.height == 'screen' %}
     #{{ hero_id }}.kapisa-hero--video {
-      min-height: 0;
-      height: auto;
-      aspect-ratio: var(--kapisa-video-desktop-ratio, {{ desktop_video_ratio }});
+      min-height: 100svh !important;
+      height: 100svh !important;
+      aspect-ratio: auto !important;
     }
   {% endif %}
 
@@ -272,13 +274,15 @@
     #{{ hero_id }}.kapisa-hero--mobile-adapt { min-height: 0; height: auto; aspect-ratio: {{ aspect_ratio_mobile }}; }
 
     #{{ hero_id }}.kapisa-hero--video {
-      min-height: 260px;
+      min-height: 0 !important;
+      height: auto !important;
+      aspect-ratio: var(--kapisa-video-mobile-ratio, {{ mobile_video_ratio }}) !important;
     }
-    {% if section.settings.mobile_height == 'adapt' %}
+    {% if section.settings.mobile_height == 'screen' %}
       #{{ hero_id }}.kapisa-hero--video {
-        min-height: 0;
-        height: auto;
-        aspect-ratio: var(--kapisa-video-mobile-ratio, {{ mobile_video_ratio }});
+        min-height: 100svh !important;
+        height: 100svh !important;
+        aspect-ratio: auto !important;
       }
     {% endif %}
 
@@ -372,15 +376,20 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
-    background: #0e1f3c;
+    background: #f4f6fa;
   }
 
-  /* Desktop Video Only: Anchor to top so typography ("6 POCKETS. ZERO COMPROMISE.") and model head are 100% visible with zero top cropping */
+  /* Desktop Video: full aspect-ratio fit so neither top (6 Pockets) nor bottom (scissors circle & shoes) is cropped */
   @media screen and (min-width: 750px) {
+    #{{ hero_id }}.kapisa-hero--video {
+      min-height: 0 !important;
+      height: auto !important;
+      aspect-ratio: var(--kapisa-video-desktop-ratio, {{ desktop_video_ratio }}) !important;
+    }
     #{{ hero_id }} .kapisa-hero__video,
     #{{ hero_id }} .kapisa-hero__video--desktop {
       object-fit: cover !important;
-      object-position: {% if section.settings.image_position != blank and section.settings.image_position != 'center center' %}{{ section.settings.image_position }}{% else %}center top{% endif %} !important;
+      object-position: {% if section.settings.image_position != blank and section.settings.image_position != 'center center' %}{{ section.settings.image_position }}{% else %}center center{% endif %} !important;
     }
   }
 
@@ -448,6 +457,7 @@
 
       const playActiveVideo = () => {
         const active = getActiveVideo();
+        if (active) updateVideoRatio(active);
         allVideos.forEach((vid) => {
           if (vid !== active) {
             vid.pause();
@@ -475,9 +485,19 @@
       };
 
       allVideos.forEach((vid) => {
-        vid.addEventListener('loadedmetadata', () => updateVideoRatio(vid), { once: true });
-        if (vid.readyState >= 1) updateVideoRatio(vid);
+        const handleRatio = () => updateVideoRatio(vid);
+        ['loadedmetadata', 'loadeddata', 'canplay', 'playing', 'timeupdate'].forEach((evt) => {
+          vid.addEventListener(evt, handleRatio, { once: true });
+        });
+        if (vid.readyState >= 1 || (vid.videoWidth && vid.videoHeight)) {
+          handleRatio();
+        }
       });
+
+      window.addEventListener('resize', () => {
+        const active = getActiveVideo();
+        if (active) updateVideoRatio(active);
+      }, { passive: true });
 
       if (mobileBreakpoint.addEventListener) {
         mobileBreakpoint.addEventListener('change', playActiveVideo);
