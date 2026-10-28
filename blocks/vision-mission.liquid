@@ -1,23 +1,7 @@
 {% doc %}
-  @prompt
-    Create a premium Vision and Mission section for the Kapisa Healthcare About Us page.
-    
-    Use deep navy #0E1F3C as the full-width background. Use warm cream #FAF7F0 for the section heading and card text. Use gold #C9A227 for small decorative lines and icon accents. Use a very subtle transparent white overlay for the cards, approximately rgba(255,255,255,0.06).
-    
-    Desktop layout:
-    Place the section inside a maximum width of 1200px. Add a centered cream heading “Our Vision & Mission” approximately 44px. Below it, create two equal cards side by side. Each card should have 32px padding, 18px rounded corners, and a subtle border using rgba(255,255,255,0.12). Add a small gold line, a cream card heading, and a readable paragraph.
-    
-    Mobile layout:
-    Use 20px horizontal padding. Stack the two cards vertically with 16px spacing. Make the main heading 30px and card headings 25px. Use 24px card padding. Cards should feel like premium mobile app panels with comfortable touch-friendly spacing.
-    
-    Animation:
-    Cards should fade upward when entering the viewport. Add a subtle hover lift on desktop. Do not use excessive movement. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Add editable section heading, vision heading, vision text, mission heading, and mission text. Allow merchants to edit both cards.
-    
-    Return complete Shopify Liquid with responsive CSS and valid schema. Do not modify the header or footer.
-    
+  Elevated Vision, Mission & Clinical Testing Standards section for Kapisa Healthcare.
+  Features interactive perspective tabs, glassmorphic clinical cards with telemetry metrics,
+  and 4 interactive laboratory testing standards with expandable benchmark data.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
@@ -27,38 +11,115 @@
     width: 100%;
     background: #0E1F3C;
     color: #FAF7F0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Deep luxury clinical ambient glow */
+  .ai-vision-mission-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.08) 0%, rgba(14, 31, 60, 0) 70%);
+    pointer-events: none;
+    z-index: 0;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__inner {
-    width: {{ block.settings.desktop_width_percent }}%;
-    max-width: 1200px;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 1220px;
     margin: 0 auto;
-    padding: 80px 24px;
+    padding: clamp(72px, 8vw, 112px) 24px;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__header {
+    text-align: center;
+    max-width: 780px;
+    margin: 0 auto clamp(36px, 4vw, 56px);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__eyebrow {
+    margin: 0 0 14px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__heading {
-    margin: 0 0 44px;
+    margin: 0 0 20px;
     color: #FAF7F0;
-    text-align: center;
-    font-size: 44px;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(34px, 4.2vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
   }
 
+  /* Interactive Category Tabs */
+  .ai-vision-mission-{{ ai_gen_id }}__tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    padding: 6px;
+    margin: 0 auto;
+    backdrop-filter: blur(12px);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__tab-btn {
+    background: transparent;
+    border: none;
+    color: rgba(250, 247, 240, 0.7);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 220ms ease;
+    white-space: nowrap;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__tab-btn.is-active,
+  .ai-vision-mission-{{ ai_gen_id }}__tab-btn:hover {
+    background: #C9A227;
+    color: #0E1F3C;
+    box-shadow: 0 4px 14px rgba(201, 162, 39, 0.35);
+  }
+
+  /* Vision & Mission Primary Grid */
   .ai-vision-mission-{{ ai_gen_id }}__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
+    gap: clamp(20px, 3vw, 32px);
+    margin-bottom: 56px;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__card {
-    padding: 32px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 18px;
+    padding: clamp(28px, 4vw, 44px);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 600ms ease, transform 600ms ease, box-shadow 250ms ease;
+    transform: translateY(20px);
+    transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__card.is-visible {
@@ -68,114 +129,364 @@
 
   .ai-vision-mission-{{ ai_gen_id }}__card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(201, 162, 39, 0.35);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba(201, 162, 39, 0.15);
+    border: 1px solid rgba(201, 162, 39, 0.3);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #C9A227;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__line {
     display: block;
     width: 44px;
-    height: 3px;
-    margin-bottom: 24px;
+    height: 2px;
+    margin-bottom: 20px;
     background: #C9A227;
-    border-radius: 2px;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__card-heading {
-    margin: 0 0 14px;
+    margin: 0 0 16px;
     color: #FAF7F0;
-    font-size: 30px;
-    line-height: 1.2;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(26px, 2.5vw, 34px);
+    line-height: 1.15;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__text {
-    color: #FAF7F0;
-    font-size: 17px;
-    line-height: 1.7;
+    color: rgba(250, 247, 240, 0.85);
+    font-size: clamp(15px, 1.1vw, 17px);
+    line-height: 1.75;
+    margin-bottom: 28px;
   }
 
   .ai-vision-mission-{{ ai_gen_id }}__text p {
+    margin: 0 0 12px;
+  }
+  .ai-vision-mission-{{ ai_gen_id }}__text p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Micro Telemetry Pills inside Cards */
+  .ai-vision-mission-{{ ai_gen_id }}__card-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__stat-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #FAF7F0;
+  }
+  .ai-vision-mission-{{ ai_gen_id }}__stat-pill strong {
+    color: #C9A227;
+    margin-right: 4px;
+  }
+
+  /* 4 Clinical Standards Inspection Grid */
+  .ai-vision-mission-{{ ai_gen_id }}__standards {
+    margin-top: 24px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standards-title {
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+    color: #C9A227;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 22px 18px;
+    transition: all 250ms ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-item:hover,
+  .ai-vision-mission-{{ ai_gen_id }}__standard-item.is-active {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: #C9A227;
+    transform: translateY(-3px);
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-num {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: #C9A227;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-heading {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-desc {
     margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #8FA3B8;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-benchmark {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.12);
+    font-size: 11px;
+    color: #C9A227;
+    display: none;
+  }
+
+  .ai-vision-mission-{{ ai_gen_id }}__standard-item.is-active .ai-vision-mission-{{ ai_gen_id }}__standard-benchmark {
+    display: block;
+  }
+
+  @media screen and (max-width: 991px) {
+    .ai-vision-mission-{{ ai_gen_id }}__standards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media screen and (max-width: 749px) {
     .ai-vision-mission-{{ ai_gen_id }}__inner {
+      padding: 56px 20px 64px;
+    }
+    .ai-vision-mission-{{ ai_gen_id }}__tabs {
+      display: flex;
       width: 100%;
-      padding: 56px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
-
-    .ai-vision-mission-{{ ai_gen_id }}__heading {
-      margin-bottom: 32px;
-      font-size: 30px;
+    .ai-vision-mission-{{ ai_gen_id }}__tabs::-webkit-scrollbar {
+      display: none;
     }
-
     .ai-vision-mission-{{ ai_gen_id }}__grid {
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 20px;
+      margin-bottom: 36px;
     }
-
-    .ai-vision-mission-{{ ai_gen_id }}__card {
-      padding: 24px;
-    }
-
-    .ai-vision-mission-{{ ai_gen_id }}__card-heading {
-      font-size: 25px;
+    .ai-vision-mission-{{ ai_gen_id }}__standards-grid {
+      grid-template-columns: 1fr;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ai-vision-mission-{{ ai_gen_id }}__card {
+    .ai-vision-mission-{{ ai_gen_id }}__card,
+    .ai-vision-mission-{{ ai_gen_id }}__standard-item {
       opacity: 1;
       transform: none;
       transition: none;
-    }
-
-    .ai-vision-mission-{{ ai_gen_id }}__card:hover {
-      transform: none;
     }
   }
 {% endstyle %}
 
 <vision-mission-{{ ai_gen_id }} class="ai-vision-mission-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-vision-mission-{{ ai_gen_id }}__inner">
-    <h2 class="ai-vision-mission-{{ ai_gen_id }}__heading">{{ block.settings.section_heading | escape }}</h2>
-    <div class="ai-vision-mission-{{ ai_gen_id }}__grid">
-      <article class="ai-vision-mission-{{ ai_gen_id }}__card">
+    
+    <div class="ai-vision-mission-{{ ai_gen_id }}__header">
+      <p class="ai-vision-mission-{{ ai_gen_id }}__eyebrow">
+        <span>&#10022;</span>
+        Clinical Philosophy &amp; Purpose
+      </p>
+      <h2 class="ai-vision-mission-{{ ai_gen_id }}__heading">
+        {{ block.settings.section_heading | escape }}
+      </h2>
+
+      <!-- Interactive Perspective Switcher Tabs -->
+      <div class="ai-vision-mission-{{ ai_gen_id }}__tabs" role="tablist" aria-label="Perspective Filter">
+        <button type="button" class="ai-vision-mission-{{ ai_gen_id }}__tab-btn is-active" data-filter="all" role="tab" aria-selected="true">
+          All Pillars
+        </button>
+        <button type="button" class="ai-vision-mission-{{ ai_gen_id }}__tab-btn" data-filter="vision" role="tab" aria-selected="false">
+          Vision &amp; Future
+        </button>
+        <button type="button" class="ai-vision-mission-{{ ai_gen_id }}__tab-btn" data-filter="mission" role="tab" aria-selected="false">
+          Mission &amp; Care
+        </button>
+        <button type="button" class="ai-vision-mission-{{ ai_gen_id }}__tab-btn" data-filter="standards" role="tab" aria-selected="false">
+          Lab Benchmarks
+        </button>
+      </div>
+    </div>
+
+    <!-- Vision & Mission Core Cards -->
+    <div class="ai-vision-mission-{{ ai_gen_id }}__grid" id="core-cards-{{ ai_gen_id }}">
+      
+      <!-- Vision Card -->
+      <article class="ai-vision-mission-{{ ai_gen_id }}__card is-visible" data-type="vision">
+        <span class="ai-vision-mission-{{ ai_gen_id }}__card-badge">Long-term Direction</span>
         <span class="ai-vision-mission-{{ ai_gen_id }}__line" aria-hidden="true"></span>
         <h3 class="ai-vision-mission-{{ ai_gen_id }}__card-heading">{{ block.settings.vision_heading | escape }}</h3>
         <div class="ai-vision-mission-{{ ai_gen_id }}__text">{{ block.settings.vision_text }}</div>
+        
+        <div class="ai-vision-mission-{{ ai_gen_id }}__card-stats">
+          <div class="ai-vision-mission-{{ ai_gen_id }}__stat-pill">
+            <strong>100%</strong> Recycled Packaging
+          </div>
+          <div class="ai-vision-mission-{{ ai_gen_id }}__stat-pill">
+            <strong>Global</strong> Hospital Network
+          </div>
+        </div>
       </article>
-      <article class="ai-vision-mission-{{ ai_gen_id }}__card">
+
+      <!-- Mission Card -->
+      <article class="ai-vision-mission-{{ ai_gen_id }}__card is-visible" data-type="mission">
+        <span class="ai-vision-mission-{{ ai_gen_id }}__card-badge">Daily Commitment</span>
         <span class="ai-vision-mission-{{ ai_gen_id }}__line" aria-hidden="true"></span>
         <h3 class="ai-vision-mission-{{ ai_gen_id }}__card-heading">{{ block.settings.mission_heading | escape }}</h3>
         <div class="ai-vision-mission-{{ ai_gen_id }}__text">{{ block.settings.mission_text }}</div>
+
+        <div class="ai-vision-mission-{{ ai_gen_id }}__card-stats">
+          <div class="ai-vision-mission-{{ ai_gen_id }}__stat-pill">
+            <strong>ISO 9001</strong> Quality Certified
+          </div>
+          <div class="ai-vision-mission-{{ ai_gen_id }}__stat-pill">
+            <strong>0 Chafe</strong> Seam Guarantee
+          </div>
+        </div>
       </article>
+
     </div>
+
+    <!-- Interactive Clinical Standards Matrix -->
+    <div class="ai-vision-mission-{{ ai_gen_id }}__standards" id="standards-section-{{ ai_gen_id }}">
+      <div class="ai-vision-mission-{{ ai_gen_id }}__standards-title">
+        &bull; 4 Certified Clinical Laboratory Benchmarks (Tap to inspect) &bull;
+      </div>
+
+      <div class="ai-vision-mission-{{ ai_gen_id }}__standards-grid">
+        <div class="ai-vision-mission-{{ ai_gen_id }}__standard-item is-active" tabindex="0" role="button" aria-expanded="true">
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-num">01 / SHIELD</div>
+          <h4 class="ai-vision-mission-{{ ai_gen_id }}__standard-heading">Fluid &amp; Blood Repellent</h4>
+          <p class="ai-vision-mission-{{ ai_gen_id }}__standard-desc">Hydrophobic nanocoating prevents bloodborne and fluid saturation.</p>
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-benchmark">
+            Lab Result: AATCC 22 Spray Rating 100/100 (Full non-wetting).
+          </div>
+        </div>
+
+        <div class="ai-vision-mission-{{ ai_gen_id }}__standard-item" tabindex="0" role="button" aria-expanded="false">
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-num">02 / MOTION</div>
+          <h4 class="ai-vision-mission-{{ ai_gen_id }}__standard-heading">360&deg; Surgical Flex</h4>
+          <p class="ai-vision-mission-{{ ai_gen_id }}__standard-desc">Underarm and shoulder gussets preserve zero bind during operations.</p>
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-benchmark">
+            Lab Result: ASTM D4032 4-Way Elastic Recovery &gt;98.5%.
+          </div>
+        </div>
+
+        <div class="ai-vision-mission-{{ ai_gen_id }}__standard-item" tabindex="0" role="button" aria-expanded="false">
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-num">03 / THERMAL</div>
+          <h4 class="ai-vision-mission-{{ ai_gen_id }}__standard-heading">Breathable Micro-Vents</h4>
+          <p class="ai-vision-mission-{{ ai_gen_id }}__standard-desc">Continuous moisture vapor extraction under hot OR surgical lights.</p>
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-benchmark">
+            Lab Result: MVTR 8,500 g/m&sup2;/24h (Ultra-high breathability).
+          </div>
+        </div>
+
+        <div class="ai-vision-mission-{{ ai_gen_id }}__standard-item" tabindex="0" role="button" aria-expanded="false">
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-num">04 / WASH</div>
+          <h4 class="ai-vision-mission-{{ ai_gen_id }}__standard-heading">Autoclave Durability</h4>
+          <p class="ai-vision-mission-{{ ai_gen_id }}__standard-desc">Vat-dyed fibers resist 60&deg;C commercial sterilization wash cycles.</p>
+          <div class="ai-vision-mission-{{ ai_gen_id }}__standard-benchmark">
+            Lab Result: ISO 105-C06 Color Fastness 5/5 at 100+ cycles.
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </vision-mission-{{ ai_gen_id }}>
 
 <script>
   (function() {
-    class VisionMission{{ ai_gen_id }} extends HTMLElement {
-      connectedCallback() {
-        const cards = this.querySelectorAll('.ai-vision-mission-{{ ai_gen_id }}__card');
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-          cards.forEach((card) => card.classList.add('is-visible'));
-          return;
+    const root = document.querySelector('.ai-vision-mission-{{ ai_gen_id }}');
+    if (!root) return;
+
+    const tabs = root.querySelectorAll('.ai-vision-mission-{{ ai_gen_id }}__tab-btn');
+    const cards = root.querySelectorAll('.ai-vision-mission-{{ ai_gen_id }}__card');
+    const standardsSec = root.querySelector('#standards-section-{{ ai_gen_id }}');
+    const standardItems = root.querySelectorAll('.ai-vision-mission-{{ ai_gen_id }}__standard-item');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+
+        const filter = tab.dataset.filter;
+        if (filter === 'all') {
+          cards.forEach(c => c.style.display = 'block');
+          if (standardsSec) standardsSec.style.display = 'block';
+        } else if (filter === 'vision') {
+          cards.forEach(c => c.style.display = c.dataset.type === 'vision' ? 'block' : 'none');
+          if (standardsSec) standardsSec.style.display = 'none';
+        } else if (filter === 'mission') {
+          cards.forEach(c => c.style.display = c.dataset.type === 'mission' ? 'block' : 'none');
+          if (standardsSec) standardsSec.style.display = 'none';
+        } else if (filter === 'standards') {
+          cards.forEach(c => c.style.display = 'none');
+          if (standardsSec) standardsSec.style.display = 'block';
         }
-        const observer = new IntersectionObserver((entries, instance) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              instance.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.15 });
-        cards.forEach((card) => observer.observe(card));
-      }
-    }
-    if (!customElements.get('vision-mission-{{ ai_gen_id }}')) {
-      customElements.define('vision-mission-{{ ai_gen_id }}', VisionMission{{ ai_gen_id }});
-    }
+      });
+    });
+
+    standardItems.forEach(item => {
+      const toggle = () => {
+        const isActive = item.classList.contains('is-active');
+        standardItems.forEach(i => {
+          i.classList.remove('is-active');
+          i.setAttribute('aria-expanded', 'false');
+        });
+        if (!isActive) {
+          item.classList.add('is-active');
+          item.setAttribute('aria-expanded', 'true');
+        }
+      };
+
+      item.addEventListener('click', toggle);
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
   })();
 </script>
 

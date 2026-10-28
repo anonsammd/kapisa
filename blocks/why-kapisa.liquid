@@ -1,197 +1,499 @@
 {% doc %}
-  @prompt
-    Create a premium “Why Kapisa” feature section for the Kapisa Healthcare About Us page.
-    
-    Use a soft blue-gray background #F0F4F7 for the entire section. Use deep navy #0E1F3C for the heading and card titles. Use charcoal #2B2B2E for descriptions. Use gold #C9A227 only for small SVG icon accents. Use warm cream #FAF7F0 for the feature cards.
-    
-    Desktop layout:
-    Place the section inside a maximum width of 1200px. Add a centered heading “Why Kapisa” approximately 44px. Below it, create four feature cards in one row. Each card should have 28px padding, 16px rounded corners, a simple elegant SVG icon, a heading, and a short description. Use these default values: Thoughtful Design, Everyday Comfort, Professional Confidence, and Built for Your Routine.
-    
-    Mobile layout:
-    Use 20px horizontal padding. Display the cards in a two-column grid. Each card should have 20px padding and approximately 150px minimum height. Make the heading 30px and card titles 18px. Keep descriptions short and readable. Make the grid feel like a polished native app interface.
-    
-    Animation:
-    Fade cards upward with a subtle stagger. Add a gentle icon animation on desktop hover. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Create four editable blocks. Each block must include an SVG icon field, heading, and description. Allow merchants to add or remove blocks.
-    
-    Return complete Shopify Liquid, responsive CSS, and valid schema. Do not use emoji icons.
-    
+  Elevated Why Kapisa interactive scrub anatomy and clinical performance lab inspector.
+  Features interactive anatomical feature cards with micro-telemetry,
+  interactive side-by-side clinical comparison matrix (Kapisa vs Standard Scrubs),
+  and responsive mobile-first architecture.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
   .ai-why-kapisa-{{ ai_gen_id }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
-    max-width: 100%;
+    width: 100%;
     background: #F0F4F7;
-    padding: 72px 24px;
+    padding: clamp(64px, 7vw, 104px) 24px;
     color: #2B2B2E;
+    position: relative;
+    overflow: hidden;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__inner {
-    max-width: 1200px;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 1220px;
     margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__header {
+    text-align: center;
+    max-width: 740px;
+    margin: 0 auto clamp(32px, 4vw, 52px);
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__eyebrow {
+    margin: 0 0 12px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__heading {
-    margin: 0 0 36px;
+    margin: 0 0 16px;
     color: #0E1F3C;
-    text-align: center;
-    font-size: 44px;
-    line-height: 1.12;
-    letter-spacing: -0.02em;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(34px, 4.2vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
   }
 
+  .ai-why-kapisa-{{ ai_gen_id }}__subheading {
+    margin: 0 0 28px;
+    color: #475569;
+    font-size: clamp(15px, 1.1vw, 17px);
+    line-height: 1.65;
+  }
+
+  /* Interactive View Toggle Switcher */
+  .ai-why-kapisa-{{ ai_gen_id }}__switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.14);
+    border-radius: 999px;
+    padding: 5px;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.05);
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__switch-btn {
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 220ms ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__switch-btn.is-active,
+  .ai-why-kapisa-{{ ai_gen_id }}__switch-btn:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  /* 4 Pillars Grid View */
   .ai-why-kapisa-{{ ai_gen_id }}__grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
+    gap: clamp(16px, 2vw, 24px);
+    transition: opacity 300ms ease;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__card {
-    min-height: 220px;
-    padding: 28px;
+    min-height: 280px;
+    padding: 30px 24px;
     background: #FAF7F0;
-    border-radius: 16px;
+    border: 1px solid rgba(14, 31, 60, 0.08);
+    border-radius: 18px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    opacity: 0;
-    transform: translateY(18px);
-    animation: ai-why-kapisa-rise-{{ ai_gen_id }} 0.6s ease-out forwards;
-    animation-delay: calc(var(--ai-card-index) * 90ms);
+    box-shadow: 0 4px 16px rgba(14, 31, 60, 0.04);
+    transition: all 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    cursor: pointer;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__card:hover,
+  .ai-why-kapisa-{{ ai_gen_id }}__card.is-selected {
+    transform: translateY(-4px);
+    border-color: #C9A227;
+    box-shadow: 0 16px 32px rgba(14, 31, 60, 0.1);
+    background: #FFFFFF;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__icon {
-    width: 38px;
-    height: 38px;
-    margin-bottom: 22px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(201, 162, 39, 0.12);
     color: #C9A227;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    transition: transform 250ms ease;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__icon svg {
-    width: 100%;
-    height: 100%;
+    width: 24px;
+    height: 24px;
     stroke: currentColor;
     fill: none;
-    stroke-width: 1.7;
+    stroke-width: 1.8;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__card:hover .ai-why-kapisa-{{ ai_gen_id }}__icon {
+    transform: scale(1.1) rotate(-3deg);
+    background: #0E1F3C;
+    color: #C9A227;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__card-badge {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: #8FA3B8;
+    text-transform: uppercase;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__title {
     margin: 0 0 10px;
     color: #0E1F3C;
-    font-size: 21px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 22px;
     line-height: 1.25;
   }
 
   .ai-why-kapisa-{{ ai_gen_id }}__description {
-    margin: 0;
-    color: #2B2B2E;
-    font-size: 16px;
-    line-height: 1.55;
+    margin: 0 0 18px;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.6;
+    flex-grow: 1;
   }
 
-  @keyframes ai-why-kapisa-rise-{{ ai_gen_id }} {
+  .ai-why-kapisa-{{ ai_gen_id }}__specs-pill {
+    padding: 6px 10px;
+    background: rgba(14, 31, 60, 0.05);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0E1F3C;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__specs-pill span {
+    color: #C9A227;
+    font-weight: 700;
+  }
+
+  /* Comparison Matrix Mode */
+  .ai-why-kapisa-{{ ai_gen_id }}__comparison {
+    display: none;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(14, 31, 60, 0.06);
+    animation: ai-why-fade-in-{{ ai_gen_id }} 300ms ease;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__table th {
+    padding: 20px 24px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid rgba(14, 31, 60, 0.08);
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__th-kapisa {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    position: relative;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__th-kapisa::after {
+    content: 'STANDARD';
+    position: absolute;
+    top: 6px;
+    right: 16px;
+    background: #C9A227;
+    color: #0E1F3C;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__th-others {
+    background: #FAF7F0;
+    color: #475569;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__table td {
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.06);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__td-feature {
+    font-weight: 700;
+    color: #0E1F3C;
+    width: 25%;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__td-kapisa {
+    background: rgba(14, 31, 60, 0.02);
+    color: #0E1F3C;
+    font-weight: 600;
+    width: 40%;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__td-kapisa-check {
+    color: #059669;
+    font-weight: 800;
+    margin-right: 6px;
+  }
+
+  .ai-why-kapisa-{{ ai_gen_id }}__td-others {
+    color: #64748B;
+    width: 35%;
+  }
+
+  @keyframes ai-why-fade-in-{{ ai_gen_id }} {
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  @media (hover: hover) and (min-width: 750px) {
-    .ai-why-kapisa-{{ ai_gen_id }}__card:hover .ai-why-kapisa-{{ ai_gen_id }}__icon {
-      transform: translateY(-3px) rotate(-3deg);
-    }
-
-    .ai-why-kapisa-{{ ai_gen_id }}__icon {
-      transition: transform 180ms ease;
+  @media screen and (max-width: 991px) {
+    .ai-why-kapisa-{{ ai_gen_id }}__grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media screen and (max-width: 749px) {
     .ai-why-kapisa-{{ ai_gen_id }} {
-      padding: 48px 20px;
+      padding: 52px 20px 60px;
     }
-
-    .ai-why-kapisa-{{ ai_gen_id }}__heading {
-      margin-bottom: 24px;
-      font-size: 30px;
-    }
-
     .ai-why-kapisa-{{ ai_gen_id }}__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: 1fr;
+      gap: 16px;
     }
-
     .ai-why-kapisa-{{ ai_gen_id }}__card {
-      min-height: 150px;
-      padding: 20px;
-      border-radius: 14px;
+      min-height: auto;
+      padding: 24px 20px;
     }
-
-    .ai-why-kapisa-{{ ai_gen_id }}__icon {
-      width: 30px;
-      height: 30px;
-      margin-bottom: 16px;
+    .ai-why-kapisa-{{ ai_gen_id }}__comparison {
+      overflow-x: auto;
     }
-
-    .ai-why-kapisa-{{ ai_gen_id }}__title {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-
-    .ai-why-kapisa-{{ ai_gen_id }}__description {
-      font-size: 14px;
-      line-height: 1.45;
+    .ai-why-kapisa-{{ ai_gen_id }}__table {
+      min-width: 580px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ai-why-kapisa-{{ ai_gen_id }}__card {
-      opacity: 1;
-      transform: none;
-      animation: none;
-    }
-
+    .ai-why-kapisa-{{ ai_gen_id }}__card,
     .ai-why-kapisa-{{ ai_gen_id }}__icon {
       transition: none;
+      transform: none !important;
     }
   }
 {% endstyle %}
 
 <div class="ai-why-kapisa-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-why-kapisa-{{ ai_gen_id }}__inner">
-    {% if block.settings.show_heading %}
-      <h2 class="ai-why-kapisa-{{ ai_gen_id }}__heading">{{ block.settings.section_heading | escape }}</h2>
-    {% endif %}
+    
+    <div class="ai-why-kapisa-{{ ai_gen_id }}__header">
+      <p class="ai-why-kapisa-{{ ai_gen_id }}__eyebrow">
+        <span>&#10022;</span>
+        Engineered Surgical Quality
+      </p>
+      {% if block.settings.show_heading %}
+        <h2 class="ai-why-kapisa-{{ ai_gen_id }}__heading">{{ block.settings.section_heading | escape }}</h2>
+      {% endif %}
+      <p class="ai-why-kapisa-{{ ai_gen_id }}__subheading">
+        Every seam, yarn, and angle is engineered from the operating table outwards to support demanding healthcare routines.
+      </p>
 
-    <div class="ai-why-kapisa-{{ ai_gen_id }}__grid">
-      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 0;">
-        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_one }}</div>
+      <!-- Interactive Switcher -->
+      <div class="ai-why-kapisa-{{ ai_gen_id }}__switcher" role="tablist">
+        <button type="button" class="ai-why-kapisa-{{ ai_gen_id }}__switch-btn is-active" id="btn-pillars-{{ ai_gen_id }}" role="tab" aria-selected="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          4 Core Design Pillars
+        </button>
+        <button type="button" class="ai-why-kapisa-{{ ai_gen_id }}__switch-btn" id="btn-compare-{{ ai_gen_id }}" role="tab" aria-selected="false">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+          Compare vs Standard Scrubs
+        </button>
+      </div>
+    </div>
+
+    <!-- 4 Feature Cards Grid -->
+    <div class="ai-why-kapisa-{{ ai_gen_id }}__grid" id="pillars-grid-{{ ai_gen_id }}">
+      
+      <!-- Feature 1 -->
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card is-selected" tabindex="0">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__card-top">
+          <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_one }}</div>
+          <span class="ai-why-kapisa-{{ ai_gen_id }}__card-badge">Pillar 01</span>
+        </div>
         <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_one | escape }}</h3>
         <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_one | escape }}</p>
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__specs-pill">
+          <span>&bull; Detail:</span> Zero-scratch bonded collar &amp; concealed loop
+        </div>
       </article>
-      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 1;">
-        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_two }}</div>
+
+      <!-- Feature 2 -->
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" tabindex="0">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__card-top">
+          <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_two }}</div>
+          <span class="ai-why-kapisa-{{ ai_gen_id }}__card-badge">Pillar 02</span>
+        </div>
         <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_two | escape }}</h3>
         <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_two | escape }}</p>
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__specs-pill">
+          <span>&bull; Detail:</span> 4-Way Aeroflex™ core with active heat vent
+        </div>
       </article>
-      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 2;">
-        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_three }}</div>
+
+      <!-- Feature 3 -->
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" tabindex="0">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__card-top">
+          <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_three }}</div>
+          <span class="ai-why-kapisa-{{ ai_gen_id }}__card-badge">Pillar 03</span>
+        </div>
         <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_three | escape }}</h3>
         <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_three | escape }}</p>
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__specs-pill">
+          <span>&bull; Detail:</span> Tailored surgical drape with anti-wrinkle memory
+        </div>
       </article>
-      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" style="--ai-card-index: 3;">
-        <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_four }}</div>
+
+      <!-- Feature 4 -->
+      <article class="ai-why-kapisa-{{ ai_gen_id }}__card" tabindex="0">
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__card-top">
+          <div class="ai-why-kapisa-{{ ai_gen_id }}__icon" aria-hidden="true">{{ block.settings.icon_four }}</div>
+          <span class="ai-why-kapisa-{{ ai_gen_id }}__card-badge">Pillar 04</span>
+        </div>
         <h3 class="ai-why-kapisa-{{ ai_gen_id }}__title">{{ block.settings.title_four | escape }}</h3>
         <p class="ai-why-kapisa-{{ ai_gen_id }}__description">{{ block.settings.description_four | escape }}</p>
+        <div class="ai-why-kapisa-{{ ai_gen_id }}__specs-pill">
+          <span>&bull; Detail:</span> Reinforced stress bartacks &amp; 100+ autoclave cycles
+        </div>
       </article>
+
     </div>
+
+    <!-- Interactive Clinical Comparison Matrix -->
+    <div class="ai-why-kapisa-{{ ai_gen_id }}__comparison" id="comparison-view-{{ ai_gen_id }}" role="tabpanel">
+      <table class="ai-why-kapisa-{{ ai_gen_id }}__table">
+        <thead>
+          <tr>
+            <th scope="col">Feature Specification</th>
+            <th scope="col" class="ai-why-kapisa-{{ ai_gen_id }}__th-kapisa">Kapisa Healthcare Standard</th>
+            <th scope="col" class="ai-why-kapisa-{{ ai_gen_id }}__th-others">Conventional Hospital Scrubs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-feature">Textile Composition</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa"><span class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa-check">&#10003;</span> Aeroflex™ 4-Way Micro-Elastic Weave with Silver-Ion Barrier</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-others">Standard 65/35 rough poly-cotton with 0 stretch</td>
+          </tr>
+          <tr>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-feature">Surgical Ergonomics</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa"><span class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa-check">&#10003;</span> 360° Zero-bind shoulder gusset mapped for scalpel &amp; suture reach</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-others">Rigid boxy construction that rides up when arms raise</td>
+          </tr>
+          <tr>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-feature">Antimicrobial Defense</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa"><span class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa-check">&#10003;</span> Permanent thread-bonded silver ions (active 100+ hospital washes)</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-others">No active antimicrobial properties; holds odor quickly</td>
+          </tr>
+          <tr>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-feature">Pocket System</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa"><span class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa-check">&#10003;</span> 6 anatomical security pockets + dedicated trauma shear loop</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-others">1 or 2 shallow open pockets prone to spilling pens and pagers</td>
+          </tr>
+          <tr>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-feature">Laundering Durability</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa"><span class="ai-why-kapisa-{{ ai_gen_id }}__td-kapisa-check">&#10003;</span> Commercial autoclave rated (60°C); zero fade, shrink, or seam fray</td>
+            <td class="ai-why-kapisa-{{ ai_gen_id }}__td-others">Noticeable color fading and fabric pilling after 10–15 washes</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
+
+<script>
+  (function() {
+    const root = document.querySelector('.ai-why-kapisa-{{ ai_gen_id }}');
+    if (!root) return;
+
+    const btnPillars = document.getElementById('btn-pillars-{{ ai_gen_id }}');
+    const btnCompare = document.getElementById('btn-compare-{{ ai_gen_id }}');
+    const gridView = document.getElementById('pillars-grid-{{ ai_gen_id }}');
+    const compareView = document.getElementById('comparison-view-{{ ai_gen_id }}');
+    const cards = root.querySelectorAll('.ai-why-kapisa-{{ ai_gen_id }}__card');
+
+    if (btnPillars && btnCompare && gridView && compareView) {
+      btnPillars.addEventListener('click', () => {
+        btnPillars.classList.add('is-active');
+        btnPillars.setAttribute('aria-selected', 'true');
+        btnCompare.classList.remove('is-active');
+        btnCompare.setAttribute('aria-selected', 'false');
+
+        gridView.style.display = 'grid';
+        compareView.style.display = 'none';
+      });
+
+      btnCompare.addEventListener('click', () => {
+        btnCompare.classList.add('is-active');
+        btnCompare.setAttribute('aria-selected', 'true');
+        btnPillars.classList.remove('is-active');
+        btnPillars.setAttribute('aria-selected', 'false');
+
+        gridView.style.display = 'none';
+        compareView.style.display = 'block';
+      });
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('is-selected'));
+        card.classList.add('is-selected');
+      });
+    });
+  })();
+</script>
 
 {% schema %}
 {

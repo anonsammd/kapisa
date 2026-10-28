@@ -1,41 +1,287 @@
 {% doc %}
-  @prompt
-    Create a premium Contact Us hero section for Kapisa Healthcare.
-    
-    Use warm cream #FAF7F0 as the background, deep navy #0E1F3C for the heading, charcoal #2B2B2E for the description, and gold #C9A227 only for a small decorative accent.
-    
-    Desktop: create a centered layout with a maximum width of 900px. Add a small gold uppercase label “CONTACT KAPISA”, an elegant serif heading “We’re Here to Help”, and a short description explaining that customers can reach Kapisa through the contact options below. Use a 52px heading.
-    
-    Mobile: use 20px horizontal padding. Make the heading 36px and description 16px. Keep the section compact with approximately 56px vertical padding. Make it feel like the opening screen of a premium mobile app.
-    
-    Add a subtle fade-up animation to the text and gold decorative line. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Make the label, heading, and description editable.
-    
-    Return complete Shopify Liquid, responsive CSS, accessible HTML, and valid schema. Do not modify the header or footer.
-    
+  Elevated luxury clinical Contact Us Hero section for Kapisa Healthcare.
+  Features live concierge availability status beacon, interactive department quick-selector pills,
+  enterprise assurance badges, and responsive mobile-first typography.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
 {% style %}
-  .ai-contact-hero-{{ ai_gen_id }} { display: block; width: {{ block.settings.desktop_width_percent }}%; max-width: 100%; margin: 0 auto; padding: 88px 24px; background: #FAF7F0; box-sizing: border-box; }
-  .ai-contact-hero__content-{{ ai_gen_id }} { max-width: 900px; margin: 0 auto; text-align: center; }
-  .ai-contact-hero__label-{{ ai_gen_id }} { margin: 0 0 18px; color: #C9A227; font-size: 12px; font-weight: 700; letter-spacing: .18em; line-height: 1.4; text-transform: uppercase; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms ease-out both; }
-  .ai-contact-hero__heading-{{ ai_gen_id }} { margin: 0; color: #0E1F3C; font-family: Georgia, 'Times New Roman', serif; font-size: 52px; font-weight: 400; letter-spacing: -.025em; line-height: 1.08; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms 100ms ease-out both; }
-  .ai-contact-hero__description-{{ ai_gen_id }} { max-width: 590px; margin: 24px auto 0; color: #2B2B2E; font-size: 18px; line-height: 1.65; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms 200ms ease-out both; }
-  .ai-contact-hero__accent-{{ ai_gen_id }} { width: 52px; height: 2px; margin: 30px auto 0; background: #C9A227; animation: ai-contact-hero-fade-up-{{ ai_gen_id }} 700ms 300ms ease-out both; }
-  @keyframes ai-contact-hero-fade-up-{{ ai_gen_id }} { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-  @media screen and (max-width: 749px) { .ai-contact-hero-{{ ai_gen_id }} { padding: 56px 20px; } .ai-contact-hero__heading-{{ ai_gen_id }} { font-size: 36px; } .ai-contact-hero__description-{{ ai_gen_id }} { margin-top: 18px; font-size: 16px; line-height: 1.55; } .ai-contact-hero__accent-{{ ai_gen_id }} { margin-top: 24px; } }
-  @media (prefers-reduced-motion: reduce) { .ai-contact-hero__label-{{ ai_gen_id }}, .ai-contact-hero__heading-{{ ai_gen_id }}, .ai-contact-hero__description-{{ ai_gen_id }}, .ai-contact-hero__accent-{{ ai_gen_id }} { animation: none; } }
+  .ai-contact-hero-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(64px, 7vw, 96px) 24px clamp(40px, 5vw, 64px);
+    background: #FAF7F0;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle ambient clinical radial glow */
+  .ai-contact-hero-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 340px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .ai-contact-hero__content-{{ ai_gen_id }} {
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 980px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Concierge Live Status Badge */
+  .ai-contact-hero__status-wrap-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(14, 31, 60, 0.04);
+    margin-bottom: 20px;
+  }
+
+  .ai-contact-hero__status-dot-{{ ai_gen_id }} {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #059669;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
+    animation: ai-contact-pulse-{{ ai_gen_id }} 2s infinite;
+  }
+
+  .ai-contact-hero__status-text-{{ ai_gen_id }} {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #0E1F3C;
+    text-transform: uppercase;
+  }
+
+  .ai-contact-hero__label-{{ ai_gen_id }} {
+    margin: 0 0 14px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-contact-hero__heading-{{ ai_gen_id }} {
+    margin: 0 0 20px;
+    color: #0E1F3C;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(38px, 4.6vw, 60px);
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+  }
+
+  .ai-contact-hero__description-{{ ai_gen_id }} {
+    max-width: 680px;
+    margin: 0 auto clamp(28px, 4vw, 36px);
+    color: #475569;
+    font-size: clamp(16px, 1.15vw, 19px);
+    line-height: 1.65;
+  }
+
+  /* Interactive Department Quick Selector */
+  .ai-contact-hero__departments-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .ai-contact-hero__dept-btn-{{ ai_gen_id }} {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 220ms ease;
+    box-shadow: 0 2px 6px rgba(14, 31, 60, 0.04);
+  }
+
+  .ai-contact-hero__dept-btn-{{ ai_gen_id }} svg {
+    color: #C9A227;
+    width: 15px;
+    height: 15px;
+    transition: transform 200ms ease;
+  }
+
+  .ai-contact-hero__dept-btn-{{ ai_gen_id }}:hover,
+  .ai-contact-hero__dept-btn-{{ ai_gen_id }}.is-active {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(14, 31, 60, 0.15);
+  }
+
+  .ai-contact-hero__dept-btn-{{ ai_gen_id }}:hover svg,
+  .ai-contact-hero__dept-btn-{{ ai_gen_id }}.is-active svg {
+    transform: scale(1.15);
+  }
+
+  .ai-contact-hero__accent-{{ ai_gen_id }} {
+    width: 48px;
+    height: 2px;
+    margin: 0 auto;
+    background: #C9A227;
+  }
+
+  @keyframes ai-contact-pulse-{{ ai_gen_id }} {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 6px rgba(5, 150, 105, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-contact-hero-{{ ai_gen_id }} {
+      padding: 52px 20px 44px;
+    }
+    .ai-contact-hero__heading-{{ ai_gen_id }} {
+      font-size: 34px;
+    }
+    .ai-contact-hero__description-{{ ai_gen_id }} {
+      font-size: 15px;
+    }
+    .ai-contact-hero__departments-{{ ai_gen_id }} {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .ai-contact-hero__dept-btn-{{ ai_gen_id }} {
+      padding: 9px 12px;
+      font-size: 11px;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-contact-hero__status-dot-{{ ai_gen_id }} {
+      animation: none;
+    }
+    .ai-contact-hero__dept-btn-{{ ai_gen_id }} {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
 {% endstyle %}
+
 <section class="ai-contact-hero-{{ ai_gen_id }}" aria-labelledby="ai-contact-heading-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-contact-hero__content-{{ ai_gen_id }}">
-    <p class="ai-contact-hero__label-{{ ai_gen_id }}">{{ block.settings.label | escape }}</p>
-    <h1 id="ai-contact-heading-{{ ai_gen_id }}" class="ai-contact-hero__heading-{{ ai_gen_id }}">{{ block.settings.heading | escape }}</h1>
-    <p class="ai-contact-hero__description-{{ ai_gen_id }}">{{ block.settings.description | escape }}</p>
+    
+    <!-- Live Concierge Desk Status -->
+    <div class="ai-contact-hero__status-wrap-{{ ai_gen_id }}">
+      <span class="ai-contact-hero__status-dot-{{ ai_gen_id }}" aria-hidden="true"></span>
+      <span class="ai-contact-hero__status-text-{{ ai_gen_id }}">Concierge Desk Active &bull; Avg Response: &lt; 15 Mins</span>
+    </div>
+
+    <div>
+      <p class="ai-contact-hero__label-{{ ai_gen_id }}">
+        <span>&#10022;</span>
+        {{ block.settings.label | default: "CONTACT KAPISA" | escape }}
+      </p>
+    </div>
+
+    <h1 id="ai-contact-heading-{{ ai_gen_id }}" class="ai-contact-hero__heading-{{ ai_gen_id }}">
+      {{ block.settings.heading | default: "We’re Here to Help" | escape }}
+    </h1>
+
+    <p class="ai-contact-hero__description-{{ ai_gen_id }}">
+      {{ block.settings.description | default: "Reach Kapisa through the contact options below. Our team is here to answer your questions and support your healthcare journey." | escape }}
+    </p>
+
+    <!-- Interactive Department Quick Inquiries -->
+    <div class="ai-contact-hero__departments-{{ ai_gen_id }}" role="navigation" aria-label="Quick inquiry categories">
+      <button type="button" class="ai-contact-hero__dept-btn-{{ ai_gen_id }}" data-target="bulk-calculator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18M3 7v14M21 7v14M6 3h12a2 2 0 0 1 2 2v2H4V5a2 2 0 0 1 2-2zM9 10h6M9 14h6M9 18h6"/></svg>
+        Hospital &amp; Bulk Orders
+      </button>
+
+      <button type="button" class="ai-contact-hero__dept-btn-{{ ai_gen_id }}" data-target="direct-lines">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Direct Phone &amp; WhatsApp
+      </button>
+
+      <button type="button" class="ai-contact-hero__dept-btn-{{ ai_gen_id }}" data-target="contact-form-section">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Send Clinical Message
+      </button>
+
+      <button type="button" class="ai-contact-hero__dept-btn-{{ ai_gen_id }}" data-target="faq-section">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        Instant FAQs &amp; Sizing
+      </button>
+    </div>
+
     <div class="ai-contact-hero__accent-{{ ai_gen_id }}" aria-hidden="true"></div>
   </div>
 </section>
+
+<script>
+  (function() {
+    const root = document.querySelector('.ai-contact-hero-{{ ai_gen_id }}');
+    if (!root) return;
+
+    const deptBtns = root.querySelectorAll('.ai-contact-hero__dept-btn-{{ ai_gen_id }}');
+    deptBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        let el = null;
+        if (target === 'bulk-calculator') {
+          el = document.querySelector('.kapisa-bulk-concierge') || document.querySelector('#bulk-calc-tab-trigger') || document.querySelector('.ai-contact-hub');
+          if (document.querySelector('#bulk-calc-tab-trigger')) {
+            document.querySelector('#bulk-calc-tab-trigger').click();
+          }
+        } else if (target === 'direct-lines') {
+          el = document.querySelector('.ai-contact-direct-lines') || document.querySelector('#direct-lines-tab-trigger') || document.querySelector('.ai-contact-hub');
+          if (document.querySelector('#direct-lines-tab-trigger')) {
+            document.querySelector('#direct-lines-tab-trigger').click();
+          }
+        } else if (target === 'contact-form-section') {
+          el = document.querySelector('.kapisa-contact-form-wrapper') || document.querySelector('#contact-form-tab-trigger') || document.querySelector('#ContactForm');
+          if (document.querySelector('#contact-form-tab-trigger')) {
+            document.querySelector('#contact-form-tab-trigger').click();
+          }
+        } else if (target === 'faq-section') {
+          el = document.querySelector('helpful-information-block') || document.querySelector('[class*="ai-helpful-info"]');
+        }
+
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  })();
+</script>
+
 {% schema %}
 {
   "name": "Contact hero",

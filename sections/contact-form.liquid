@@ -12,128 +12,243 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  .kapisa-contact-form-section {
+    background: #FAF7F0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kapisa-contact-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 20px;
+    padding: clamp(28px, 4vw, 48px);
+    box-shadow: 0 16px 48px rgba(14, 31, 60, 0.06);
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .kapisa-contact-topics {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    justify-content: center;
+  }
+
+  .kapisa-contact-topic-chip {
+    background: #FAF7F0;
+    border: 1px solid rgba(14, 31, 60, 0.14);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    transition: all 180ms ease;
+  }
+
+  .kapisa-contact-topic-chip.is-active,
+  .kapisa-contact-topic-chip:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+  }
+
+  .kapisa-contact-submit-btn {
+    width: 100%;
+    min-height: 52px;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border: 1px solid #0E1F3C;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 220ms ease;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.2);
+  }
+
+  .kapisa-contact-submit-btn:hover {
+    background: #C9A227;
+    border-color: #C9A227;
+    color: #0E1F3C;
+    box-shadow: 0 8px 24px rgba(201, 162, 39, 0.4);
+  }
 {%- endstyle -%}
 
-<div class="color-{{ section.settings.color_scheme }} gradient">
+<div class="color-{{ section.settings.color_scheme }} gradient kapisa-contact-form-section">
   <div class="contact page-width page-width--narrow section-{{ section.id }}-padding">
-    {%- if section.settings.heading != blank -%}
-      <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}">
-        {{ section.settings.heading }}
-      </h2>
-    {%- else -%}
-      <h2 class="visually-hidden">{{ 'templates.contact.form.title' | t }}</h2>
-    {%- endif -%}
-    {%- liquid
-      assign contact_form_class = 'isolate'
-      if settings.animations_reveal_on_scroll
-        assign contact_form_class = 'isolate scroll-trigger animate--slide-in'
-      endif
-    -%}
-    {%- form 'contact', id: 'ContactForm', class: contact_form_class -%}
-      {%- if form.posted_successfully? -%}
-        <h2 class="form-status form-status-list form__message" tabindex="-1" autofocus>
-          {{- 'icon-success.svg' | inline_asset_content -}}
-          {{ 'templates.contact.form.post_success' | t }}
-        </h2>
-      {%- elsif form.errors -%}
-        <div class="form__message">
-          <h2 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus>
-            {{- 'icon-error.svg' | inline_asset_content -}}
-            {{ 'templates.contact.form.error_heading' | t }}
+    <div class="kapisa-contact-card">
+      
+      {%- if section.settings.heading != blank -%}
+        <div style="text-align:center; margin-bottom: 20px;">
+          <span style="font-size:11px; font-weight:700; letter-spacing:0.2em; color:#C9A227; text-transform:uppercase;">Priority Medical Concierge</span>
+          <h2 class="title title-wrapper--no-top-margin inline-richtext {{ section.settings.heading_size }}{% if settings.animations_reveal_on_scroll %} scroll-trigger animate--slide-in{% endif %}" style="margin: 6px 0 0; color:#0E1F3C; font-family:Georgia,serif;">
+            {{ section.settings.heading }}
           </h2>
         </div>
-        <ul class="form-status-list caption-large" role="list">
-          <li>
-            <a href="#ContactForm-email" class="link">
-              {{ form.errors.translated_fields.email | capitalize }}
-              {{ form.errors.messages.email }}
-            </a>
-          </li>
-        </ul>
+      {%- else -%}
+        <div style="text-align:center; margin-bottom: 20px;">
+          <span style="font-size:11px; font-weight:700; letter-spacing:0.2em; color:#C9A227; text-transform:uppercase;">Priority Medical Concierge</span>
+          <h2 style="margin: 6px 0 0; color:#0E1F3C; font-family:Georgia,serif; font-size:32px;">
+            Send a Clinical Inquiry
+          </h2>
+        </div>
       {%- endif -%}
-      <div class="contact__fields">
+
+      <!-- Topic Pills -->
+      <div class="kapisa-contact-topics" role="group" aria-label="Inquiry Type">
+        <button type="button" class="kapisa-contact-topic-chip is-active" data-topic="General Clinical Support">General Support</button>
+        <button type="button" class="kapisa-contact-topic-chip" data-topic="Hospital &amp; Bulk Procurement">Hospital Procurement</button>
+        <button type="button" class="kapisa-contact-topic-chip" data-topic="Sizing &amp; Fitting Advisory">Sizing Advisory</button>
+        <button type="button" class="kapisa-contact-topic-chip" data-topic="Custom Institutional Embroidery">Custom Embroidery</button>
+      </div>
+
+      {%- liquid
+        assign contact_form_class = 'isolate'
+        if settings.animations_reveal_on_scroll
+          assign contact_form_class = 'isolate scroll-trigger animate--slide-in'
+        endif
+      -%}
+      {%- form 'contact', id: 'ContactForm', class: contact_form_class -%}
+        {%- if form.posted_successfully? -%}
+          <div style="padding:16px 20px; background:rgba(5,150,105,0.1); border:1px solid #059669; border-radius:8px; margin-bottom:24px; color:#065F46;">
+            <h3 class="form-status form-status-list form__message" tabindex="-1" autofocus style="margin:0; font-size:16px; font-weight:700;">
+              {{- 'icon-success.svg' | inline_asset_content -}}
+              {{ 'templates.contact.form.post_success' | t }}
+            </h3>
+            <p style="margin:6px 0 0; font-size:14px;">Our clinical concierge team will review your message and reply promptly.</p>
+          </div>
+        {%- elsif form.errors -%}
+          <div class="form__message" style="margin-bottom:20px; padding:16px; background:rgba(220,38,38,0.1); border:1px solid #DC2626; border-radius:8px;">
+            <h3 class="form-status caption-large text-body" role="alert" tabindex="-1" autofocus style="margin:0; color:#991B1B; font-weight:700;">
+              {{- 'icon-error.svg' | inline_asset_content -}}
+              {{ 'templates.contact.form.error_heading' | t }}
+            </h3>
+            <ul class="form-status-list caption-large" role="list" style="margin:8px 0 0; color:#991B1B;">
+              <li>
+                <a href="#ContactForm-email" class="link">
+                  {{ form.errors.translated_fields.email | capitalize }}
+                  {{ form.errors.messages.email }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        {%- endif -%}
+
+        <input type="hidden" name="contact[Topic]" id="ContactForm-topic-input" value="General Clinical Support">
+
+        <div class="contact__fields">
+          <div class="field">
+            <input
+              class="field__input"
+              autocomplete="name"
+              type="text"
+              id="ContactForm-name"
+              name="contact[{{ 'templates.contact.form.name' | t }}]"
+              value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+              placeholder="{{ 'templates.contact.form.name' | t }}"
+              required
+            >
+            <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }} *</label>
+          </div>
+          <div class="field field--with-error">
+            <input
+              autocomplete="email"
+              type="email"
+              id="ContactForm-email"
+              class="field__input"
+              name="contact[email]"
+              spellcheck="false"
+              autocapitalize="off"
+              value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+              aria-required="true"
+              {% if form.errors contains 'email' %}
+                aria-invalid="true"
+                aria-describedby="ContactForm-email-error"
+              {% endif %}
+              placeholder="{{ 'templates.contact.form.email' | t }}"
+              required
+            >
+            <label class="field__label" for="ContactForm-email">
+              {{- 'templates.contact.form.email' | t }}
+              <span aria-hidden="true">*</span>
+            </label>
+            {%- if form.errors contains 'email' -%}
+              <small class="contact__field-error" id="ContactForm-email-error">
+                <span class="visually-hidden">{{ 'accessibility.error' | t }}</span>
+                <span class="form__message">
+                  <span class="svg-wrapper">
+                    {{- 'icon-error.svg' | inline_asset_content -}}
+                  </span>
+                  {{- form.errors.translated_fields.email | capitalize }}
+                  {{ form.errors.messages.email -}}
+                </span>
+              </small>
+            {%- endif -%}
+          </div>
+        </div>
+
         <div class="field">
           <input
+            type="tel"
+            id="ContactForm-phone"
             class="field__input"
-            autocomplete="name"
-            type="text"
-            id="ContactForm-name"
-            name="contact[{{ 'templates.contact.form.name' | t }}]"
-            value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
-            placeholder="{{ 'templates.contact.form.name' | t }}"
+            autocomplete="tel"
+            name="contact[{{ 'templates.contact.form.phone' | t }}]"
+            pattern="[0-9\-+ ]*"
+            value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+            placeholder="{{ 'templates.contact.form.phone' | t }}"
           >
-          <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.name' | t }}</label>
+          <label class="field__label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
         </div>
-        <div class="field field--with-error">
-          <input
-            autocomplete="email"
-            type="email"
-            id="ContactForm-email"
-            class="field__input"
-            name="contact[email]"
-            spellcheck="false"
-            autocapitalize="off"
-            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
-            aria-required="true"
-            {% if form.errors contains 'email' %}
-              aria-invalid="true"
-              aria-describedby="ContactForm-email-error"
-            {% endif %}
-            placeholder="{{ 'templates.contact.form.email' | t }}"
+
+        <div class="field">
+          <textarea
+            rows="6"
+            id="ContactForm-body"
+            class="text-area field__input"
+            name="contact[{{ 'templates.contact.form.comment' | t }}]"
+            placeholder="{{ 'templates.contact.form.comment' | t }}"
+            required
           >
-          <label class="field__label" for="ContactForm-email">
-            {{- 'templates.contact.form.email' | t }}
-            <span aria-hidden="true">*</span></label
-          >
-          {%- if form.errors contains 'email' -%}
-            <small class="contact__field-error" id="ContactForm-email-error">
-              <span class="visually-hidden">{{ 'accessibility.error' | t }}</span>
-              <span class="form__message">
-                <span class="svg-wrapper">
-                  {{- 'icon-error.svg' | inline_asset_content -}}
-                </span>
-                {{- form.errors.translated_fields.email | capitalize }}
-                {{ form.errors.messages.email -}}
-              </span>
-            </small>
-          {%- endif -%}
+            {{- form.body -}}
+          </textarea>
+          <label class="form__label field__label" for="ContactForm-body">
+            {{- 'templates.contact.form.comment' | t }} *
+          </label>
         </div>
-      </div>
-      <div class="field">
-        <input
-          type="tel"
-          id="ContactForm-phone"
-          class="field__input"
-          autocomplete="tel"
-          name="contact[{{ 'templates.contact.form.phone' | t }}]"
-          pattern="[0-9\-]*"
-          value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
-          placeholder="{{ 'templates.contact.form.phone' | t }}"
-        >
-        <label class="field__label" for="ContactForm-phone">{{ 'templates.contact.form.phone' | t }}</label>
-      </div>
-      <div class="field">
-        <textarea
-          rows="10"
-          id="ContactForm-body"
-          class="text-area field__input"
-          name="contact[{{ 'templates.contact.form.comment' | t }}]"
-          placeholder="{{ 'templates.contact.form.comment' | t }}"
-        >
-          {{- form.body -}}
-        </textarea>
-        <label class="form__label field__label" for="ContactForm-body">
-          {{- 'templates.contact.form.comment' | t -}}
-        </label>
-      </div>
-      <div class="contact__button">
-        <button type="submit" class="button">
-          {{ 'templates.contact.form.send' | t }}
-        </button>
-      </div>
-    {%- endform -%}
+
+        <div class="contact__button" style="margin-top:20px;">
+          <button type="submit" class="kapisa-contact-submit-btn">
+            {{ 'templates.contact.form.send' | t }} &rarr;
+          </button>
+        </div>
+      {%- endform -%}
+
+    </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    const topicChips = document.querySelectorAll('.kapisa-contact-topic-chip');
+    const topicInput = document.getElementById('ContactForm-topic-input');
+    if (topicChips.length && topicInput) {
+      topicChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          topicChips.forEach(c => c.classList.remove('is-active'));
+          chip.classList.add('is-active');
+          topicInput.value = chip.dataset.topic;
+        });
+      });
+    }
+  })();
+</script>
 
 {% schema %}
 {

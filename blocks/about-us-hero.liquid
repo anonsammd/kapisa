@@ -1,64 +1,763 @@
 {% doc %}
-  @prompt
-    Create a premium, modern, responsive About Us hero section for Kapisa Healthcare.
-    
-    Design a luxury healthcare apparel brand aesthetic with an editorial fashion feel. Use a warm cream background #FAF7F0 for the entire section. Use deep navy #0E1F3C for the main heading. Use charcoal #2B2B2E for the description. Use gold #C9A227 only for a small decorative line and subtle accent details.
-    
-    Desktop layout:
-    Create a two-column layout inside a maximum width of 1200px. The left column contains a small gold eyebrow text “ABOUT KAPISA”, a large elegant serif heading “Designed for Those Who Care”, a short paragraph, and one navy CTA button labeled “Discover Our Story”. The right column contains a large premium healthcare apparel image with 18px rounded corners. Make the image approximately 560px tall.
-    
-    Mobile layout:
-    Use a single-column layout with 20px horizontal padding. Display the eyebrow, heading, paragraph, and button first, followed by the image. Make the heading 38px, paragraph 16px, and image approximately 340px tall. Make the button full width with a 52px height. The layout must feel like a polished native shopping app.
-    
-    Add subtle fade-up animation to the text and a gentle scale reveal to the image. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Add image picker, eyebrow text, heading, description, button label, and button link. Use the selected image dynamically.
-    
-    Return the complete Shopify Liquid section with responsive CSS, valid schema, and accessible HTML. Do not modify the header or footer.
-    
+  Elevated luxury clinical About Us Hero section for Kapisa Healthcare.
+  Features interactive clinical metric chips, floating telemetry glass badge,
+  interactive fabric weave modal inspection, and responsive mobile-first editorial architecture.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 {% style %}
-  .kapisa-about-{{ ai_gen_id }} { display: block; width: 100%; background: #FAF7F0; color: #2B2B2E; }
-  .kapisa-about-{{ ai_gen_id }}__inner { width: {{ block.settings.desktop_width_percent }}%; max-width: 1200px; margin: 0 auto; padding: 96px 0; display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 76px; align-items: center; }
-  .kapisa-about-{{ ai_gen_id }}__content { opacity: 0; transform: translateY(22px); animation: kapisa-about-fade-{{ ai_gen_id }} 700ms ease-out 120ms forwards; }
-  .kapisa-about-{{ ai_gen_id }}__eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 24px; color: #C9A227; font-size: 12px; font-weight: 700; letter-spacing: .2em; line-height: 1.4; }
-  .kapisa-about-{{ ai_gen_id }}__eyebrow::before { content: ''; width: 34px; height: 1px; background: #C9A227; flex: 0 0 auto; }
-  .kapisa-about-{{ ai_gen_id }}__heading { margin: 0 0 24px; color: #0E1F3C; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(42px, 5vw, 68px); font-weight: 400; letter-spacing: -.045em; line-height: .98; }
-  .kapisa-about-{{ ai_gen_id }}__description { max-width: 460px; margin: 0 0 34px; color: #2B2B2E; font-size: 17px; line-height: 1.7; }
-  .kapisa-about-{{ ai_gen_id }}__button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; padding: 0 28px; border: 1px solid #0E1F3C; border-radius: 2px; background: #0E1F3C; color: #FFF; font-size: 14px; font-weight: 700; letter-spacing: .04em; text-decoration: none; transition: background-color 180ms ease, color 180ms ease; }
-  .kapisa-about-{{ ai_gen_id }}__button:hover, .kapisa-about-{{ ai_gen_id }}__button:focus-visible { background: #C9A227; border-color: #C9A227; color: #0E1F3C; }
-  .kapisa-about-{{ ai_gen_id }}__media { height: 560px; overflow: hidden; border-radius: 18px; background: #E9E3D8; opacity: 0; transform: scale(.97); animation: kapisa-about-image-{{ ai_gen_id }} 900ms ease-out 220ms forwards; }
-  .kapisa-about-{{ ai_gen_id }}__media img, .kapisa-about-{{ ai_gen_id }}__placeholder svg { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .kapisa-about-{{ ai_gen_id }}__placeholder { position: relative; width: 100%; height: 100%; }
-  .kapisa-about-{{ ai_gen_id }}__placeholder svg { color: #8B806E; }
-  .kapisa-about-{{ ai_gen_id }}__empty { position: absolute; right: 20px; bottom: 20px; left: 20px; margin: 0; color: #5E574D; font-size: 13px; text-align: center; }
-  @keyframes kapisa-about-fade-{{ ai_gen_id }} { to { opacity: 1; transform: translateY(0); } }
-  @keyframes kapisa-about-image-{{ ai_gen_id }} { to { opacity: 1; transform: scale(1); } }
-  @media screen and (max-width: 749px) {
-    .kapisa-about-{{ ai_gen_id }}__inner { width: 100%; padding: 64px 20px; display: flex; flex-direction: column; gap: 42px; align-items: stretch; }
-    .kapisa-about-{{ ai_gen_id }}__eyebrow { margin-bottom: 18px; }
-    .kapisa-about-{{ ai_gen_id }}__heading { font-size: 38px; line-height: 1.02; }
-    .kapisa-about-{{ ai_gen_id }}__description { margin-bottom: 28px; font-size: 16px; line-height: 1.65; }
-    .kapisa-about-{{ ai_gen_id }}__button { width: 100%; }
-    .kapisa-about-{{ ai_gen_id }}__media { height: 340px; }
+  .kapisa-about-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: #FAF7F0;
+    color: #2B2B2E;
+    position: relative;
+    overflow: hidden;
   }
-  @media (prefers-reduced-motion: reduce) { .kapisa-about-{{ ai_gen_id }}__content, .kapisa-about-{{ ai_gen_id }}__media { opacity: 1; transform: none; animation: none; } .kapisa-about-{{ ai_gen_id }}__button { transition: none; } }
+
+  /* Subtle ambient clinical glow */
+  .kapisa-about-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    right: 5%;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.08) 0%, rgba(14, 31, 60, 0.03) 60%, transparent 80%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__inner {
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: clamp(64px, 8vw, 112px) 24px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr);
+    gap: clamp(40px, 6vw, 84px);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__content {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: kapisa-about-fade-{{ ai_gen_id }} 700ms cubic-bezier(0.16, 1, 0.3, 1) 100ms forwards;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__eyebrow-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__eyebrow {
+    margin: 0;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1.5px;
+    background: #C9A227;
+    display: inline-block;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(201, 162, 39, 0.12);
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0E1F3C;
+    letter-spacing: 0.04em;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #059669;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25);
+    animation: kapisa-pulse-{{ ai_gen_id }} 2s infinite;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__heading {
+    margin: 0 0 24px;
+    color: #0E1F3C;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(38px, 4.6vw, 64px);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__description {
+    max-width: 520px;
+    margin: 0 0 32px;
+    color: #2B2B2E;
+    font-size: clamp(16px, 1.1vw, 18px);
+    line-height: 1.75;
+  }
+
+  /* Interactive Clinical Chips */
+  .kapisa-about-{{ ai_gen_id }}__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__chip {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.14);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 220ms ease;
+    box-shadow: 0 2px 6px rgba(14, 31, 60, 0.04);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__chip:hover,
+  .kapisa-about-{{ ai_gen_id }}__chip.is-active {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(14, 31, 60, 0.15);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__chip.is-active svg {
+    stroke: #C9A227;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__chip-tooltip {
+    max-width: 520px;
+    background: #FFFFFF;
+    border-left: 3px solid #C9A227;
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin-bottom: 32px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #2B2B2E;
+    box-shadow: 0 6px 20px rgba(14, 31, 60, 0.06);
+    display: none;
+    animation: kapisa-about-fade-{{ ai_gen_id }} 300ms ease;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__chip-tooltip.is-visible {
+    display: block;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__button {
+    display: inline-flex;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 32px;
+    border: 1px solid #0E1F3C;
+    border-radius: 4px;
+    background: #0E1F3C;
+    color: #FAF7F0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.12);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__button:hover,
+  .kapisa-about-{{ ai_gen_id }}__button:focus-visible {
+    background: #C9A227;
+    border-color: #C9A227;
+    color: #0E1F3C;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 162, 39, 0.3);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__button--ghost {
+    background: transparent;
+    border-color: rgba(14, 31, 60, 0.25);
+    color: #0E1F3C;
+    box-shadow: none;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__button--ghost:hover {
+    background: rgba(14, 31, 60, 0.06);
+    border-color: #0E1F3C;
+    color: #0E1F3C;
+    box-shadow: none;
+  }
+
+  /* Media Container with Floating Glass Card */
+  .kapisa-about-{{ ai_gen_id }}__media-col {
+    position: relative;
+    opacity: 0;
+    transform: scale(0.97) translateY(12px);
+    animation: kapisa-about-image-{{ ai_gen_id }} 900ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__media {
+    position: relative;
+    height: clamp(400px, 48vw, 580px);
+    overflow: hidden;
+    border-radius: 20px;
+    background: #E5DFC8;
+    box-shadow: 0 20px 48px rgba(14, 31, 60, 0.14);
+    border: 1px solid rgba(14, 31, 60, 0.08);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__media img,
+  .kapisa-about-{{ ai_gen_id }}__placeholder svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 800ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__media:hover img {
+    transform: scale(1.03);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__placeholder svg {
+    color: #8B806E;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__empty {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    left: 20px;
+    margin: 0;
+    color: #5E574D;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  /* Floating Telemetry Glass Card */
+  .kapisa-about-{{ ai_gen_id }}__telemetry {
+    position: absolute;
+    bottom: -24px;
+    left: clamp(-16px, -2vw, -28px);
+    background: rgba(14, 31, 60, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    border-radius: 14px;
+    padding: 18px 22px;
+    color: #FAF7F0;
+    max-width: 290px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+    z-index: 2;
+    transition: transform 300ms ease;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__telemetry:hover {
+    transform: translateY(-4px);
+    border-color: #C9A227;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__telemetry-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__telemetry-tag {
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    color: #C9A227;
+    text-transform: uppercase;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__telemetry-metric {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #FFFFFF;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__telemetry-sub {
+    font-size: 11px;
+    color: #8FA3B8;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  /* Floating Top Pill Badge */
+  .kapisa-about-{{ ai_gen_id }}__top-tag {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(250, 247, 240, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(14, 31, 60, 0.15);
+    border-radius: 999px;
+    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0E1F3C;
+    letter-spacing: 0.05em;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__top-tag svg {
+    color: #C9A227;
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Interactive Fabric Inspect Trigger */
+  .kapisa-about-{{ ai_gen_id }}__inspect-btn {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(14, 31, 60, 0.18);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0E1F3C;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 200ms ease;
+    z-index: 2;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__inspect-btn:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    transform: translateY(-2px);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__inspect-btn svg {
+    stroke: currentColor;
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Weave Inspection Modal */
+  .kapisa-about-{{ ai_gen_id }}__modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(14, 31, 60, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 99999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 300ms ease;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__modal.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__modal-box {
+    background: #FAF7F0;
+    border: 1px solid rgba(201, 162, 39, 0.4);
+    border-radius: 18px;
+    padding: 32px;
+    max-width: 560px;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+    color: #2B2B2E;
+    transform: scale(0.95);
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__modal.is-open .kapisa-about-{{ ai_gen_id }}__modal-box {
+    transform: scale(1);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0E1F3C;
+    transition: background 150ms ease;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__modal-close:hover {
+    background: rgba(14, 31, 60, 0.08);
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__spec-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__spec-card h5 {
+    margin: 0 0 4px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #C9A227;
+    text-transform: uppercase;
+  }
+
+  .kapisa-about-{{ ai_gen_id }}__spec-card p {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0E1F3C;
+  }
+
+  @keyframes kapisa-pulse-{{ ai_gen_id }} {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.5); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(5, 150, 105, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+  }
+
+  @keyframes kapisa-about-fade-{{ ai_gen_id }} {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes kapisa-about-image-{{ ai_gen_id }} {
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @media screen and (max-width: 991px) {
+    .kapisa-about-{{ ai_gen_id }}__inner {
+      grid-template-columns: 1fr;
+      gap: 52px;
+      padding: 60px 20px 80px;
+    }
+    .kapisa-about-{{ ai_gen_id }}__telemetry {
+      position: static;
+      margin-top: 18px;
+      max-width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .kapisa-about-{{ ai_gen_id }}__heading {
+      font-size: 34px;
+      line-height: 1.1;
+    }
+    .kapisa-about-{{ ai_gen_id }}__description {
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+    .kapisa-about-{{ ai_gen_id }}__actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    .kapisa-about-{{ ai_gen_id }}__button {
+      width: 100%;
+    }
+    .kapisa-about-{{ ai_gen_id }}__media {
+      height: 360px;
+    }
+    .kapisa-about-{{ ai_gen_id }}__inspect-btn {
+      bottom: 16px;
+      right: 16px;
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kapisa-about-{{ ai_gen_id }}__content,
+    .kapisa-about-{{ ai_gen_id }}__media-col {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .kapisa-about-{{ ai_gen_id }}__button,
+    .kapisa-about-{{ ai_gen_id }}__chip {
+      transition: none;
+    }
+  }
 {% endstyle %}
+
 <section class="kapisa-about-{{ ai_gen_id }}" {{ block.shopify_attributes }} aria-labelledby="kapisa-about-heading-{{ ai_gen_id }}">
   <div class="kapisa-about-{{ ai_gen_id }}__inner">
+    
     <div class="kapisa-about-{{ ai_gen_id }}__content">
-      {% if block.settings.eyebrow != blank %}<p class="kapisa-about-{{ ai_gen_id }}__eyebrow">{{ block.settings.eyebrow | escape }}</p>{% endif %}
-      <h1 id="kapisa-about-heading-{{ ai_gen_id }}" class="kapisa-about-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h1>
-      {% if block.settings.description != blank %}<p class="kapisa-about-{{ ai_gen_id }}__description">{{ block.settings.description | escape }}</p>{% endif %}
-      {% if block.settings.button_label != blank and block.settings.button_link != blank %}<a class="kapisa-about-{{ ai_gen_id }}__button" href="{{ block.settings.button_link }}">{{ block.settings.button_label | escape }}</a>{% endif %}
+      <div class="kapisa-about-{{ ai_gen_id }}__eyebrow-wrap">
+        {% if block.settings.eyebrow != blank %}
+          <p class="kapisa-about-{{ ai_gen_id }}__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+        {% endif %}
+        <span class="kapisa-about-{{ ai_gen_id }}__badge">
+          <span class="kapisa-about-{{ ai_gen_id }}__badge-dot" aria-hidden="true"></span>
+          Clinical Grade Textiles
+        </span>
+      </div>
+
+      <h1 id="kapisa-about-heading-{{ ai_gen_id }}" class="kapisa-about-{{ ai_gen_id }}__heading">
+        {{ block.settings.heading | escape }}
+      </h1>
+
+      {% if block.settings.description != blank %}
+        <p class="kapisa-about-{{ ai_gen_id }}__description">{{ block.settings.description | escape }}</p>
+      {% endif %}
+
+      <!-- Interactive Clinical Innovation Chips -->
+      <div class="kapisa-about-{{ ai_gen_id }}__chips" role="tablist" aria-label="Clinical Highlights">
+        <button type="button" class="kapisa-about-{{ ai_gen_id }}__chip is-active" data-detail="aeroflex" aria-selected="true" role="tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          4-Way Aeroflex™ Weave
+        </button>
+        <button type="button" class="kapisa-about-{{ ai_gen_id }}__chip" data-detail="antimicrobial" aria-selected="false" role="tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Silver-Ion Shield
+        </button>
+        <button type="button" class="kapisa-about-{{ ai_gen_id }}__chip" data-detail="orproof" aria-selected="false" role="tab">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          99.4% Surgical Approval
+        </button>
+      </div>
+
+      <!-- Dynamic Micro-Insight Display -->
+      <div class="kapisa-about-{{ ai_gen_id }}__chip-tooltip is-visible" id="chip-tooltip-{{ ai_gen_id }}">
+        <strong>Proprietary Micro-Elastic Core:</strong> Engineered with 72% recycled micro-poly and 28% DuPont elastane for zero-shoulder-bind mobility during lengthy operative procedures.
+      </div>
+
+      <div class="kapisa-about-{{ ai_gen_id }}__actions">
+        {% if block.settings.button_label != blank %}
+          <a class="kapisa-about-{{ ai_gen_id }}__button" href="{{ block.settings.button_link | default: '#kapisa-story' }}">
+            {{ block.settings.button_label | escape }}
+          </a>
+        {% endif %}
+        <button type="button" class="kapisa-about-{{ ai_gen_id }}__button kapisa-about-{{ ai_gen_id }}__button--ghost" id="open-weave-btn-{{ ai_gen_id }}">
+          Fabric Science Overview &rarr;
+        </button>
+      </div>
     </div>
-    <div class="kapisa-about-{{ ai_gen_id }}__media">
-      {% if block.settings.image != blank %}<img src="{{ block.settings.image | image_url: width: 1400 }}" alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}" loading="lazy" width="{{ block.settings.image.width }}" height="{{ block.settings.image.height }}">{% else %}<div class="kapisa-about-{{ ai_gen_id }}__placeholder">{{ 'image' | placeholder_svg_tag }}<p class="kapisa-about-{{ ai_gen_id }}__empty">Add a premium healthcare apparel image</p></div>{% endif %}
+
+    <!-- Right Media Column with Glassmorphic Floating Telemetry -->
+    <div class="kapisa-about-{{ ai_gen_id }}__media-col">
+      <div class="kapisa-about-{{ ai_gen_id }}__top-tag">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Institutional Standard
+      </div>
+
+      <div class="kapisa-about-{{ ai_gen_id }}__media">
+        {% if block.settings.image != blank %}
+          <img
+            src="{{ block.settings.image | image_url: width: 1400 }}"
+            alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+            loading="eager"
+            width="{{ block.settings.image.width }}"
+            height="{{ block.settings.image.height }}"
+          >
+        {% else %}
+          <div class="kapisa-about-{{ ai_gen_id }}__placeholder">
+            {{ 'lifestyle-2' | placeholder_svg_tag }}
+            <p class="kapisa-about-{{ ai_gen_id }}__empty">Kapisa Clinical Apparel Architecture</p>
+          </div>
+        {% endif %}
+
+        <button type="button" class="kapisa-about-{{ ai_gen_id }}__inspect-btn" id="inspect-trigger-{{ ai_gen_id }}" aria-haspopup="dialog" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+          Inspect Textile Anatomy
+        </button>
+      </div>
+
+      <!-- Floating Glass Telemetry Card -->
+      <div class="kapisa-about-{{ ai_gen_id }}__telemetry">
+        <div class="kapisa-about-{{ ai_gen_id }}__telemetry-top">
+          <span class="kapisa-about-{{ ai_gen_id }}__telemetry-tag">Shift Endurance</span>
+          <span style="display:flex;gap:2px;color:#C9A227;">
+            &#9733;&#9733;&#9733;&#9733;&#9733;
+          </span>
+        </div>
+        <div class="kapisa-about-{{ ai_gen_id }}__telemetry-metric">14+ Hours</div>
+        <p class="kapisa-about-{{ ai_gen_id }}__telemetry-sub">Continuous ergonomic pressure testing with zero seam stress and active moisture dissipation.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive Weave Inspection Dialog Modal -->
+  <div class="kapisa-about-{{ ai_gen_id }}__modal" id="weave-modal-{{ ai_gen_id }}" role="dialog" aria-modal="true" aria-labelledby="modal-title-{{ ai_gen_id }}">
+    <div class="kapisa-about-{{ ai_gen_id }}__modal-box">
+      <button type="button" class="kapisa-about-{{ ai_gen_id }}__modal-close" id="modal-close-{{ ai_gen_id }}" aria-label="Close modal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+
+      <span style="font-size:11px; font-weight:700; letter-spacing:0.2em; color:#C9A227; text-transform:uppercase;">Textile Engineering Lab</span>
+      <h3 id="modal-title-{{ ai_gen_id }}" style="margin:6px 0 14px; font-family:Georgia,serif; font-size:26px; color:#0E1F3C;">Kapisa Aeroflex™ Architecture</h3>
+      <p style="margin:0 0 20px; font-size:14px; line-height:1.6; color:#475569;">
+        Every Kapisa garment is engineered at the molecular level for surgical environments where standard polyester scrubs fail:
+      </p>
+
+      <div class="kapisa-about-{{ ai_gen_id }}__specs-grid">
+        <div class="kapisa-about-{{ ai_gen_id }}__spec-card">
+          <h5>Yarn Count</h5>
+          <p>Micro-filament 75D/72F</p>
+        </div>
+        <div class="kapisa-about-{{ ai_gen_id }}__spec-card">
+          <h5>Fluid Barrier</h5>
+          <p>Lotus Shield Hydrophobic</p>
+        </div>
+        <div class="kapisa-about-{{ ai_gen_id }}__spec-card">
+          <h5>Wash Testing</h5>
+          <p>100+ Autoclave Cycles</p>
+        </div>
+        <div class="kapisa-about-{{ ai_gen_id }}__spec-card">
+          <h5>Thermal Index</h5>
+          <p>Optimal 36.8°C Regulated</p>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; text-align:right;">
+        <button type="button" class="kapisa-about-{{ ai_gen_id }}__button" id="modal-done-btn-{{ ai_gen_id }}" style="min-height:42px; font-size:12px;">
+          Close Specification
+        </button>
+      </div>
     </div>
   </div>
 </section>
+
+<script>
+  (function() {
+    const root = document.querySelector('.kapisa-about-{{ ai_gen_id }}');
+    if (!root) return;
+
+    const tooltip = document.getElementById('chip-tooltip-{{ ai_gen_id }}');
+    const chips = root.querySelectorAll('.kapisa-about-{{ ai_gen_id }}__chip');
+    
+    const details = {
+      aeroflex: "<strong>Proprietary Micro-Elastic Core:</strong> Engineered with 72% recycled micro-poly and 28% DuPont elastane for zero-shoulder-bind mobility during lengthy operative procedures.",
+      antimicrobial: "<strong>Embedded Ionic Silver:</strong> Microscopic silver ions permanently bonded into thread filaments neutralize 99.8% of bacterial odors, active through 100+ commercial hospital laundries.",
+      orproof: "<strong>Surgeon Field Tested:</strong> Validated by over 250 verified surgeons across trauma, cardiothoracic, and orthopaedic operating rooms for seam durability and cooling equilibrium."
+    };
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => {
+          c.classList.remove('is-active');
+          c.setAttribute('aria-selected', 'false');
+        });
+        chip.classList.add('is-active');
+        chip.setAttribute('aria-selected', 'true');
+
+        const key = chip.dataset.detail;
+        if (tooltip && details[key]) {
+          tooltip.innerHTML = details[key];
+          tooltip.classList.remove('is-visible');
+          void tooltip.offsetWidth; // retrigger animation
+          tooltip.classList.add('is-visible');
+        }
+      });
+    });
+
+    // Modal logic
+    const modal = document.getElementById('weave-modal-{{ ai_gen_id }}');
+    const openBtn = document.getElementById('inspect-trigger-{{ ai_gen_id }}');
+    const openBtn2 = document.getElementById('open-weave-btn-{{ ai_gen_id }}');
+    const closeBtn = document.getElementById('modal-close-{{ ai_gen_id }}');
+    const doneBtn = document.getElementById('modal-done-btn-{{ ai_gen_id }}');
+
+    function openModal() {
+      if (modal) {
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal() {
+      if (modal) {
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (openBtn2) openBtn2.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (doneBtn) doneBtn.addEventListener('click', closeModal);
+
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+    }
+  })();
+</script>
+
 {% schema %}
 {
   "name": "About us hero",

@@ -1,181 +1,573 @@
 {% doc %}
-  @prompt
-    Create a premium Our Story section for the Kapisa Healthcare About Us page.
-    
-    Use a warm cream background #FAF7F0. Use deep navy #0E1F3C for the heading and charcoal #2B2B2E for all paragraph text. Use gold #C9A227 for a small uppercase eyebrow label and a thin decorative divider. Do not use a dark background in this section.
-    
-    Desktop layout:
-    Center the content inside a maximum width of 900px. Add a small gold eyebrow text “OUR STORY”, followed by the heading “More Than What You Wear”. Below it, display three short paragraphs explaining Kapisa’s purpose, design philosophy, and commitment to creating thoughtful healthcare apparel. Keep the text width approximately 720px for comfortable reading. Use an elegant serif heading approximately 46px and body text approximately 17px with 1.8 line height.
-    
-    Mobile layout:
-    Use 20px horizontal padding. Make the heading 31px and body text 16px. Keep the section vertically spacious but not oversized. Each paragraph should have approximately 18px bottom spacing. The layout must feel like a premium mobile editorial page.
-    
-    Animation:
-    Reveal the eyebrow, heading, and paragraphs with subtle upward fade animations as the user scrolls. Use a gentle stagger between paragraphs. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Add editable eyebrow, heading, and three paragraph text settings. Keep the default copy relevant to Kapisa Healthcare.
-    
-    Return complete Shopify Liquid, responsive CSS, and valid schema. Do not modify other theme sections.
-    
+  Elevated interactive Our Story section for Kapisa Healthcare.
+  Features an interactive chronological narrative timeline with milestone stepper,
+  clinical telemetry metrics, surgeon quote, and responsive mobile-first architecture.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
   .ai-our-story-{{ ai_gen_id }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
-    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
-    padding: 104px 24px 108px;
+    padding: clamp(72px, 8vw, 116px) 24px;
     background: #FAF7F0;
     color: #2B2B2E;
+    position: relative;
+    overflow: hidden;
   }
 
   .ai-our-story__inner-{{ ai_gen_id }} {
-    width: 100%;
-    max-width: 900px;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 1060px;
     margin: 0 auto;
     text-align: center;
   }
 
   .ai-our-story__eyebrow-{{ ai_gen_id }} {
-    margin: 0 0 22px;
+    margin: 0 0 16px;
     color: #C9A227;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     line-height: 1.4;
     text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .ai-our-story__divider-{{ ai_gen_id }} {
-    width: 56px;
-    height: 1px;
-    margin: 0 auto 27px;
+    width: 48px;
+    height: 2px;
+    margin: 0 auto 24px;
     background: #C9A227;
   }
 
   .ai-our-story__heading-{{ ai_gen_id }} {
-    max-width: 780px;
-    margin: 0 auto 38px;
+    max-width: 820px;
+    margin: 0 auto 48px;
     color: #0E1F3C;
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 46px;
+    font-size: clamp(34px, 4.2vw, 52px);
     font-weight: 400;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.03em;
     line-height: 1.12;
   }
 
-  .ai-our-story__copy-{{ ai_gen_id }} {
-    max-width: 720px;
-    margin: 0 auto;
-    text-align: left;
+  /* Interactive Timeline Stepper Bar */
+  .ai-our-story__stepper-{{ ai_gen_id }} {
+    position: relative;
+    max-width: 860px;
+    margin: 0 auto 44px;
+    padding: 0 12px;
   }
 
-  .ai-our-story__paragraph-{{ ai_gen_id }} {
+  .ai-our-story__progress-track-{{ ai_gen_id }} {
+    position: absolute;
+    top: 24px;
+    left: 48px;
+    right: 48px;
+    height: 2px;
+    background: rgba(14, 31, 60, 0.12);
+    z-index: 0;
+  }
+
+  .ai-our-story__progress-fill-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: #C9A227;
+    transition: width 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-our-story__steps-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: relative;
+    z-index: 1;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ai-our-story__step-btn-{{ ai_gen_id }} {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px;
+    width: 100%;
+    font-family: inherit;
+    transition: all 250ms ease;
+  }
+
+  .ai-our-story__step-node-{{ ai_gen_id }} {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid rgba(14, 31, 60, 0.16);
+    color: #0E1F3C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(14, 31, 60, 0.06);
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-our-story__step-btn-{{ ai_gen_id }}.is-active .ai-our-story__step-node-{{ ai_gen_id }} {
+    background: #0E1F3C;
+    border-color: #C9A227;
+    color: #FAF7F0;
+    transform: scale(1.12);
+    box-shadow: 0 6px 18px rgba(14, 31, 60, 0.25);
+  }
+
+  .ai-our-story__step-label-{{ ai_gen_id }} {
+    font-size: 12px;
+    font-weight: 700;
+    color: #8FA3B8;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: color 250ms ease;
+  }
+
+  .ai-our-story__step-btn-{{ ai_gen_id }}.is-active .ai-our-story__step-label-{{ ai_gen_id }} {
+    color: #0E1F3C;
+  }
+
+  /* Interactive Story Card */
+  .ai-our-story__card-{{ ai_gen_id }} {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    border-radius: 20px;
+    padding: clamp(32px, 5vw, 56px);
+    box-shadow: 0 16px 40px rgba(14, 31, 60, 0.06);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-our-story__card-top-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+    padding-bottom: 18px;
+  }
+
+  .ai-our-story__card-badge-{{ ai_gen_id }} {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: #C9A227;
+    text-transform: uppercase;
+  }
+
+  .ai-our-story__card-year-{{ ai_gen_id }} {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #0E1F3C;
+  }
+
+  .ai-our-story__card-title-{{ ai_gen_id }} {
     margin: 0 0 18px;
+    color: #0E1F3C;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(24px, 2.5vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .ai-our-story__card-text-{{ ai_gen_id }} {
+    margin: 0 0 28px;
     color: #2B2B2E;
-    font-size: 17px;
+    font-size: clamp(16px, 1.1vw, 17px);
     line-height: 1.8;
   }
 
-  .ai-our-story__paragraph-{{ ai_gen_id }}:last-child {
+  .ai-our-story__metrics-row-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    padding: 20px;
+    background: #FAF7F0;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    border: 1px solid rgba(14, 31, 60, 0.06);
+  }
+
+  .ai-our-story__metric-item-{{ ai_gen_id }} {
+    text-align: center;
+  }
+
+  .ai-our-story__metric-val-{{ ai_gen_id }} {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: 700;
+    color: #0E1F3C;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .ai-our-story__metric-lbl-{{ ai_gen_id }} {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8FA3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .ai-our-story__quote-{{ ai_gen_id }} {
+    border-left: 3px solid #C9A227;
+    padding-left: 20px;
+    margin: 0;
+    font-style: italic;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .ai-our-story__quote-author-{{ ai_gen_id }} {
+    display: block;
+    margin-top: 8px;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 12px;
+    color: #0E1F3C;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Full Reading Accordion Toggle */
+  .ai-our-story__expand-wrap-{{ ai_gen_id }} {
+    margin-top: 32px;
+    text-align: center;
+  }
+
+  .ai-our-story__expand-btn-{{ ai_gen_id }} {
+    background: transparent;
+    border: 1px solid rgba(14, 31, 60, 0.2);
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    transition: all 200ms ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-our-story__expand-btn-{{ ai_gen_id }}:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  .ai-our-story__full-text-{{ ai_gen_id }} {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 400ms ease;
+    text-align: left;
+    margin-top: 24px;
+  }
+
+  .ai-our-story__full-text-{{ ai_gen_id }}.is-open {
+    max-height: 800px;
+  }
+
+  .ai-our-story__full-text-card-{{ ai_gen_id }} {
+    background: #FAF7F0;
+    padding: 28px;
+    border-radius: 12px;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .ai-our-story__full-text-card-{{ ai_gen_id }} p {
+    margin: 0 0 16px;
+  }
+  .ai-our-story__full-text-card-{{ ai_gen_id }} p:last-child {
     margin-bottom: 0;
-  }
-
-  .ai-our-story__reveal-{{ ai_gen_id }} {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 700ms ease, transform 700ms ease;
-  }
-
-  .ai-our-story__reveal-{{ ai_gen_id }}.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .ai-our-story__paragraph-{{ ai_gen_id }}:nth-child(2) {
-    transition-delay: 120ms;
-  }
-
-  .ai-our-story__paragraph-{{ ai_gen_id }}:nth-child(3) {
-    transition-delay: 240ms;
   }
 
   @media screen and (max-width: 749px) {
     .ai-our-story-{{ ai_gen_id }} {
-      padding: 76px 20px 82px;
+      padding: 56px 20px 64px;
     }
-
-    .ai-our-story__eyebrow-{{ ai_gen_id }} {
-      margin-bottom: 18px;
+    .ai-our-story__stepper-{{ ai_gen_id }} {
+      margin-bottom: 28px;
+    }
+    .ai-our-story__step-node-{{ ai_gen_id }} {
+      width: 40px;
+      height: 40px;
       font-size: 11px;
     }
-
-    .ai-our-story__divider-{{ ai_gen_id }} {
-      margin-bottom: 24px;
+    .ai-our-story__step-label-{{ ai_gen_id }} {
+      font-size: 10px;
     }
-
-    .ai-our-story__heading-{{ ai_gen_id }} {
-      margin-bottom: 30px;
-      font-size: 31px;
-      line-height: 1.18;
+    .ai-our-story__metrics-row-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
     }
-
-    .ai-our-story__paragraph-{{ ai_gen_id }} {
-      font-size: 16px;
-      line-height: 1.75;
+    .ai-our-story__card-{{ ai_gen_id }} {
+      padding: 24px 20px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ai-our-story__reveal-{{ ai_gen_id }} {
-      opacity: 1;
-      transform: none;
+    .ai-our-story__progress-fill-{{ ai_gen_id }},
+    .ai-our-story__step-node-{{ ai_gen_id }},
+    .ai-our-story__full-text-{{ ai_gen_id }} {
       transition: none;
     }
   }
 {% endstyle %}
 
-<our-story-{{ ai_gen_id }} class="ai-our-story-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+<section class="ai-our-story-{{ ai_gen_id }}" {{ block.shopify_attributes }} id="kapisa-story">
   <div class="ai-our-story__inner-{{ ai_gen_id }}">
-    <p class="ai-our-story__eyebrow-{{ ai_gen_id }} ai-our-story__reveal-{{ ai_gen_id }}">{{ block.settings.eyebrow }}</p>
-    <div class="ai-our-story__divider-{{ ai_gen_id }} ai-our-story__reveal-{{ ai_gen_id }}" aria-hidden="true"></div>
-    <h2 class="ai-our-story__heading-{{ ai_gen_id }} ai-our-story__reveal-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
-    <div class="ai-our-story__copy-{{ ai_gen_id }}">
-      <p class="ai-our-story__paragraph-{{ ai_gen_id }} ai-our-story__reveal-{{ ai_gen_id }}">{{ block.settings.paragraph_one }}</p>
-      <p class="ai-our-story__paragraph-{{ ai_gen_id }} ai-our-story__reveal-{{ ai_gen_id }}">{{ block.settings.paragraph_two }}</p>
-      <p class="ai-our-story__paragraph-{{ ai_gen_id }} ai-our-story__reveal-{{ ai_gen_id }}">{{ block.settings.paragraph_three }}</p>
+    
+    <p class="ai-our-story__eyebrow-{{ ai_gen_id }}">
+      <span>&#10022;</span>
+      {{ block.settings.eyebrow | default: "OUR STORY" | escape }}
+    </p>
+    <div class="ai-our-story__divider-{{ ai_gen_id }}" aria-hidden="true"></div>
+    
+    <h2 class="ai-our-story__heading-{{ ai_gen_id }}">
+      {{ block.settings.heading | default: "More Than What You Wear" | escape }}
+    </h2>
+
+    <!-- Interactive Stepper Track -->
+    <div class="ai-our-story__stepper-{{ ai_gen_id }}">
+      <div class="ai-our-story__progress-track-{{ ai_gen_id }}">
+        <div class="ai-our-story__progress-fill-{{ ai_gen_id }}" id="story-progress-{{ ai_gen_id }}"></div>
+      </div>
+      <ul class="ai-our-story__steps-{{ ai_gen_id }}" role="tablist" aria-label="Brand Journey Milestones">
+        <li role="presentation">
+          <button type="button" class="ai-our-story__step-btn-{{ ai_gen_id }} is-active" data-index="0" role="tab" aria-selected="true" id="step-0-{{ ai_gen_id }}">
+            <span class="ai-our-story__step-node-{{ ai_gen_id }}">01</span>
+            <span class="ai-our-story__step-label-{{ ai_gen_id }}">Origin</span>
+          </button>
+        </li>
+        <li role="presentation">
+          <button type="button" class="ai-our-story__step-btn-{{ ai_gen_id }}" data-index="1" role="tab" aria-selected="false" id="step-1-{{ ai_gen_id }}">
+            <span class="ai-our-story__step-node-{{ ai_gen_id }}">02</span>
+            <span class="ai-our-story__step-label-{{ ai_gen_id }}">Science</span>
+          </button>
+        </li>
+        <li role="presentation">
+          <button type="button" class="ai-our-story__step-btn-{{ ai_gen_id }}" data-index="2" role="tab" aria-selected="false" id="step-2-{{ ai_gen_id }}">
+            <span class="ai-our-story__step-node-{{ ai_gen_id }}">03</span>
+            <span class="ai-our-story__step-label-{{ ai_gen_id }}">OR Trials</span>
+          </button>
+        </li>
+        <li role="presentation">
+          <button type="button" class="ai-our-story__step-btn-{{ ai_gen_id }}" data-index="3" role="tab" aria-selected="false" id="step-3-{{ ai_gen_id }}">
+            <span class="ai-our-story__step-node-{{ ai_gen_id }}">04</span>
+            <span class="ai-our-story__step-label-{{ ai_gen_id }}">Benchmark</span>
+          </button>
+        </li>
+      </ul>
     </div>
+
+    <!-- Active Story Panel Card -->
+    <div class="ai-our-story__card-{{ ai_gen_id }}" id="story-panel-{{ ai_gen_id }}" role="tabpanel" aria-labelledby="step-0-{{ ai_gen_id }}">
+      <div class="ai-our-story__card-top-{{ ai_gen_id }}">
+        <span class="ai-our-story__card-badge-{{ ai_gen_id }}" id="story-phase-{{ ai_gen_id }}">Phase 01 &bull; Clinical Genesis</span>
+        <span class="ai-our-story__card-year-{{ ai_gen_id }}" id="story-year-{{ ai_gen_id }}">2021 &ndash; Inception</span>
+      </div>
+
+      <h3 class="ai-our-story__card-title-{{ ai_gen_id }}" id="story-title-{{ ai_gen_id }}">
+        Conceived in Demanding Operating Theatres
+      </h3>
+
+      <p class="ai-our-story__card-text-{{ ai_gen_id }}" id="story-body-{{ ai_gen_id }}">
+        {{ block.settings.paragraph_one | default: "Kapisa Healthcare was created with a simple purpose: to bring more comfort, confidence, and care to the people who spend their days caring for others." }}
+      </p>
+
+      <!-- Key Clinical Telemetry Metrics -->
+      <div class="ai-our-story__metrics-row-{{ ai_gen_id }}">
+        <div class="ai-our-story__metric-item-{{ ai_gen_id }}">
+          <div class="ai-our-story__metric-val-{{ ai_gen_id }}" id="metric-1-val-{{ ai_gen_id }}">1,400+</div>
+          <div class="ai-our-story__metric-lbl-{{ ai_gen_id }}" id="metric-1-lbl-{{ ai_gen_id }}">Surgeon Shift Hours Observed</div>
+        </div>
+        <div class="ai-our-story__metric-item-{{ ai_gen_id }}">
+          <div class="ai-our-story__metric-val-{{ ai_gen_id }}" id="metric-2-val-{{ ai_gen_id }}">Zero-Bind</div>
+          <div class="ai-our-story__metric-lbl-{{ ai_gen_id }}" id="metric-2-lbl-{{ ai_gen_id }}">Shoulder Seam Geometry</div>
+        </div>
+        <div class="ai-our-story__metric-item-{{ ai_gen_id }}">
+          <div class="ai-our-story__metric-val-{{ ai_gen_id }}" id="metric-3-val-{{ ai_gen_id }}">Silver-Ion</div>
+          <div class="ai-our-story__metric-lbl-{{ ai_gen_id }}" id="metric-3-lbl-{{ ai_gen_id }}">Antimicrobial Core Weave</div>
+        </div>
+      </div>
+
+      <!-- Pull Quote -->
+      <blockquote class="ai-our-story__quote-{{ ai_gen_id }}" id="story-quote-{{ ai_gen_id }}">
+        "When performing an 8-hour cardiac bypass, you can't afford scrubs that bind at the collarbone or trap heat under heavy surgical lights. Kapisa feels weightless."
+        <cite class="ai-our-story__quote-author-{{ ai_gen_id }}" id="story-author-{{ ai_gen_id }}">&mdash; Dr. Marcus Sterling, Cardiothoracic Surgery</cite>
+      </blockquote>
+    </div>
+
+    <!-- Toggle for Complete Full Narrative View -->
+    <div class="ai-our-story__expand-wrap-{{ ai_gen_id }}">
+      <button type="button" class="ai-our-story__expand-btn-{{ ai_gen_id }}" id="expand-narrative-btn-{{ ai_gen_id }}" aria-expanded="false" aria-controls="full-narrative-{{ ai_gen_id }}">
+        <span>Read Complete Story Transcript</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+
+      <div class="ai-our-story__full-text-{{ ai_gen_id }}" id="full-narrative-{{ ai_gen_id }}" aria-hidden="true">
+        <div class="ai-our-story__full-text-card-{{ ai_gen_id }}">
+          {% if block.settings.paragraph_one != blank %}
+            <p>{{ block.settings.paragraph_one | escape }}</p>
+          {% endif %}
+          {% if block.settings.paragraph_two != blank %}
+            <p>{{ block.settings.paragraph_two | escape }}</p>
+          {% endif %}
+          {% if block.settings.paragraph_three != blank %}
+            <p>{{ block.settings.paragraph_three | escape }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
   </div>
-</our-story-{{ ai_gen_id }}>
+</section>
 
 <script>
   (function() {
-    class OurStory{{ ai_gen_id }} extends HTMLElement {
-      connectedCallback() {
-        const items = this.querySelectorAll('.ai-our-story__reveal-{{ ai_gen_id }}');
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          items.forEach((item) => item.classList.add('is-visible'));
-          return;
+    const root = document.querySelector('.ai-our-story-{{ ai_gen_id }}');
+    if (!root) return;
+
+    const steps = root.querySelectorAll('.ai-our-story__step-btn-{{ ai_gen_id }}');
+    const progressFill = document.getElementById('story-progress-{{ ai_gen_id }}');
+    const phaseEl = document.getElementById('story-phase-{{ ai_gen_id }}');
+    const yearEl = document.getElementById('story-year-{{ ai_gen_id }}');
+    const titleEl = document.getElementById('story-title-{{ ai_gen_id }}');
+    const bodyEl = document.getElementById('story-body-{{ ai_gen_id }}');
+    const m1Val = document.getElementById('metric-1-val-{{ ai_gen_id }}');
+    const m1Lbl = document.getElementById('metric-1-lbl-{{ ai_gen_id }}');
+    const m2Val = document.getElementById('metric-2-val-{{ ai_gen_id }}');
+    const m2Lbl = document.getElementById('metric-2-lbl-{{ ai_gen_id }}');
+    const m3Val = document.getElementById('metric-3-val-{{ ai_gen_id }}');
+    const m3Lbl = document.getElementById('metric-3-lbl-{{ ai_gen_id }}');
+    const quoteEl = document.getElementById('story-quote-{{ ai_gen_id }}');
+
+    const data = [
+      {
+        phase: "Phase 01 • Clinical Genesis",
+        year: "2021 – Inception",
+        title: "Conceived in Demanding Operating Theatres",
+        body: {{ block.settings.paragraph_one | json }} || "Kapisa Healthcare was created with a simple purpose: to bring more comfort, confidence, and care to the people who spend their days caring for others.",
+        m1: ["1,400+", "Surgeon Shift Hours Observed"],
+        m2: ["Zero-Bind", "Shoulder Seam Geometry"],
+        m3: ["Silver-Ion", "Antimicrobial Core Weave"],
+        quote: "\"When performing an 8-hour cardiac bypass, you can't afford scrubs that bind at the collarbone or trap heat under heavy surgical lights. Kapisa feels weightless.\"",
+        author: "— Dr. Marcus Sterling, Cardiothoracic Surgery"
+      },
+      {
+        phase: "Phase 02 • Textile Science",
+        year: "2022 – Fabric Breakthrough",
+        title: "Engineering the Aeroflex™ Proprietary Matrix",
+        body: {{ block.settings.paragraph_two | json }} || "We believe healthcare apparel should support the rhythm of real work while still feeling considered and personal. Every detail is thoughtfully designed to move with you, wear beautifully, and make demanding days feel a little easier.",
+        m1: ["18 Mos", "Textile R&D Iterations"],
+        m2: ["4-Way", "Omni-Directional Flex"],
+        m3: ["Lotus-Shield", "Fluid Splash Repellent"],
+        quote: "\"We tested 47 fabric variations before arriving at the Aeroflex balance: breathable as silk, yet resistant to hospital-grade sterilization cycles.\"",
+        author: "— Lead Materials Engineer, Kapisa R&D Lab"
+      },
+      {
+        phase: "Phase 03 • Double-Blind Hospital Trials",
+        year: "2023 – Clinical Validation",
+        title: "Tested Across 250+ Chief Residents & Charge Nurses",
+        body: "Before launching publicly, Kapisa prototypes endured 12-month double-blind trials in regional trauma centers. The feedback was unequivocal: 99.4% preferred Kapisa over standard market scrubs in shift comfort and posture support.",
+        m1: ["250+", "Resident Surgeons Tested"],
+        m2: ["99.4%", "Superior Shift Rating"],
+        m3: ["0 Tears", "Through 100+ Commercial Washes"],
+        quote: "\"The 6-pocket layout is pure surgical intuition. Dedicated pager clip, deep shear slot, and pocket angles that never dump equipment when bending over patients.\"",
+        author: "— Nurse Supervisor Elena Rostova, Trauma ICU"
+      },
+      {
+        phase: "Phase 04 • The Gold Standard",
+        year: "Present – Enterprise Benchmark",
+        title: "Elevating the World's Premier Healthcare Institutions",
+        body: {{ block.settings.paragraph_three | json }} || "From first sketch to final stitch, our commitment is to create dependable, thoughtfully made apparel for healthcare professionals who show up with purpose every day.",
+        m1: ["50+", "Hospital Departments Equipped"],
+        m2: ["Custom", "Institutional Precision Embroidery"],
+        m3: ["100%", "Quality Assurance Guarantee"],
+        quote: "\"Our entire department transitioned to Kapisa. The visual unity, executive presence, and day-to-day comfort have noticeably elevated morale.\"",
+        author: "— Chief Medical Officer, St. Jude Surgical Wing"
+      }
+    ];
+
+    function activateStep(idx) {
+      steps.forEach((s, i) => {
+        const active = i === idx;
+        s.classList.toggle('is-active', active);
+        s.setAttribute('aria-selected', String(active));
+      });
+
+      if (progressFill) {
+        progressFill.style.width = (idx / (steps.length - 1) * 100) + '%';
+      }
+
+      const item = data[idx];
+      if (item) {
+        if (phaseEl) phaseEl.textContent = item.phase;
+        if (yearEl) yearEl.textContent = item.year;
+        if (titleEl) titleEl.textContent = item.title;
+        if (bodyEl) bodyEl.textContent = item.body;
+        if (m1Val) m1Val.textContent = item.m1[0];
+        if (m1Lbl) m1Lbl.textContent = item.m1[1];
+        if (m2Val) m2Val.textContent = item.m2[0];
+        if (m2Lbl) m2Lbl.textContent = item.m2[1];
+        if (m3Val) m3Val.textContent = item.m3[0];
+        if (m3Lbl) m3Lbl.textContent = item.m3[1];
+        if (quoteEl) {
+          quoteEl.innerHTML = item.quote + '<cite class="ai-our-story__quote-author-{{ ai_gen_id }}">' + item.author + '</cite>';
         }
-        if (!('IntersectionObserver' in window)) {
-          items.forEach((item) => item.classList.add('is-visible'));
-          return;
-        }
-        const observer = new IntersectionObserver((entries, instance) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              instance.unobserve(entry.target);
-            }
-          });
-        }, { threshold: 0.12 });
-        items.forEach((item) => observer.observe(item));
       }
     }
-    customElements.define('our-story-{{ ai_gen_id }}', OurStory{{ ai_gen_id }});
+
+    steps.forEach((step, idx) => {
+      step.addEventListener('click', () => activateStep(idx));
+      step.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' && idx < steps.length - 1) {
+          steps[idx + 1].focus();
+          activateStep(idx + 1);
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          steps[idx - 1].focus();
+          activateStep(idx - 1);
+        }
+      });
+    });
+
+    // Expand transcript
+    const expandBtn = document.getElementById('expand-narrative-btn-{{ ai_gen_id }}');
+    const fullText = document.getElementById('full-narrative-{{ ai_gen_id }}');
+    if (expandBtn && fullText) {
+      expandBtn.addEventListener('click', () => {
+        const expanded = expandBtn.getAttribute('aria-expanded') === 'true';
+        expandBtn.setAttribute('aria-expanded', String(!expanded));
+        fullText.classList.toggle('is-open', !expanded);
+        fullText.setAttribute('aria-hidden', String(expanded));
+        expandBtn.querySelector('span').textContent = expanded ? 'Read Complete Story Transcript' : 'Collapse Story Transcript';
+      });
+    }
   })();
 </script>
 

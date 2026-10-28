@@ -1,48 +1,62 @@
 {% doc %}
-  @prompt
-    Create a premium final CTA for the Kapisa Healthcare Contact Us page.
-    
-    Use deep navy #0E1F3C as the background. Use warm cream #FAF7F0 for the heading and description. Use gold #C9A227 for a thin decorative accent.
-    
-    Desktop: center everything inside 850px. Use a 42px elegant serif heading “Explore Kapisa”. Add a short description and a cream button labeled “Shop All Scrubs”. Use approximately 90px vertical padding.
-    
-    Mobile: use 20px horizontal padding, 30px heading, 16px description, and a full-width 52px-high button. Use approximately 60px vertical padding.
-    
-    Add subtle fade-up animation and a gentle button press effect. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Make heading, description, button text, and button link editable. Default link should be `/collections/all`.
-    
-    Return complete Shopify Liquid, responsive CSS, accessible HTML, and valid schema.
-    
+  Elevated final Call-to-Action for the Kapisa Healthcare Contact Us page.
+  Features deep navy luxury background, dual interactive buttons,
+  clinical assurance badges, and responsive native-app mobile layout.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% assign cta_link = block.settings.button_link | default: '/collections/all' %}
 
 {% style %}
   .ai-final-cta-{{ ai_gen_id }} {
     display: block;
-    width: {{ block.settings.desktop_width_percent }}%;
-    max-width: 100%;
+    width: 100%;
     box-sizing: border-box;
-    padding: 90px 24px;
+    padding: clamp(72px, 8vw, 108px) 24px;
     background: #0E1F3C;
     color: #FAF7F0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle ambient radial glow */
+  .ai-final-cta-{{ ai_gen_id }}::before {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
   }
 
   .ai-final-cta__content-{{ ai_gen_id }} {
-    width: 100%;
-    max-width: 850px;
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 880px;
     margin: 0 auto;
     text-align: center;
-    opacity: 0;
-    transform: translateY(18px);
-    animation: ai-final-cta-fade-up-{{ ai_gen_id }} 700ms ease-out 100ms forwards;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ai-final-cta__eyebrow-{{ ai_gen_id }} {
+    margin: 0 0 16px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .ai-final-cta__accent-{{ ai_gen_id }} {
-    width: 56px;
+    width: 48px;
     height: 2px;
-    margin: 0 auto 26px;
+    margin: 0 auto 24px;
     background: #C9A227;
   }
 
@@ -50,7 +64,7 @@
     margin: 0;
     color: #FAF7F0;
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 42px;
+    font-size: clamp(34px, 4.2vw, 48px);
     line-height: 1.15;
     font-weight: 400;
     letter-spacing: -0.02em;
@@ -58,10 +72,19 @@
 
   .ai-final-cta__description-{{ ai_gen_id }} {
     max-width: 620px;
-    margin: 18px auto 32px;
-    color: #FAF7F0;
-    font-size: 18px;
-    line-height: 1.6;
+    margin: 18px auto 36px;
+    color: rgba(250, 247, 240, 0.85);
+    font-size: clamp(16px, 1.1vw, 18px);
+    line-height: 1.65;
+  }
+
+  .ai-final-cta__buttons-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
   }
 
   .ai-final-cta__button-{{ ai_gen_id }} {
@@ -69,72 +92,133 @@
     min-height: 52px;
     align-items: center;
     justify-content: center;
-    padding: 14px 30px;
+    padding: 0 34px;
     border: 1px solid #FAF7F0;
-    border-radius: {{ block.settings.button_radius }}px;
+    border-radius: {{ block.settings.button_radius | default: 4 }}px;
     background: #FAF7F0;
     color: #0E1F3C;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    line-height: 1.2;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     text-align: center;
     text-decoration: none;
-    transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+    transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
 
-  .ai-final-cta__button-{{ ai_gen_id }}:hover {
+  .ai-final-cta__button-{{ ai_gen_id }}:hover,
+  .ai-final-cta__button-{{ ai_gen_id }}:focus-visible {
     background: #C9A227;
     border-color: #C9A227;
     color: #0E1F3C;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201, 162, 39, 0.4);
   }
 
-  .ai-final-cta__button-{{ ai_gen_id }}:active {
-    transform: translateY(2px);
+  .ai-final-cta__button--secondary-{{ ai_gen_id }} {
+    background: transparent;
+    border-color: rgba(250, 247, 240, 0.35);
+    color: #FAF7F0;
+    box-shadow: none;
   }
 
-  .ai-final-cta__button-{{ ai_gen_id }}:focus-visible {
-    outline: 3px solid #C9A227;
-    outline-offset: 4px;
+  .ai-final-cta__button--secondary-{{ ai_gen_id }}:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #FAF7F0;
+    color: #FAF7F0;
+    box-shadow: none;
   }
 
-  @keyframes ai-final-cta-fade-up-{{ ai_gen_id }} {
-    from { opacity: 0; transform: translateY(18px); }
-    to { opacity: 1; transform: translateY(0); }
+  .ai-final-cta__badges-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(16px, 3vw, 36px);
+    flex-wrap: wrap;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .ai-final-cta__badge-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(250, 247, 240, 0.8);
+    letter-spacing: 0.04em;
+  }
+
+  .ai-final-cta__badge-{{ ai_gen_id }} svg {
+    color: #C9A227;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
   }
 
   @media screen and (max-width: 749px) {
-    .ai-final-cta-{{ ai_gen_id }} { padding: 60px 20px; }
-    .ai-final-cta__heading-{{ ai_gen_id }} { font-size: 30px; }
-    .ai-final-cta__description-{{ ai_gen_id }} {
-      margin: 16px auto 26px;
-      font-size: 16px;
+    .ai-final-cta-{{ ai_gen_id }} { padding: 56px 20px 64px; }
+    .ai-final-cta__heading-{{ ai_gen_id }} { font-size: 32px; }
+    .ai-final-cta__buttons-{{ ai_gen_id }} {
+      flex-direction: column;
+      width: 100%;
     }
     .ai-final-cta__button-{{ ai_gen_id }} {
       width: 100%;
-      min-height: 52px;
+    }
+    .ai-final-cta__badges-{{ ai_gen_id }} {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+      max-width: 280px;
+      margin: 0 auto;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ai-final-cta__content-{{ ai_gen_id }} {
-      opacity: 1;
-      transform: none;
-      animation: none;
-    }
-    .ai-final-cta__button-{{ ai_gen_id }} { transition: none; }
+    .ai-final-cta__button-{{ ai_gen_id }} { transition: none !important; transform: none !important; }
   }
 {% endstyle %}
 
 <div class="ai-final-cta-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-final-cta__content-{{ ai_gen_id }}">
+    
+    <div class="ai-final-cta__eyebrow-{{ ai_gen_id }}">
+      <span>&#10022;</span>
+      Ready for Clinical Excellence
+    </div>
+
     <div class="ai-final-cta__accent-{{ ai_gen_id }}" aria-hidden="true"></div>
-    <h2 class="ai-final-cta__heading-{{ ai_gen_id }}">{{ block.settings.heading | escape }}</h2>
-    <p class="ai-final-cta__description-{{ ai_gen_id }}">{{ block.settings.description | escape | newline_to_br }}</p>
-    {% if block.settings.button_link != blank %}
-      <a class="ai-final-cta__button-{{ ai_gen_id }}" href="{{ block.settings.button_link }}">
-        {{ block.settings.button_text | escape }}
+    
+    <h2 class="ai-final-cta__heading-{{ ai_gen_id }}">{{ block.settings.heading | default: "Explore Kapisa" | escape }}</h2>
+    
+    <p class="ai-final-cta__description-{{ ai_gen_id }}">{{ block.settings.description | default: "Discover thoughtfully designed healthcare apparel made to support your everyday work." | escape | newline_to_br }}</p>
+    
+    <div class="ai-final-cta__buttons-{{ ai_gen_id }}">
+      <a class="ai-final-cta__button-{{ ai_gen_id }}" href="{{ cta_link }}">
+        {{ block.settings.button_text | default: "Shop All Scrubs" | escape }}
       </a>
-    {% endif %}
+      <a class="ai-final-cta__button-{{ ai_gen_id }} ai-final-cta__button--secondary-{{ ai_gen_id }}" href="#ContactForm">
+        Message Concierge &rarr;
+      </a>
+    </div>
+
+    <div class="ai-final-cta__badges-{{ ai_gen_id }}">
+      <div class="ai-final-cta__badge-{{ ai_gen_id }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        30-Day Clinical Wear Guarantee
+      </div>
+      <div class="ai-final-cta__badge-{{ ai_gen_id }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        Sample Swatches for Institutions
+      </div>
+      <div class="ai-final-cta__badge-{{ ai_gen_id }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Expedited Surgical Logistics
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -184,7 +268,7 @@
       "max": 20,
       "step": 2,
       "unit": "px",
-      "default": 0
+      "default": 4
     }
   ],
   "presets": [{ "name": "Final CTA" }],

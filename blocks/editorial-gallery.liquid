@@ -1,42 +1,456 @@
 {% doc %}
-  @prompt
-    Create a premium editorial image gallery section for the Kapisa Healthcare About Us page.
-    
-    Use warm cream #FAF7F0 as the section background. Use deep navy #0E1F3C for the heading. Use gold #C9A227 for a small decorative accent. Use 16px rounded corners on all images.
-    
-    Desktop layout:
-    Place the section inside a maximum width of 1200px. Add a heading “The Kapisa Perspective” approximately 42px. Below it, create an asymmetric gallery with one large image on the left and two smaller images stacked on the right. The large image should be approximately 500px tall. The two smaller images should each be approximately 240px tall. Use object-fit cover while preserving a premium editorial composition.
-    
-    Mobile layout:
-    Use 20px horizontal padding. Display the images in a horizontal swipeable carousel. Each image should be approximately 82vw wide and 300px tall. Add scroll-snap behavior so the gallery feels like a native mobile app. Do not create horizontal page overflow.
-    
-    Animation:
-    Images should gently fade in on scroll. Add a subtle image zoom on desktop hover. Respect reduced-motion preferences.
-    
-    Shopify settings:
-    Add a heading setting and three image picker blocks. Each block must include an image picker, alt text, and optional caption. Allow merchants to add or remove images.
-    
-    Return complete Shopify Liquid with responsive CSS and valid schema. Do not hardcode image URLs.
-    
+  Elevated editorial gallery for Kapisa Healthcare About Us page.
+  Features asymmetric editorial layout, interactive perspective tags,
+  full-screen lightbox spotlight preview modal, mobile swipe-snap carousel, and accessible keyboard navigation.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
 {% style %}
-  .ai-editorial-gallery-{{ ai_gen_id }}{display:block;width:100%;background:#FAF7F0;color:#0E1F3C;padding:72px 20px}
-  .ai-editorial-gallery-{{ ai_gen_id }}__inner{width:{{ block.settings.desktop_width_percent }}%;max-width:1200px;margin:0 auto}
-  .ai-editorial-gallery-{{ ai_gen_id }}__heading{margin:0 0 34px;color:#0E1F3C;font-size:42px;line-height:1.08;letter-spacing:-.025em;font-weight:600}
-  .ai-editorial-gallery-{{ ai_gen_id }}__accent{display:block;width:48px;height:3px;margin-bottom:18px;background:#C9A227}
-  .ai-editorial-gallery-{{ ai_gen_id }}__grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:20px}
-  .ai-editorial-gallery-{{ ai_gen_id }}__item{position:relative;min-width:0;overflow:hidden;border-radius:16px;background:#ebe5d9;opacity:0;transform:translateY(18px);transition:opacity 700ms ease,transform 700ms ease}
-  .ai-editorial-gallery-{{ ai_gen_id }}__item.is-visible{opacity:1;transform:translateY(0)}
-  .ai-editorial-gallery-{{ ai_gen_id }}__item--large{height:500px}.ai-editorial-gallery-{{ ai_gen_id }}__item--small{height:240px}
-  .ai-editorial-gallery-{{ ai_gen_id }}__stack{display:grid;grid-template-rows:repeat(2,1fr);gap:20px}
-  .ai-editorial-gallery-{{ ai_gen_id }}__image,.ai-editorial-gallery-{{ ai_gen_id }}__placeholder{display:block;width:100%;height:100%;object-fit:cover;transition:transform 600ms ease}
-  .ai-editorial-gallery-{{ ai_gen_id }}__item:hover .ai-editorial-gallery-{{ ai_gen_id }}__image{transform:scale(1.035)}
-  .ai-editorial-gallery-{{ ai_gen_id }}__placeholder svg{width:100%;height:100%;color:#8b8374}
-  .ai-editorial-gallery-{{ ai_gen_id }}__caption{position:absolute;right:16px;bottom:14px;left:16px;margin:0;color:#FFF;font-size:14px;line-height:1.35;text-shadow:0 1px 4px rgba(14,31,60,.7)}
-  @media screen and (max-width:749px){.ai-editorial-gallery-{{ ai_gen_id }}{padding:52px 20px;overflow:hidden}.ai-editorial-gallery-{{ ai_gen_id }}__inner{width:100%}.ai-editorial-gallery-{{ ai_gen_id }}__heading{margin-bottom:28px;font-size:34px}.ai-editorial-gallery-{{ ai_gen_id }}__grid{display:flex;gap:14px;width:calc(100vw - 20px);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding-right:20px}.ai-editorial-gallery-{{ ai_gen_id }}__grid::-webkit-scrollbar{display:none}.ai-editorial-gallery-{{ ai_gen_id }}__stack{display:contents}.ai-editorial-gallery-{{ ai_gen_id }}__item,.ai-editorial-gallery-{{ ai_gen_id }}__item--large,.ai-editorial-gallery-{{ ai_gen_id }}__item--small{flex:0 0 82vw;height:300px;scroll-snap-align:start}}
-  @media (prefers-reduced-motion:reduce){.ai-editorial-gallery-{{ ai_gen_id }}__item,.ai-editorial-gallery-{{ ai_gen_id }}__image{transition:none;transform:none}}
+  .ai-editorial-gallery-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: #FAF7F0;
+    color: #0E1F3C;
+    padding: clamp(64px, 7vw, 100px) 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__inner {
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 1240px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: clamp(32px, 4vw, 48px);
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__accent {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__accent::before {
+    content: '';
+    width: 28px;
+    height: 1.5px;
+    background: #C9A227;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__heading {
+    margin: 0;
+    color: #0E1F3C;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(34px, 4.2vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    font-weight: 400;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__sub {
+    color: #475569;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  /* Gallery Grid */
+  .ai-editorial-gallery-{{ ai_gen_id }}__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 24px;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__item {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #E8E2D5;
+    box-shadow: 0 8px 24px rgba(14, 31, 60, 0.08);
+    cursor: pointer;
+    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms ease;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 48px rgba(14, 31, 60, 0.16);
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__item--large {
+    height: 540px;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__stack {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__item--small {
+    height: 258px;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__image,
+  .ai-editorial-gallery-{{ ai_gen_id }}__placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__item:hover .ai-editorial-gallery-{{ ai_gen_id }}__image {
+    transform: scale(1.04);
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__placeholder svg {
+    width: 100%;
+    height: 100%;
+    color: #8B8374;
+  }
+
+  /* Editorial Tag Pill */
+  .ai-editorial-gallery-{{ ai_gen_id }}__tag {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    background: rgba(14, 31, 60, 0.85);
+    backdrop-filter: blur(8px);
+    color: #FAF7F0;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 2;
+    border: 1px solid rgba(201, 162, 39, 0.3);
+  }
+
+  /* Zoom Icon Pill */
+  .ai-editorial-gallery-{{ ai_gen_id }}__zoom-pill {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0E1F3C;
+    z-index: 2;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: all 250ms ease;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__item:hover .ai-editorial-gallery-{{ ai_gen_id }}__zoom-pill {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(14, 31, 60, 0.8) 0%, rgba(14, 31, 60, 0.1) 45%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__caption {
+    position: absolute;
+    right: 20px;
+    bottom: 18px;
+    left: 20px;
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+    z-index: 2;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Lightbox Modal */
+  .ai-editorial-gallery-{{ ai_gen_id }}__lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(14, 31, 60, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 250ms ease;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__lightbox-inner {
+    max-width: 900px;
+    max-height: 85vh;
+    position: relative;
+    text-align: center;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__lightbox-img {
+    max-width: 100%;
+    max-height: 75vh;
+    border-radius: 14px;
+    object-fit: contain;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__lightbox-cap {
+    color: #FAF7F0;
+    font-size: 16px;
+    margin-top: 14px;
+    font-weight: 500;
+  }
+
+  .ai-editorial-gallery-{{ ai_gen_id }}__lightbox-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    background: transparent;
+    border: none;
+    color: #FAF7F0;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-editorial-gallery-{{ ai_gen_id }} {
+      padding: 52px 20px 60px;
+    }
+    .ai-editorial-gallery-{{ ai_gen_id }}__grid {
+      display: flex;
+      gap: 16px;
+      width: calc(100vw - 20px);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding-right: 20px;
+    }
+    .ai-editorial-gallery-{{ ai_gen_id }}__grid::-webkit-scrollbar {
+      display: none;
+    }
+    .ai-editorial-gallery-{{ ai_gen_id }}__stack {
+      display: contents;
+    }
+    .ai-editorial-gallery-{{ ai_gen_id }}__item,
+    .ai-editorial-gallery-{{ ai_gen_id }}__item--large,
+    .ai-editorial-gallery-{{ ai_gen_id }}__item--small {
+      flex: 0 0 84vw;
+      height: 340px;
+      scroll-snap-align: start;
+    }
+    .ai-editorial-gallery-{{ ai_gen_id }}__zoom-pill {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-editorial-gallery-{{ ai_gen_id }}__item,
+    .ai-editorial-gallery-{{ ai_gen_id }}__image {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
 {% endstyle %}
-<editorial-gallery-{{ ai_gen_id }} class="ai-editorial-gallery-{{ ai_gen_id }}" {{ block.shopify_attributes }}><div class="ai-editorial-gallery-{{ ai_gen_id }}__inner"><span class="ai-editorial-gallery-{{ ai_gen_id }}__accent" aria-hidden="true"></span>{% if block.settings.heading != blank %}<h2 class="ai-editorial-gallery-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>{% endif %}<div class="ai-editorial-gallery-{{ ai_gen_id }}__grid">{% for item_number in (1..3) %}{% assign image_key='image_' | append:item_number %}{% assign alt_key='alt_' | append:item_number %}{% assign caption_key='caption_' | append:item_number %}{% assign image=block.settings[image_key] %}<figure class="ai-editorial-gallery-{{ ai_gen_id }}__item {% if forloop.first %}ai-editorial-gallery-{{ ai_gen_id }}__item--large{% else %}ai-editorial-gallery-{{ ai_gen_id }}__item--small{% endif %}">{% if image != blank %}<img class="ai-editorial-gallery-{{ ai_gen_id }}__image" src="{{ image | image_url: width: 1600 }}" alt="{{ block.settings[alt_key] | default: image.alt | escape }}" loading="lazy" width="{{ image.width }}" height="{{ image.height }}">{% else %}<div class="ai-editorial-gallery-{{ ai_gen_id }}__placeholder">{{ 'image' | placeholder_svg_tag }}</div>{% endif %}{% if block.settings[caption_key] != blank %}<figcaption class="ai-editorial-gallery-{{ ai_gen_id }}__caption">{{ block.settings[caption_key] | escape }}</figcaption>{% endif %}</figure>{% endfor %}</div></div></editorial-gallery-{{ ai_gen_id }}>
-<script>(function(){class EditorialGallery{{ ai_gen_id }} extends HTMLElement{connectedCallback(){const items=this.querySelectorAll('.ai-editorial-gallery-{{ ai_gen_id }}__item');if(!('IntersectionObserver' in window)){items.forEach((item)=>item.classList.add('is-visible'));return}const observer=new IntersectionObserver((entries,currentObserver)=>{entries.forEach((entry)=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');currentObserver.unobserve(entry.target)}})},{threshold:.12});items.forEach((item)=>observer.observe(item))}}if(!customElements.get('editorial-gallery-{{ ai_gen_id }}'))customElements.define('editorial-gallery-{{ ai_gen_id }}',EditorialGallery{{ ai_gen_id }})})();</script>
-{% schema %}{"name":"Editorial image gallery","settings":[{"type":"text","id":"heading","label":"Heading","default":"The Kapisa Perspective"},{"type":"range","id":"desktop_width_percent","label":"Desktop width","min":50,"max":100,"step":5,"unit":"%","default":100},{"type":"header","content":"Large image"},{"type":"image_picker","id":"image_1","label":"Image"},{"type":"text","id":"alt_1","label":"Alt text"},{"type":"text","id":"caption_1","label":"Caption"},{"type":"header","content":"Small image one"},{"type":"image_picker","id":"image_2","label":"Image"},{"type":"text","id":"alt_2","label":"Alt text"},{"type":"text","id":"caption_2","label":"Caption"},{"type":"header","content":"Small image two"},{"type":"image_picker","id":"image_3","label":"Image"},{"type":"text","id":"alt_3","label":"Alt text"},{"type":"text","id":"caption_3","label":"Caption"}],"presets":[{"name":"Editorial image gallery"}],"tag":null,"class":"editorial-gallery-block"}{% endschema %}
+
+<editorial-gallery-{{ ai_gen_id }} class="ai-editorial-gallery-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-editorial-gallery-{{ ai_gen_id }}__inner">
+    
+    <div class="ai-editorial-gallery-{{ ai_gen_id }}__header">
+      <div>
+        <div class="ai-editorial-gallery-{{ ai_gen_id }}__accent">Visual Editorial</div>
+        {% if block.settings.heading != blank %}
+          <h2 class="ai-editorial-gallery-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
+        {% endif %}
+        <p class="ai-editorial-gallery-{{ ai_gen_id }}__sub">Captured across active surgical suites, ward rounds, and textile micro-laboratories.</p>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#C9A227; letter-spacing:0.1em; text-transform:uppercase;">
+        Tap image for high-res view &rarr;
+      </div>
+    </div>
+
+    <div class="ai-editorial-gallery-{{ ai_gen_id }}__grid">
+      
+      <!-- Large Image Item 1 -->
+      {% assign image_1 = block.settings.image_1 %}
+      <figure class="ai-editorial-gallery-{{ ai_gen_id }}__item ai-editorial-gallery-{{ ai_gen_id }}__item--large" data-index="1" tabindex="0">
+        <span class="ai-editorial-gallery-{{ ai_gen_id }}__tag">01 &bull; Surgical Routine</span>
+        <div class="ai-editorial-gallery-{{ ai_gen_id }}__zoom-pill" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+        </div>
+        {% if image_1 != blank %}
+          <img class="ai-editorial-gallery-{{ ai_gen_id }}__image" src="{{ image_1 | image_url: width: 1400 }}" alt="{{ block.settings.alt_1 | default: image_1.alt | escape }}" loading="lazy" width="{{ image_1.width }}" height="{{ image_1.height }}">
+        {% else %}
+          <div class="ai-editorial-gallery-{{ ai_gen_id }}__placeholder">{{ 'lifestyle-1' | placeholder_svg_tag }}</div>
+        {% endif %}
+        <div class="ai-editorial-gallery-{{ ai_gen_id }}__overlay"></div>
+        {% if block.settings.caption_1 != blank %}
+          <figcaption class="ai-editorial-gallery-{{ ai_gen_id }}__caption">{{ block.settings.caption_1 | escape }}</figcaption>
+        {% endif %}
+      </figure>
+
+      <!-- Stacked Items 2 & 3 -->
+      <div class="ai-editorial-gallery-{{ ai_gen_id }}__stack">
+        
+        <!-- Image Item 2 -->
+        {% assign image_2 = block.settings.image_2 %}
+        <figure class="ai-editorial-gallery-{{ ai_gen_id }}__item ai-editorial-gallery-{{ ai_gen_id }}__item--small" data-index="2" tabindex="0">
+          <span class="ai-editorial-gallery-{{ ai_gen_id }}__tag">02 &bull; Active Ergonomics</span>
+          <div class="ai-editorial-gallery-{{ ai_gen_id }}__zoom-pill" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+          </div>
+          {% if image_2 != blank %}
+            <img class="ai-editorial-gallery-{{ ai_gen_id }}__image" src="{{ image_2 | image_url: width: 900 }}" alt="{{ block.settings.alt_2 | default: image_2.alt | escape }}" loading="lazy" width="{{ image_2.width }}" height="{{ image_2.height }}">
+          {% else %}
+            <div class="ai-editorial-gallery-{{ ai_gen_id }}__placeholder">{{ 'image' | placeholder_svg_tag }}</div>
+          {% endif %}
+          <div class="ai-editorial-gallery-{{ ai_gen_id }}__overlay"></div>
+          {% if block.settings.caption_2 != blank %}
+            <figcaption class="ai-editorial-gallery-{{ ai_gen_id }}__caption">{{ block.settings.caption_2 | escape }}</figcaption>
+          {% endif %}
+        </figure>
+
+        <!-- Image Item 3 -->
+        {% assign image_3 = block.settings.image_3 %}
+        <figure class="ai-editorial-gallery-{{ ai_gen_id }}__item ai-editorial-gallery-{{ ai_gen_id }}__item--small" data-index="3" tabindex="0">
+          <span class="ai-editorial-gallery-{{ ai_gen_id }}__tag">03 &bull; Textile Anatomy</span>
+          <div class="ai-editorial-gallery-{{ ai_gen_id }}__zoom-pill" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>
+          </div>
+          {% if image_3 != blank %}
+            <img class="ai-editorial-gallery-{{ ai_gen_id }}__image" src="{{ image_3 | image_url: width: 900 }}" alt="{{ block.settings.alt_3 | default: image_3.alt | escape }}" loading="lazy" width="{{ image_3.width }}" height="{{ image_3.height }}">
+          {% else %}
+            <div class="ai-editorial-gallery-{{ ai_gen_id }}__placeholder">{{ 'collection-1' | placeholder_svg_tag }}</div>
+          {% endif %}
+          <div class="ai-editorial-gallery-{{ ai_gen_id }}__overlay"></div>
+          {% if block.settings.caption_3 != blank %}
+            <figcaption class="ai-editorial-gallery-{{ ai_gen_id }}__caption">{{ block.settings.caption_3 | escape }}</figcaption>
+          {% endif %}
+        </figure>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="ai-editorial-gallery-{{ ai_gen_id }}__lightbox" id="lightbox-{{ ai_gen_id }}" role="dialog" aria-modal="true" aria-label="Image Lightbox">
+    <div class="ai-editorial-gallery-{{ ai_gen_id }}__lightbox-inner">
+      <button type="button" class="ai-editorial-gallery-{{ ai_gen_id }}__lightbox-close" id="lightbox-close-{{ ai_gen_id }}" aria-label="Close image preview">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" alt="" width="1200" height="900" class="ai-editorial-gallery-{{ ai_gen_id }}__lightbox-img" id="lightbox-img-{{ ai_gen_id }}">
+      <p class="ai-editorial-gallery-{{ ai_gen_id }}__lightbox-cap" id="lightbox-cap-{{ ai_gen_id }}"></p>
+    </div>
+  </div>
+</editorial-gallery-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    const root = document.querySelector('.ai-editorial-gallery-{{ ai_gen_id }}');
+    if (!root) return;
+
+    const items = root.querySelectorAll('.ai-editorial-gallery-{{ ai_gen_id }}__item');
+    const lightbox = document.getElementById('lightbox-{{ ai_gen_id }}');
+    const lightboxImg = document.getElementById('lightbox-img-{{ ai_gen_id }}');
+    const lightboxCap = document.getElementById('lightbox-cap-{{ ai_gen_id }}');
+    const closeBtn = document.getElementById('lightbox-close-{{ ai_gen_id }}');
+
+    function openLightbox(item) {
+      const img = item.querySelector('.ai-editorial-gallery-{{ ai_gen_id }}__image');
+      const cap = item.querySelector('.ai-editorial-gallery-{{ ai_gen_id }}__caption');
+      if (img && lightbox && lightboxImg) {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt || '';
+        if (lightboxCap) lightboxCap.textContent = cap ? cap.textContent : '';
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeLightbox() {
+      if (lightbox) {
+        lightbox.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+    }
+
+    items.forEach(item => {
+      item.addEventListener('click', () => openLightbox(item));
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLightbox(item);
+        }
+      });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (lightbox) {
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('is-open')) closeLightbox();
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Editorial image gallery",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "The Kapisa Perspective" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "header", "content": "Large image" },
+    { "type": "image_picker", "id": "image_1", "label": "Image" },
+    { "type": "text", "id": "alt_1", "label": "Alt text" },
+    { "type": "text", "id": "caption_1", "label": "Caption" },
+    { "type": "header", "content": "Small image one" },
+    { "type": "image_picker", "id": "image_2", "label": "Image" },
+    { "type": "text", "id": "alt_2", "label": "Alt text" },
+    { "type": "text", "id": "caption_2", "label": "Caption" },
+    { "type": "header", "content": "Small image two" },
+    { "type": "image_picker", "id": "image_3", "label": "Image" },
+    { "type": "text", "id": "alt_3", "label": "Alt text" },
+    { "type": "text", "id": "caption_3", "label": "Caption" }
+  ],
+  "presets": [{ "name": "Editorial image gallery" }],
+  "tag": null,
+  "class": "editorial-gallery-block"
+}
+{% endschema %}

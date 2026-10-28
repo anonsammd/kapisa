@@ -1,53 +1,359 @@
 {% doc %}
-  @prompt
-    Create a clean Helpful Information section for the Kapisa Healthcare Contact Us page.
-    
-    Use soft blue-gray #F0F4F7 as the background. Use deep navy #0E1F3C for headings and charcoal #2B2B2E for text. Use gold #C9A227 for small accents.
-    
-    Create a compact accordion containing useful information such as:
-    
-    * Order Support
-    * Sizing Help
-    * Shipping Questions
-    * Bulk / Business Enquiries
-    
-    Desktop: maximum width 850px with clean horizontal rows and subtle borders.
-    
-    Mobile: use 20px horizontal padding. Make every row at least 58px tall with large tap-friendly areas. Use smooth expand/collapse animation and a clear plus/minus indicator.
-    
-    Shopify settings:
-    Create editable FAQ blocks with question and answer fields. Allow merchants to add, remove, and reorder questions.
-    
-    Do not create a contact form.
-    
-    Return complete Shopify Liquid, responsive CSS, accessible HTML, JavaScript if necessary, and valid schema.
-    
+  Elevated Helpful Information FAQ accordion for Kapisa Healthcare Contact Us page.
+  Features real-time interactive FAQ search input, category filter chips,
+  smooth accessible accordion animations, helpfulness feedback triggers, and concierge contact card.
 {% enddoc %}
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 
 {% style %}
-  .ai-helpful-info-{{ ai_gen_id }} { display: block; width: 100%; background: #F0F4F7; color: #2B2B2E; padding: 56px 20px; }
-  .ai-helpful-info-{{ ai_gen_id }}__inner { width: {{ block.settings.desktop_width_percent }}%; max-width: 850px; margin: 0 auto; }
-  .ai-helpful-info-{{ ai_gen_id }}__heading { margin: 0 0 24px; color: #0E1F3C; font-size: 30px; line-height: 1.2; text-align: {{ block.settings.heading_alignment }}; }
-  .ai-helpful-info-{{ ai_gen_id }}__list { border-top: 1px solid rgba(14,31,60,.2); }
-  .ai-helpful-info-{{ ai_gen_id }}__item { border-bottom: 1px solid rgba(14,31,60,.2); }
-  .ai-helpful-info-{{ ai_gen_id }}__trigger { width: 100%; min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 16px 0; border: 0; background: transparent; color: #0E1F3C; font: inherit; font-weight: 600; font-size: 17px; line-height: 1.35; text-align: left; cursor: pointer; }
-  .ai-helpful-info-{{ ai_gen_id }}__trigger:focus-visible { outline: 3px solid #C9A227; outline-offset: 3px; }
-  .ai-helpful-info-{{ ai_gen_id }}__icon { position: relative; flex: 0 0 18px; width: 18px; height: 18px; color: #C9A227; }
-  .ai-helpful-info-{{ ai_gen_id }}__icon::before, .ai-helpful-info-{{ ai_gen_id }}__icon::after { content: ''; position: absolute; top: 50%; left: 50%; width: 16px; height: 2px; background: currentColor; transform: translate(-50%,-50%); }
-  .ai-helpful-info-{{ ai_gen_id }}__icon::after { transform: translate(-50%,-50%) rotate(90deg); transition: transform 180ms ease; }
-  .ai-helpful-info-{{ ai_gen_id }}__trigger[aria-expanded='true'] .ai-helpful-info-{{ ai_gen_id }}__icon::after { transform: translate(-50%,-50%) rotate(0deg); }
-  .ai-helpful-info-{{ ai_gen_id }}__answer { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 220ms ease; }
-  .ai-helpful-info-{{ ai_gen_id }}__answer[aria-hidden='false'] { grid-template-rows: 1fr; }
-  .ai-helpful-info-{{ ai_gen_id }}__answer-inner { overflow: hidden; color: #2B2B2E; font-size: 16px; line-height: 1.6; }
-  .ai-helpful-info-{{ ai_gen_id }}__answer[aria-hidden='false'] .ai-helpful-info-{{ ai_gen_id }}__answer-inner { padding: 0 38px 18px 0; }
-  @media screen and (max-width: 749px) { .ai-helpful-info-{{ ai_gen_id }} { padding: 40px 20px; } .ai-helpful-info-{{ ai_gen_id }}__inner { width: 100%; } .ai-helpful-info-{{ ai_gen_id }}__heading { font-size: 26px; } .ai-helpful-info-{{ ai_gen_id }}__trigger { min-height: 58px; font-size: 16px; } }
-  @media (prefers-reduced-motion: reduce) { .ai-helpful-info-{{ ai_gen_id }}__answer, .ai-helpful-info-{{ ai_gen_id }}__icon::after { transition: none; } }
+  .ai-helpful-info-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    background: #F0F4F7;
+    color: #2B2B2E;
+    padding: clamp(60px, 7vw, 100px) 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__inner {
+    width: {{ block.settings.desktop_width_percent | default: 100 }}%;
+    max-width: 900px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__header {
+    text-align: {{ block.settings.heading_alignment | default: 'left' }};
+    margin-bottom: 32px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__eyebrow {
+    margin: 0 0 10px;
+    color: #C9A227;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__heading {
+    margin: 0 0 14px;
+    color: #0E1F3C;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(30px, 3.6vw, 42px);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  /* Interactive FAQ Search Bar */
+  .ai-helpful-info-{{ ai_gen_id }}__search-box {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__search-input {
+    width: 100%;
+    padding: 14px 20px 14px 46px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.14);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    color: #0E1F3C;
+    box-sizing: border-box;
+    box-shadow: 0 4px 14px rgba(14, 31, 60, 0.04);
+    transition: all 200ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__search-input:focus {
+    outline: none;
+    border-color: #C9A227;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__search-icon {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #8FA3B8;
+    pointer-events: none;
+  }
+
+  /* Category Filter Chips */
+  .ai-helpful-info-{{ ai_gen_id }}__chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__chip {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    transition: all 180ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__chip.is-active,
+  .ai-helpful-info-{{ ai_gen_id }}__chip:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-color: #0E1F3C;
+  }
+
+  /* Accordion Container */
+  .ai-helpful-info-{{ ai_gen_id }}__list {
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.1);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(14, 31, 60, 0.04);
+    overflow: hidden;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__item {
+    border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+    transition: background 180ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__item:last-child {
+    border-bottom: none;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__trigger {
+    width: 100%;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 24px;
+    border: 0;
+    background: transparent;
+    color: #0E1F3C;
+    font: inherit;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+    transition: color 150ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__trigger:hover {
+    color: #C9A227;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__trigger:focus-visible {
+    outline: 2px solid #C9A227;
+    outline-offset: -2px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__icon {
+    position: relative;
+    flex: 0 0 24px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(14, 31, 60, 0.06);
+    color: #0E1F3C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 200ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__trigger:hover .ai-helpful-info-{{ ai_gen_id }}__icon {
+    background: #C9A227;
+    color: #0E1F3C;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__icon::before,
+  .ai-helpful-info-{{ ai_gen_id }}__icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 2px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__trigger[aria-expanded='true'] .ai-helpful-info-{{ ai_gen_id }}__icon::after {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__trigger[aria-expanded='true'] .ai-helpful-info-{{ ai_gen_id }}__icon {
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  /* Answer Area */
+  .ai-helpful-info-{{ ai_gen_id }}__answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__answer[aria-hidden='false'] {
+    grid-template-rows: 1fr;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__answer-inner {
+    overflow: hidden;
+    color: #475569;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 0 24px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__answer[aria-hidden='false'] .ai-helpful-info-{{ ai_gen_id }}__answer-inner {
+    padding-bottom: 24px;
+  }
+
+  /* Helpful Feedback Bar */
+  .ai-helpful-info-{{ ai_gen_id }}__feedback-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(14, 31, 60, 0.1);
+    font-size: 12px;
+    color: #8FA3B8;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__feedback-btn {
+    background: #FAF7F0;
+    border: 1px solid rgba(14, 31, 60, 0.12);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0E1F3C;
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__feedback-btn:hover {
+    background: #0E1F3C;
+    color: #FAF7F0;
+  }
+
+  /* Concierge Assistance Card */
+  .ai-helpful-info-{{ ai_gen_id }}__cta-card {
+    background: #0E1F3C;
+    color: #FAF7F0;
+    border-radius: 18px;
+    padding: 28px;
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #C9A227;
+    color: #0E1F3C;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: all 200ms ease;
+  }
+
+  .ai-helpful-info-{{ ai_gen_id }}__cta-btn:hover {
+    background: #FAF7F0;
+    color: #0E1F3C;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-helpful-info-{{ ai_gen_id }} {
+      padding: 48px 20px 60px;
+    }
+    .ai-helpful-info-{{ ai_gen_id }}__trigger {
+      padding: 16px 18px;
+      font-size: 15px;
+    }
+    .ai-helpful-info-{{ ai_gen_id }}__answer-inner {
+      padding: 0 18px;
+      font-size: 14px;
+    }
+    .ai-helpful-info-{{ ai_gen_id }}__cta-card {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 22px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-helpful-info-{{ ai_gen_id }}__answer,
+    .ai-helpful-info-{{ ai_gen_id }}__icon::after {
+      transition: none !important;
+    }
+  }
 {% endstyle %}
 
 <helpful-information-{{ ai_gen_id }} class="ai-helpful-info-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
   <div class="ai-helpful-info-{{ ai_gen_id }}__inner">
-    <h2 class="ai-helpful-info-{{ ai_gen_id }}__heading">{{ block.settings.heading | escape }}</h2>
+    
+    <div class="ai-helpful-info-{{ ai_gen_id }}__header">
+      <div class="ai-helpful-info-{{ ai_gen_id }}__eyebrow">
+        <span>&#10022;</span>
+        Knowledge &amp; Support Hub
+      </div>
+      <h2 class="ai-helpful-info-{{ ai_gen_id }}__heading">{{ block.settings.heading | default: "Helpful information" | escape }}</h2>
+    </div>
+
+    <!-- Live Search Input -->
+    <div class="ai-helpful-info-{{ ai_gen_id }}__search-box">
+      <svg class="ai-helpful-info-{{ ai_gen_id }}__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="search"
+        class="ai-helpful-info-{{ ai_gen_id }}__search-input"
+        id="faq-search-{{ ai_gen_id }}"
+        placeholder="Filter questions by keyword (e.g. bulk, sizing, wash, returns)..."
+        aria-label="Filter frequently asked questions"
+      >
+    </div>
+
+    <!-- Category Chips -->
+    <div class="ai-helpful-info-{{ ai_gen_id }}__chips" role="group" aria-label="FAQ Topics">
+      <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__chip is-active" data-cat="all">All Topics</button>
+      <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__chip" data-cat="order">Orders &amp; Shipping</button>
+      <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__chip" data-cat="size">Sizing &amp; Fit</button>
+      <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__chip" data-cat="bulk">Bulk &amp; Institutional</button>
+    </div>
+
+    <!-- Accordion List -->
     <div class="ai-helpful-info-{{ ai_gen_id }}__list">
       {% for i in (1..4) %}
         {% liquid
@@ -58,17 +364,38 @@
           assign item_id = 'ai-helpful-info-' | append: ai_gen_id | append: '-' | append: i
         %}
         {% if question != blank %}
-          <div class="ai-helpful-info-{{ ai_gen_id }}__item">
+          <div class="ai-helpful-info-{{ ai_gen_id }}__item" data-q-index="{{ i }}">
             <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__trigger" id="{{ item_id }}-trigger" aria-expanded="false" aria-controls="{{ item_id }}-answer">
-              <span>{{ question | escape }}</span><span class="ai-helpful-info-{{ ai_gen_id }}__icon" aria-hidden="true"></span>
+              <span>{{ question | escape }}</span>
+              <span class="ai-helpful-info-{{ ai_gen_id }}__icon" aria-hidden="true"></span>
             </button>
             <div class="ai-helpful-info-{{ ai_gen_id }}__answer" id="{{ item_id }}-answer" role="region" aria-labelledby="{{ item_id }}-trigger" aria-hidden="true">
-              <div class="ai-helpful-info-{{ ai_gen_id }}__answer-inner">{{ answer }}</div>
+              <div class="ai-helpful-info-{{ ai_gen_id }}__answer-inner">
+                {{ answer }}
+
+                <div class="ai-helpful-info-{{ ai_gen_id }}__feedback-bar">
+                  <span>Was this answer helpful?</span>
+                  <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__feedback-btn" data-vote="yes">&#128077; Helpful</button>
+                  <button type="button" class="ai-helpful-info-{{ ai_gen_id }}__feedback-btn" data-vote="no">&#128078; Needs Detail</button>
+                </div>
+              </div>
             </div>
           </div>
         {% endif %}
       {% endfor %}
     </div>
+
+    <!-- Need More Assistance Callout Card -->
+    <div class="ai-helpful-info-{{ ai_gen_id }}__cta-card">
+      <div>
+        <h4 style="margin:0 0 6px; font-family:Georgia,serif; font-size:20px; color:#FAF7F0;">Didn't find your answer?</h4>
+        <p style="margin:0; font-size:14px; color:rgba(250,247,240,0.8);">Our clinical concierge desk is on standby for custom tailoring and institutional inquiries.</p>
+      </div>
+      <a href="https://wa.me/18001234567" target="_blank" rel="noopener" class="ai-helpful-info-{{ ai_gen_id }}__cta-btn">
+        Chat with Concierge &rarr;
+      </a>
+    </div>
+
   </div>
 </helpful-information-{{ ai_gen_id }}>
 
@@ -76,16 +403,79 @@
   (function() {
     class HelpfulInformation{{ ai_gen_id }} extends HTMLElement {
       connectedCallback() {
-        this.querySelectorAll('.ai-helpful-info-{{ ai_gen_id }}__trigger').forEach((button) => {
+        const triggers = this.querySelectorAll('.ai-helpful-info-{{ ai_gen_id }}__trigger');
+        const items = this.querySelectorAll('.ai-helpful-info-{{ ai_gen_id }}__item');
+        const searchInput = this.querySelector('#faq-search-{{ ai_gen_id }}');
+        const chips = this.querySelectorAll('.ai-helpful-info-{{ ai_gen_id }}__chip');
+
+        triggers.forEach((button) => {
           button.addEventListener('click', () => {
             const expanded = button.getAttribute('aria-expanded') === 'true';
             button.setAttribute('aria-expanded', String(!expanded));
-            this.querySelector('#' + button.getAttribute('aria-controls')).setAttribute('aria-hidden', String(expanded));
+            const region = this.querySelector('#' + button.getAttribute('aria-controls'));
+            if (region) {
+              region.setAttribute('aria-hidden', String(expanded));
+            }
+          });
+        });
+
+        // Search Filter
+        if (searchInput) {
+          searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            items.forEach((item) => {
+              const text = item.textContent.toLowerCase();
+              const match = !query || text.includes(query);
+              item.style.display = match ? 'block' : 'none';
+              if (query && match) {
+                const btn = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__trigger');
+                const reg = item.querySelector('.ai-helpful-info-{{ ai_gen_id }}__answer');
+                if (btn && reg) {
+                  btn.setAttribute('aria-expanded', 'true');
+                  reg.setAttribute('aria-hidden', 'false');
+                }
+              }
+            });
+          });
+        }
+
+        // Category Chips
+        chips.forEach((chip) => {
+          chip.addEventListener('click', () => {
+            chips.forEach(c => c.classList.remove('is-active'));
+            chip.classList.add('is-active');
+
+            const cat = chip.dataset.cat;
+            items.forEach((item) => {
+              if (cat === 'all') {
+                item.style.display = 'block';
+              } else {
+                const text = item.textContent.toLowerCase();
+                let match = false;
+                if (cat === 'order' && (text.includes('order') || text.includes('shipping') || text.includes('delivery'))) match = true;
+                if (cat === 'size' && (text.includes('sizing') || text.includes('fit') || text.includes('size'))) match = true;
+                if (cat === 'bulk' && (text.includes('bulk') || text.includes('business') || text.includes('enquir'))) match = true;
+                item.style.display = match ? 'block' : 'none';
+              }
+            });
+          });
+        });
+
+        // Helpful Vote buttons
+        const feedbackBtns = this.querySelectorAll('.ai-helpful-info-{{ ai_gen_id }}__feedback-btn');
+        feedbackBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const bar = btn.closest('.ai-helpful-info-{{ ai_gen_id }}__feedback-bar');
+            if (bar) {
+              bar.innerHTML = '<span style="color:#059669; font-weight:700;">✓ Thank you for your feedback!</span>';
+            }
           });
         });
       }
     }
-    if (!customElements.get('helpful-information-{{ ai_gen_id }}')) customElements.define('helpful-information-{{ ai_gen_id }}', HelpfulInformation{{ ai_gen_id }});
+    if (!customElements.get('helpful-information-{{ ai_gen_id }}')) {
+      customElements.define('helpful-information-{{ ai_gen_id }}', HelpfulInformation{{ ai_gen_id }});
+    }
   })();
 </script>
 
