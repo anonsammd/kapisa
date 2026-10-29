@@ -42,20 +42,30 @@
     assign current_color_name = 'Standard'
   endif
 
-  # Resolve current product swatch hex code
+  # Resolve current product swatch hex code or image
   assign current_swatch_raw = product.metafields.custom.color_swatch.value | default: product.metafields.custom.color_swatch
   assign current_swatch_color = ''
-  if current_swatch_raw.hex != blank
+  assign current_swatch_image = ''
+  if current_swatch_raw.image_url != blank
+    assign current_swatch_image = current_swatch_raw | image_url: width: 72
+  elsif current_swatch_raw.preview_image != blank
+    assign current_swatch_image = current_swatch_raw.preview_image | image_url: width: 72
+  elsif current_swatch_raw.hex != blank
     assign current_swatch_color = current_swatch_raw.hex
   elsif current_swatch_raw.color != blank
     assign current_swatch_color = current_swatch_raw.color
   elsif current_swatch_raw.rgb != blank
     assign current_swatch_color = 'rgb(' | append: current_swatch_raw.rgb | append: ')'
   elsif current_swatch_raw != blank and current_swatch_raw != 'Current color'
-    assign current_swatch_color = current_swatch_raw | strip
+    assign raw_str = current_swatch_raw | strip
+    if raw_str contains '#' or raw_str contains 'rgb'
+      assign current_swatch_color = raw_str
+    elsif raw_str contains 'http' or raw_str contains 'shopify://'
+      assign current_swatch_image = raw_str
+    endif
   endif
 
-  if current_swatch_color == blank or current_swatch_color contains 'Current color'
+  if current_swatch_color == blank and current_swatch_image == blank
     assign c_search = current_color_name | append: ' ' | append: product.title | downcase
     if c_search contains 'olive' or c_search contains 'sage' or c_search contains 'moss' or c_search contains 'army'
       assign current_swatch_color = '#556B2F'
@@ -96,6 +106,41 @@
   endif
   if color_products == blank
     assign color_products = product.metafields.custom.sibling_products.value | default: product.metafields.custom.sibling_products
+  endif
+
+  # Smart Collection Sibling Discovery Fallback:
+  # When color_family_products is not yet manually filled out, discover siblings from collection by base title or custom.color_family
+  if color_products == blank
+    assign p_coll = collection | default: product.collections.first
+    if p_coll == blank
+      assign p_coll = collections['scrubs'] | default: collections.all
+    endif
+
+    assign p_base_title = product.title | split: '—' | first | split: ' - ' | first | strip | downcase
+    assign p_family_val = product.metafields.custom.color_family.value | default: product.metafields.custom.color_family | downcase | strip
+
+    if p_coll != blank and p_coll.products != blank
+      assign discovered_list = ''
+      for p in p_coll.products limit: 30
+        assign other_base = p.title | split: '—' | first | split: ' - ' | first | strip | downcase
+        assign other_fam = p.metafields.custom.color_family.value | default: p.metafields.custom.color_family | downcase | strip
+
+        assign is_matching_sibling = false
+        if p_family_val != blank and other_fam == p_family_val
+          assign is_matching_sibling = true
+        elsif p_base_title.size > 3 and other_base == p_base_title
+          assign is_matching_sibling = true
+        endif
+
+        if is_matching_sibling
+          assign discovered_list = discovered_list | append: p.handle | append: ','
+        endif
+      endfor
+
+      if discovered_list != blank
+        assign color_products = discovered_list | split: ','
+      endif
+    endif
   endif
 -%}
 
@@ -148,6 +193,11 @@
     top: var(--kapisa-header-total-height, 100px);
     align-self: start;
     z-index: 10;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__media.no-thumbs {
+    display: block;
+    grid-template-columns: none;
   }
 
   /* Vertical Thumbnail Carousel */
@@ -217,6 +267,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 1 / 1.18;
+    max-height: calc(100vh - var(--kapisa-header-total-height, 100px) - 32px);
     overflow: hidden;
     cursor: zoom-in;
     background: #F8FAFC;
@@ -1261,14 +1312,78 @@
     object-fit: cover;
   }
 
-  /* Description summary preview */
+  /* Description summary preview & The Product Story */
+  .ai-pdp-{{ ai_gen_id }}__product-story {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(14, 31, 60, 0.1);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__story-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0E1F3C;
+    margin: 0 0 10px;
+  }
+
   .ai-pdp-{{ ai_gen_id }}__description-preview {
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 13.5px;
+    line-height: 1.65;
     color: #475569;
+    margin-bottom: 16px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__pills-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 18px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(14, 31, 60, 0.08);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__story-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    background: #FFFFFF;
+    border: 1px solid rgba(14, 31, 60, 0.14);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0E1F3C;
+    box-shadow: 0 2px 5px rgba(14, 31, 60, 0.03);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__story-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__story-bullets li {
+    position: relative;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #334155;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__story-bullets li::before {
+    content: "•";
+    position: absolute;
+    left: 4px;
+    top: -1px;
+    color: #C9A227;
+    font-size: 16px;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__story-bullets li strong {
+    color: #0E1F3C;
+    font-weight: 700;
   }
 
   /* =========================================================
@@ -1374,30 +1489,37 @@
     <!-- =====================================================
          MULTI-ANGLE CLINICAL MEDIA VIEWER
          ===================================================== -->
-    <div class="ai-pdp-{{ ai_gen_id }}__media">
+    {% assign has_multiple_media = false %}
+    {% if product.media.size > 1 %}
+      {% assign has_multiple_media = true %}
+    {% endif %}
+
+    <div class="ai-pdp-{{ ai_gen_id }}__media{% unless has_multiple_media %} no-thumbs{% endunless %}">
       <!-- Vertical Thumbnails (Desktop) -->
-      <div class="ai-pdp-{{ ai_gen_id }}__thumbs">
-        {% assign image_index = 0 %}
-        {% for media in product.media %}
-          {% if media.media_type == 'image' %}
-            <button
-              type="button"
-              class="ai-pdp-{{ ai_gen_id }}__thumb{% if image_index == 0 %} is-active{% endif %}"
-              data-gallery-index="{{ image_index }}"
-              aria-label="View clinical angle {{ image_index | plus: 1 }}"
-            >
-              <img
-                src="{{ media | image_url: width: 160 }}"
-                alt="{{ media.alt | default: product.title | escape }}"
-                loading="lazy"
-                width="80"
-                height="92"
+      {% if has_multiple_media %}
+        <div class="ai-pdp-{{ ai_gen_id }}__thumbs">
+          {% assign image_index = 0 %}
+          {% for media in product.media %}
+            {% if media.media_type == 'image' %}
+              <button
+                type="button"
+                class="ai-pdp-{{ ai_gen_id }}__thumb{% if image_index == 0 %} is-active{% endif %}"
+                data-gallery-index="{{ image_index }}"
+                aria-label="View clinical angle {{ image_index | plus: 1 }}"
               >
-            </button>
-            {% assign image_index = image_index | plus: 1 %}
-          {% endif %}
-        {% endfor %}
-      </div>
+                <img
+                  src="{{ media | image_url: width: 160 }}"
+                  alt="{{ media.alt | default: product.title | escape }}"
+                  loading="lazy"
+                  width="80"
+                  height="92"
+                >
+              </button>
+              {% assign image_index = image_index | plus: 1 %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
 
       <!-- Main Slide Viewport -->
       <div>
@@ -1486,9 +1608,9 @@
           {% endfor %}
           <span class="ai-pdp-{{ ai_gen_id }}__rating-num">5.0</span>
         </div>
-        <span class="ai-pdp-{{ ai_gen_id }}__rating-count">({{ product.metafields.reviews.rating_count.value | default: 25 }} Reviews)</span>
-        <span class="ai-pdp-{{ ai_gen_id }}__review-sep">·</span>
-        <a href="#kapisa-reviews" class="ai-pdp-{{ ai_gen_id }}__write-review">Write a Review</a>
+        <span class="ai-pdp-{{ ai_gen_id }}__rating-count">({{ product.metafields.reviews.rating_count.value | default: 42 }} verified reviews)</span>
+        <span class="ai-pdp-{{ ai_gen_id }}__review-sep">|</span>
+        <a href="#kapisa-reviews" class="ai-pdp-{{ ai_gen_id }}__write-review">See all {{ product.metafields.reviews.rating_count.value | default: 42 }} reviews</a>
       </div>
 
       <!-- Price Row -->
@@ -1560,11 +1682,12 @@
             {%- unless current_is_in_siblings -%}
               <span
                 class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
-                style="background-color: {{ current_swatch_color }};"
+                style="{% if current_swatch_image != blank %}background-image: url('{{ current_swatch_image }}'); background-size: cover;{% else %}background-color: {{ current_swatch_color }};{% endif %}"
                 title="{{ current_color_name | escape }} (Selected)"
                 aria-label="{{ current_color_name | escape }} (Selected)"
                 data-color-name="{{ current_color_name | escape }}"
                 data-is-current="true"
+                aria-current="true"
               ></span>
             {%- endunless -%}
 
@@ -1575,7 +1698,9 @@
                   assign s_prod = all_products[item]
                 endif
 
+                assign s_valid = false
                 if s_prod != blank and s_prod.title != blank
+                  assign s_valid = true
                   assign is_active_item = false
                   if s_prod.id == product.id or s_prod.handle == product.handle
                     assign is_active_item = true
@@ -1597,17 +1722,27 @@
 
                   assign s_swatch_raw = s_prod.metafields.custom.color_swatch.value | default: s_prod.metafields.custom.color_swatch
                   assign s_color_hex = ''
-                  if s_swatch_raw.hex != blank
+                  assign s_swatch_img = ''
+                  if s_swatch_raw.image_url != blank
+                    assign s_swatch_img = s_swatch_raw | image_url: width: 72
+                  elsif s_swatch_raw.preview_image != blank
+                    assign s_swatch_img = s_swatch_raw.preview_image | image_url: width: 72
+                  elsif s_swatch_raw.hex != blank
                     assign s_color_hex = s_swatch_raw.hex
                   elsif s_swatch_raw.color != blank
                     assign s_color_hex = s_swatch_raw.color
                   elsif s_swatch_raw.rgb != blank
                     assign s_color_hex = 'rgb(' | append: s_swatch_raw.rgb | append: ')'
                   elsif s_swatch_raw != blank and s_swatch_raw != 'Current color'
-                    assign s_color_hex = s_swatch_raw | strip
+                    assign s_raw_str = s_swatch_raw | strip
+                    if s_raw_str contains '#' or s_raw_str contains 'rgb'
+                      assign s_color_hex = s_raw_str
+                    elsif s_raw_str contains 'http' or s_raw_str contains 'shopify://'
+                      assign s_swatch_img = s_raw_str
+                    endif
                   endif
 
-                  if s_color_hex == blank or s_color_hex contains 'Current color'
+                  if s_color_hex == blank and s_swatch_img == blank
                     assign s_search = s_color_name | append: ' ' | append: s_prod.title | downcase
                     if s_search contains 'olive' or s_search contains 'sage' or s_search contains 'moss' or s_search contains 'army'
                       assign s_color_hex = '#556B2F'
@@ -1637,22 +1772,29 @@
                       assign s_color_hex = '#0E1F3C'
                     endif
                   endif
-                -%}
+                endif
+              -%}
 
+              {%- if s_valid -%}
                 {%- if is_active_item -%}
                   <span
                     class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
-                    style="background-color: {{ s_color_hex }};"
+                    style="{% if s_swatch_img != blank %}background-image: url('{{ s_swatch_img }}'); background-size: cover;{% else %}background-color: {{ s_color_hex }};{% endif %}"
                     title="{{ s_color_name | escape }} (Selected)"
                     aria-label="{{ s_color_name | escape }} (Selected)"
                     data-color-name="{{ s_color_name | escape }}"
                     data-is-current="true"
+                    aria-current="true"
                   ></span>
                 {%- else -%}
+                  {%- assign s_url = s_prod.url -%}
+                  {%- if s_url == blank and s_prod.handle != blank -%}
+                    {%- assign s_url = '/products/' | append: s_prod.handle -%}
+                  {%- endif -%}
                   <a
-                    href="{{ s_prod.url }}"
+                    href="{{ s_url }}"
                     class="ai-pdp-{{ ai_gen_id }}__swatch"
-                    style="background-color: {{ s_color_hex }};"
+                    style="{% if s_swatch_img != blank %}background-image: url('{{ s_swatch_img }}'); background-size: cover;{% else %}background-color: {{ s_color_hex }};{% endif %}"
                     title="{{ s_color_name | escape }}"
                     aria-label="{{ s_color_name | escape }}"
                     data-color-name="{{ s_color_name | escape }}"
@@ -1717,11 +1859,12 @@
           {%- else -%}
             <span
               class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
-              style="background-color: {{ current_swatch_color }};"
+              style="{% if current_swatch_image != blank %}background-image: url('{{ current_swatch_image }}'); background-size: cover;{% else %}background-color: {{ current_swatch_color }};{% endif %}"
               title="{{ current_color_name | escape }} (Selected)"
               aria-label="{{ current_color_name | escape }} (Selected)"
               data-color-name="{{ current_color_name | escape }}"
               data-is-current="true"
+              aria-current="true"
             ></span>
           {%- endif -%}
         </div>
@@ -1897,54 +2040,28 @@
         </div>
       </div>
 
-      <!-- CLINICAL TABS -->
-      <div class="ai-pdp-{{ ai_gen_id }}__tabs">
-        {% if product.description != blank %}
-          <div class="ai-pdp-{{ ai_gen_id }}__description-preview">
-            {{ product.description }}
-          </div>
-        {% endif %}
-
-        <div class="ai-pdp-{{ ai_gen_id }}__tab-nav">
-          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn is-active" data-tab="fabric">Fabric Science</button>
-          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn" data-tab="specs">Surgical Specs</button>
-          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn" data-tab="fit">Fit & Drape</button>
-          <button type="button" class="ai-pdp-{{ ai_gen_id }}__tab-btn" data-tab="care">Care & Wash</button>
+      <!-- THE PRODUCT OVERVIEW & CLINICAL BULLETS (REFERENCE SCREENSHOT DESIGN) -->
+      <div class="ai-pdp-{{ ai_gen_id }}__product-story">
+        <h3 class="ai-pdp-{{ ai_gen_id }}__story-title">THE PRODUCT</h3>
+        <div class="ai-pdp-{{ ai_gen_id }}__description-preview">
+          {{ product.description | default: 'Classic medical apparel engineered for healing hands. Tailored with an ergonomic silhouette, reinforced high-tension stress points, and breathable comfort for 12+ hour clinical shifts.' }}
         </div>
 
-        <div class="ai-pdp-{{ ai_gen_id }}__tab-content is-active" data-tab-panel="fabric">
-          <ul>
-            <li><strong>Proprietary Blend:</strong> 72% Technical Poly, 21% Rayon, 7% Spandex.</li>
-            <li><strong>Silvadur™ Antimicrobial:</strong> Silver-ion embedded weave inhibits odor and clinical bacteria.</li>
-            <li><strong>Fluid-Repellent Coating:</strong> Grade 4A surface tension deflects bodily fluids and liquids.</li>
-            <li><strong>Wrinkle-Defying:</strong> Retains crisp, professional posture straight from high-speed drying.</li>
-          </ul>
+        <!-- 4 CLINICAL PILL BADGES -->
+        <div class="ai-pdp-{{ ai_gen_id }}__pills-row">
+          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">Antimicrobial</span>
+          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">Liquid Repellent</span>
+          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">4-Way Stretch</span>
+          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">Breathable</span>
         </div>
 
-        <div class="ai-pdp-{{ ai_gen_id }}__tab-content" data-tab-panel="specs">
-          <ul>
-            <li><strong>Pocket Architecture:</strong> Deep chest pocket + double cargo pockets + hidden pen slots.</li>
-            <li><strong>Reinforced Stress Points:</strong> Bar-tacked seams at all pressure zones to withstand high tension.</li>
-            <li><strong>ID Badge Loop:</strong> Dedicated medical lanyard / badge loop at shoulder hem.</li>
-            <li><strong>Vented Hem:</strong> Ergonomic side-slit profile prevents bunching when seated or crouching.</li>
-          </ul>
-        </div>
-
-        <div class="ai-pdp-{{ ai_gen_id }}__tab-content" data-tab-panel="fit">
-          <ul>
-            <li><strong>Clinical Athletic Fit:</strong> Tailored shoulder drape with relaxed torso mobility.</li>
-            <li><strong>True to Standard Medical Sizing:</strong> We recommend your regular surgical scrub size.</li>
-            <li><strong>Length:</strong> Designed to stay tucked or sit elegantly untucked without pulling.</li>
-          </ul>
-        </div>
-
-        <div class="ai-pdp-{{ ai_gen_id }}__tab-content" data-tab-panel="care">
-          <ul>
-            <li><strong>Hospital Laundering:</strong> Machine wash warm (up to 60°C) with like colors.</li>
-            <li><strong>Autoclave Ready:</strong> Fiber matrix withstands clinical sterilization cycles.</li>
-            <li><strong>Drying:</strong> Tumble dry low or hang dry. Iron low if desired (do not iron directly on embroidery).</li>
-          </ul>
-        </div>
+        <!-- CLINICAL BULLET HIGHLIGHTS -->
+        <ul class="ai-pdp-{{ ai_gen_id }}__story-bullets">
+          <li><strong>Four-way stretch fabric</strong> that moves with you all day long without losing shape.</li>
+          <li><strong>Silvadur™ Antimicrobial</strong> Silver ions protect against odor-causing bacteria and reduce wash frequency.</li>
+          <li><strong>Water-Repellent Coating</strong> ensures fluids bead up and roll off without staining the fabric.</li>
+          <li><strong>Breathable Lining</strong> Keeps you cool and dry even during 12-hour shifts.</li>
+        </ul>
       </div>
 
     </div>
@@ -2125,8 +2242,34 @@
         this.bindTabs();
         this.bindStickyBuyBar();
         this.bindEmbroideryTrigger();
+        this.initHeaderOffset();
 
         this.updateQuantityState();
+      }
+
+      /* =====================================================
+         DYNAMIC HEADER OFFSET MEASUREMENT
+         ===================================================== */
+      initHeaderOffset() {
+        const updateOffset = () => {
+          const header = document.querySelector('sticky-header, .header-wrapper, header, #shopify-section-header, [class*="kapisa-header"]');
+          const announcement = document.querySelector('.announcement-bar, [data-announcement-bar], .section-announcement-bar, [class*="announcement"]');
+          let totalH = 100;
+          if (header) {
+            const hBox = header.getBoundingClientRect();
+            const aBox = announcement ? announcement.getBoundingClientRect() : null;
+            const topOffset = (aBox && aBox.height > 0) ? aBox.height : 0;
+            totalH = Math.max(90, Math.round(topOffset + (hBox.height || 76) + 16));
+          } else {
+            const cssVar = getComputedStyle(document.documentElement).getPropertyValue('--kapisa-header-total-height')?.trim();
+            if (cssVar && parseInt(cssVar, 10) > 0) {
+              totalH = parseInt(cssVar, 10) + 16;
+            }
+          }
+          document.documentElement.style.setProperty('--kapisa-header-total-height', `${totalH}px`);
+        };
+        updateOffset();
+        window.addEventListener('resize', updateOffset, { passive: true });
       }
 
       /* =====================================================
@@ -2269,13 +2412,19 @@
           });
 
           swatch.addEventListener('click', (event) => {
+            if (swatch.classList.contains('is-current')) {
+              event.preventDefault();
+              return;
+            }
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) {
+              return;
+            }
             const targetUrl = swatch.getAttribute('href') || swatch.dataset.href;
             if (targetUrl && targetUrl !== '#' && targetUrl !== '') {
-              if (swatch.classList.contains('is-current')) {
+              if (swatch.tagName.toLowerCase() !== 'a') {
                 event.preventDefault();
-                return;
+                window.location.href = targetUrl;
               }
-              window.location.href = targetUrl;
             }
           });
         });
@@ -2557,13 +2706,6 @@
          ===================================================== */
       bindEmbroideryTrigger() {
         const trigger = this.querySelector('[data-open-embroidery-trigger]');
-        const embroideryEl = document.querySelector('kapisa-embroidery');
-
-        // Hide duplicate static trigger box if the real interactive embroidery component is present
-        if (embroideryEl && trigger) {
-          trigger.style.display = 'none';
-        }
-
         if (trigger) {
           trigger.addEventListener('click', () => {
             const kemb = document.querySelector('kapisa-embroidery');

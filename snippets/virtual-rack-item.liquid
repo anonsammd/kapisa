@@ -25,7 +25,7 @@
     <path d="M50 31 L12 50" stroke="rgba(255,255,255,.25)" stroke-width="1" fill="none"/>
   </svg>
   <span class="ai-rack__garment">
-    <img src="{{ front | image_url: width: 480 }}" alt="{{ title | escape }}" loading="lazy" draggable="false">
+    <img src="{{ front | image_url: width: 480 }}" alt="{{ title | escape }}" loading="lazy" draggable="false" width="480" height="600">
   </span>
   <span class="ai-rack__pill">{{ button_text }}{% if show_price and price != blank %} <em>· {{ price | money }}</em>{% endif %}</span>
 </a>

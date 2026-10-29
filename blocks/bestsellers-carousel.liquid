@@ -594,18 +594,35 @@
               {% if color_family_prods != blank %}
                 <div class="ai-best-{{ ai_gen_id }}__swatches" aria-label="Available colors">
                   {% for rel in color_family_prods limit: 4 %}
-                    {% assign rel_c = rel.metafields.custom.color_swatch.value %}
+                    {% assign rel_c = rel.metafields.custom.color_swatch.value | default: rel.metafields.custom.color_swatch %}
                     {% if rel_c == blank %}
                       {% assign r_title = rel.title | downcase %}
-                      {% if r_title contains 'navy' or r_title contains 'blue' %}{% assign rel_c = '#1B3B6F' %}
-                      {% elsif r_title contains 'black' %}{% assign rel_c = '#18191C' %}
-                      {% elsif r_title contains 'green' or r_title contains 'hunter' %}{% assign rel_c = '#1B4942' %}
-                      {% elsif r_title contains 'wine' or r_title contains 'red' or r_title contains 'burgundy' %}{% assign rel_c = '#4A1525' %}
-                      {% elsif r_title contains 'grey' or r_title contains 'slate' %}{% assign rel_c = '#40464D' %}
-                      {% else %}{% assign rel_c = '#1E293B' %}
+                      {% if r_title contains 'olive' or r_title contains 'sage' or r_title contains 'moss' %}
+                        {% assign rel_c = '#556B2F' %}
+                      {% elsif r_title contains 'navy' or r_title contains 'midnight' or r_title contains 'blue' %}
+                        {% assign rel_c = '#0E1F3C' %}
+                      {% elsif r_title contains 'black' or r_title contains 'onyx' %}
+                        {% assign rel_c = '#18191C' %}
+                      {% elsif r_title contains 'green' or r_title contains 'hunter' or r_title contains 'emerald' %}
+                        {% assign rel_c = '#1B4942' %}
+                      {% elsif r_title contains 'ceil' or r_title contains 'sky' %}
+                        {% assign rel_c = '#6BA4B8' %}
+                      {% elsif r_title contains 'wine' or r_title contains 'red' or r_title contains 'burgundy' %}
+                        {% assign rel_c = '#4A1525' %}
+                      {% elsif r_title contains 'grey' or r_title contains 'slate' %}
+                        {% assign rel_c = '#5A626A' %}
+                      {% elsif r_title contains 'teal' or r_title contains 'aqua' %}
+                        {% assign rel_c = '#0D9488' %}
+                      {% elsif r_title contains 'khaki' or r_title contains 'tan' or r_title contains 'beige' %}
+                        {% assign rel_c = '#C2B280' %}
+                      {% else %}
+                        {% assign rel_c = '#0E1F3C' %}
                       {% endif %}
                     {% endif %}
-                    {% assign rel_url = '/products/' | append: rel.handle %}
+                    {% assign rel_url = rel.url %}
+                    {% if rel_url == blank %}
+                      {% assign rel_url = '/products/' | append: rel.handle %}
+                    {% endif %}
                     <a href="{{ rel_url }}" class="ai-best-{{ ai_gen_id }}__swatch" style="background: {{ rel_c }}; display: inline-block;" title="{{ rel.title | escape }}" aria-label="{{ rel.title | escape }}"></a>
                   {% endfor %}
                   {% if color_family_prods.size > 4 %}
@@ -616,21 +633,29 @@
                 <div class="ai-best-{{ ai_gen_id }}__swatches" aria-label="Available colors">
                   {% for val in color_option.values limit: 4 %}
                     {% assign color_clean = val | downcase | strip %}
-                    {% assign bg_color = color_clean %}
-                    {% if color_clean contains 'navy' %}
-                      {% assign bg_color = '#1B3B6F' %}
-                    {% elsif color_clean contains 'black' %}
+                    {% assign bg_color = '#0E1F3C' %}
+                    {% if color_clean contains 'olive' or color_clean contains 'sage' %}
+                      {% assign bg_color = '#556B2F' %}
+                    {% elsif color_clean contains 'navy' or color_clean contains 'midnight' %}
+                      {% assign bg_color = '#0E1F3C' %}
+                    {% elsif color_clean contains 'black' or color_clean contains 'onyx' %}
                       {% assign bg_color = '#18191C' %}
                     {% elsif color_clean contains 'hunter' or color_clean contains 'green' %}
                       {% assign bg_color = '#1B4942' %}
+                    {% elsif color_clean contains 'ceil' %}
+                      {% assign bg_color = '#6BA4B8' %}
                     {% elsif color_clean contains 'wine' or color_clean contains 'burgundy' or color_clean contains 'maroon' %}
                       {% assign bg_color = '#4A1525' %}
                     {% elsif color_clean contains 'grey' or color_clean contains 'gray' or color_clean contains 'slate' %}
-                      {% assign bg_color = '#40464D' %}
+                      {% assign bg_color = '#5A626A' %}
                     {% elsif color_clean contains 'royal' or color_clean contains 'blue' %}
-                      {% assign bg_color = '#2563EB' %}
+                      {% assign bg_color = '#1B365D' %}
                     {% elsif color_clean contains 'pastel' or color_clean contains 'lavender' or color_clean contains 'lilac' %}
                       {% assign bg_color = '#756B98' %}
+                    {% elsif color_clean contains 'teal' %}
+                      {% assign bg_color = '#0D9488' %}
+                    {% elsif color_clean contains 'khaki' or color_clean contains 'tan' %}
+                      {% assign bg_color = '#C2B280' %}
                     {% endif %}
                     <span class="ai-best-{{ ai_gen_id }}__swatch" style="background: {{ bg_color }}" title="{{ val | escape }}" aria-label="{{ val | escape }}"></span>
                   {% endfor %}

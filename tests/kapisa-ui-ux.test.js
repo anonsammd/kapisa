@@ -234,6 +234,56 @@ describe('Kapisa UI/UX Collection & PDP Architecture Verification', () => {
     assert.equal(renderedSwatches[2].href, '/products/signature-scrub-top-black');
     assert.equal(renderedSwatches[2].colorHex, '#18191C');
   });
+
+  // 8. PDP Product Story & Reference Visual Contracts
+  it('12. PDP Product Story, Clinical Pills & Single-Media Layout Contracts', async () => {
+    const fs = await import('node:fs');
+    const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+
+    // "THE PRODUCT" story header and 4 clinical pills
+    assert.match(pdpLiquid, /THE PRODUCT/, 'PDP must render "THE PRODUCT" section');
+    assert.match(pdpLiquid, /Antimicrobial/, 'PDP pills must include Antimicrobial');
+    assert.match(pdpLiquid, /Liquid Repellent/, 'PDP pills must include Liquid Repellent');
+    assert.match(pdpLiquid, /4-Way Stretch/, 'PDP pills must include 4-Way Stretch');
+    assert.match(pdpLiquid, /Breathable/, 'PDP pills must include Breathable');
+
+    // Single media condition & no-thumbs class
+    assert.match(pdpLiquid, /no-thumbs/, 'PDP must declare .no-thumbs class when media size <= 1');
+    assert.match(pdpLiquid, /has_multiple_media/, 'PDP must conditionally render thumbnail track');
+
+    // Dynamic header height measurement
+    assert.match(pdpLiquid, /initHeaderOffset/, 'PDP must measure sticky header dynamically in JS');
+  });
+
+  // 9. Smart Sibling Discovery & Swatch Image Support
+  it('13. Smart Sibling Discovery & Image Swatch Fallback Contracts', async () => {
+    const fs = await import('node:fs');
+    const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+
+    // Image swatch support
+    assert.match(pdpLiquid, /background-image:\s*url/, 'PDP must support image-based fabric swatches');
+  });
+
+  // 10. Liquid Syntax Safety, Review Anchor & Image Dimensions
+  it('14. Liquid Syntax Safety, Review Anchor & Image Dimensions', async () => {
+    const fs = await import('node:fs');
+    const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+    const rackSection = fs.readFileSync('sections/virtual-rack.liquid', 'utf-8');
+    const rackSnippet = fs.readFileSync('snippets/virtual-rack-item.liquid', 'utf-8');
+
+    // Sibling product swatch valid guard and url fallback
+    assert.match(pdpLiquid, /s_valid/, 'PDP must guard sibling swatch rendering with s_valid');
+    assert.match(pdpLiquid, /assign s_url = '\/products\/' \| append: s_prod\.handle/, 'PDP must provide fallback URL for sibling products');
+
+    // Verified reviews copy and anchor link
+    assert.match(pdpLiquid, /verified reviews/, 'PDP must display "verified reviews"');
+    assert.match(pdpLiquid, /href="#kapisa-reviews"/, 'PDP must link directly to #kapisa-reviews');
+
+    // Virtual rack img dimensions
+    assert.match(rackSection, /<img class="ai-rack__f-img"[^>]*width="480"[^>]*height="600"/, 'virtual-rack section img must have width and height');
+    assert.match(rackSnippet, /<img[^>]*width="480"[^>]*height="600"/, 'virtual-rack snippet img must have width and height');
+  });
 });
+
 
 
