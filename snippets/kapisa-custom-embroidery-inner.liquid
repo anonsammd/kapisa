@@ -1,6 +1,6 @@
 {%- comment -%}
-  KAPISA — Custom Embroidery Rebuild (Knya Medical Apparel Styling)
-  Single preview image, left-chest placement, icon selector, bundle logic, dynamic currency.
+  KAPISA — Per-product Custom Embroidery Preview
+  Uses product image metafields and live service variants for embroidery choices.
 {%- endcomment -%}
 
 {%- liquid
@@ -14,32 +14,13 @@
     assign feature_off = true
   endif
 
-  # Resolve preview images per product (top, bottom, combo)
-  assign preview_top = blank
-  if product.metafields.custom.top_embroidery_image.value != blank
-    assign preview_top = product.metafields.custom.top_embroidery_image.value
-  elsif product.featured_image != blank
-    assign preview_top = product.featured_image
-  elsif product.images.first != blank
-    assign preview_top = product.images.first
+  assign preview_top = product.metafields.custom.top_embroidery_image.value
+  if preview_top == blank
+    assign feature_off = true
   endif
 
-  assign preview_bottom = blank
-  if product.metafields.custom.bottom_embroidery_image.value != blank
-    assign preview_bottom = product.metafields.custom.bottom_embroidery_image.value
-  endif
-
-  assign preview_combo = blank
-  if product.metafields.custom.combo_embroidery_image.value != blank
-    assign preview_combo = product.metafields.custom.combo_embroidery_image.value
-  endif
-
-  if preview_bottom == blank
-    assign preview_bottom = preview_top
-  endif
-  if preview_combo == blank
-    assign preview_combo = preview_top
-  endif
+  assign preview_bottom = product.metafields.custom.bottom_embroidery_image.value | default: preview_top
+  assign preview_combo = product.metafields.custom.combo_embroidery_image.value | default: preview_top
 
   assign preview_top_url = blank
   assign preview_top_w = 600
@@ -48,8 +29,6 @@
     assign preview_top_url = preview_top | image_url: width: 1200
     assign preview_top_w = preview_top.width | default: 600
     assign preview_top_h = preview_top.height | default: 640
-  else
-    assign preview_top_url = 'kapisa-scrub-default.svg' | asset_url
   endif
 
   assign preview_bot_url = blank
@@ -77,164 +56,88 @@
   # Service product fallback
   assign svc_prod = all_products['embroidery-options-service']
 
-  # Resolve embroidery options
-  assign raw_options = product.metafields.custom.embroidery_options.value
-  if raw_options == blank
-    assign raw_options = cfg.default_options
-  endif
-
   assign valid_count = 0
-  assign min_price = 0
+  assign min_price = blank
 -%}
 
 {%- capture options_json -%}
 [
   {%- unless feature_off -%}
-    {%- if raw_options != blank -%}
-      {%- for opt in raw_options -%}
-        {%- liquid
-          assign kind = opt.kind.value | downcase | default: 'top'
-          assign label = opt.label.value | strip
-          assign handle = opt.system.handle | default: kind
-          assign sv = opt.service_variant.value
-          if sv == blank and svc_prod != blank
-            for v in svc_prod.variants
-              assign vt = v.title | downcase
-              if v.available
-                if vt contains kind or kind contains vt
-                  assign sv = v
-                  break
-                endif
-              endif
-            endfor
-          endif
-          if label == blank
-            case kind
-              when 'combo'
-                assign label = 'Embroidery Bundle'
-              when 'bottom'
-                assign label = 'Bottom Embroidery'
-              else
-                assign label = 'Top Embroidery'
-            endcase
-          endif
-          assign p_price = blank
-          assign p_var_id = blank
-          if sv != blank and sv.available
-            assign p_price = sv.price
-            assign p_var_id = sv.id
-            if min_price == 0 or p_price < min_price
-              assign min_price = p_price
+    {%- liquid
+      assign sv_top = blank
+      assign sv_bottom = blank
+      assign sv_combo = blank
+      if svc_prod != blank
+        for v in svc_prod.variants
+          if v.available
+            assign vt = v.title | downcase
+            if vt contains 'combo' or vt contains 'bundle'
+              assign sv_combo = v
+            elsif vt contains 'bottom'
+              assign sv_bottom = v
+            elsif vt contains 'top'
+              assign sv_top = v
             endif
           endif
-          assign badge = ''
-          assign desc = ''
-          case kind
-            when 'combo'
-              assign desc = 'Name and Designation + Icon + Name on bottoms'
-            when 'bottom'
-              assign desc = 'Your name on your scrub bottom'
-            else
-              assign desc = 'Your name and icon/logo, stitched on your scrub top.'
-          endcase
-        -%}
-        {%- if sv != blank and sv.available -%}
-        {%- if valid_count > 0 -%},{%- endif -%}
-        {
-          "handle": {{ handle | json }},
-          "label": {{ label | json }},
-          "kind": {{ kind | json }},
-          "badge": {{ badge | json }},
-          "description": {{ desc | json }},
-          "price": {{ p_price | json }},
-          "formattedPrice": {{ p_price | money | json }},
-          "variantId": {{ p_var_id | json }},
-          "sortOrder": {{ opt.sort_order.value | default: forloop.index | json }}
-        }
-        {%- assign valid_count = valid_count | plus: 1 -%}
-        {%- endif -%}
-      {%- endfor -%}
-    {%- else -%}
-      {%- comment -%} Standard fallback if no metafields set {%- endcomment -%}
-      {%- liquid
-        assign sv_top = blank
-        assign sv_bottom = blank
-        assign sv_combo = blank
-        if svc_prod != blank
-          for v in svc_prod.variants
-            if v.available
-              assign vt = v.title | downcase
-              if vt contains 'combo' or vt contains 'bundle'
-                assign sv_combo = v
-              elsif vt contains 'bottom'
-                assign sv_bottom = v
-              elsif vt contains 'top'
-                assign sv_top = v
-              endif
-            endif
-          endfor
-        endif
-        assign min_price = 0
-        if sv_top != blank
+        endfor
+      endif
+      if sv_combo != blank
+        assign min_price = sv_combo.price
+      endif
+      if sv_top != blank
+        if min_price == blank or sv_top.price < min_price
           assign min_price = sv_top.price
         endif
-        if sv_bottom != blank
-          if min_price == 0 or sv_bottom.price < min_price
-            assign min_price = sv_bottom.price
-          endif
+      endif
+      if sv_bottom != blank
+        if min_price == blank or sv_bottom.price < min_price
+          assign min_price = sv_bottom.price
         endif
-        if sv_combo != blank
-          if min_price == 0 or sv_combo.price < min_price
-            assign min_price = sv_combo.price
-          endif
-        endif
-        assign valid_count = 0
-      -%}
-      {%- if sv_combo != blank -%}
-        {%- if valid_count > 0 -%},{%- endif -%}
+      endif
+    -%}
+    {%- if sv_combo != blank -%}
       {
         "handle": "combo",
         "label": "Embroidery Bundle",
         "kind": "combo",
         "badge": "",
-        "description": "Name and Designation + Icon + Name on bottoms",
+        "description": "Top and bottom embroidery",
         "price": {{ sv_combo.price | json }},
         "formattedPrice": {{ sv_combo.price | money | json }},
         "variantId": {{ sv_combo.id | json }},
         "sortOrder": 1
       }
-        {%- assign valid_count = valid_count | plus: 1 -%}
-      {%- endif -%}
-      {%- if sv_top != blank -%}
-        {%- if valid_count > 0 -%},{%- endif -%}
+      {%- assign valid_count = valid_count | plus: 1 -%}
+    {%- endif -%}
+    {%- if sv_top != blank -%}
+      {%- if valid_count > 0 -%},{%- endif -%}
       {
         "handle": "top",
         "label": "Top Embroidery",
         "kind": "top",
         "badge": "",
-        "description": "Your name and icon/logo, stitched on your scrub top.",
+        "description": "Embroidery on the top",
         "price": {{ sv_top.price | json }},
         "formattedPrice": {{ sv_top.price | money | json }},
         "variantId": {{ sv_top.id | json }},
         "sortOrder": 2
       }
-        {%- assign valid_count = valid_count | plus: 1 -%}
-      {%- endif -%}
-      {%- if sv_bottom != blank -%}
-        {%- if valid_count > 0 -%},{%- endif -%}
+      {%- assign valid_count = valid_count | plus: 1 -%}
+    {%- endif -%}
+    {%- if sv_bottom != blank -%}
+      {%- if valid_count > 0 -%},{%- endif -%}
       {
         "handle": "bottom",
         "label": "Bottom Embroidery",
         "kind": "bottom",
         "badge": "",
-        "description": "Your name on your scrub bottom",
+        "description": "Embroidery on the bottom",
         "price": {{ sv_bottom.price | json }},
         "formattedPrice": {{ sv_bottom.price | money | json }},
         "variantId": {{ sv_bottom.id | json }},
         "sortOrder": 3
       }
-        {%- assign valid_count = valid_count | plus: 1 -%}
-      {%- endif -%}
+      {%- assign valid_count = valid_count | plus: 1 -%}
     {%- endif -%}
   {%- endunless -%}
 ]
@@ -252,7 +155,7 @@
 {%- endif -%}
 {%- assign thread_list = thread_rows | split: '~' -%}
 
-{%- if valid_count > 0 or request.design_mode -%}
+{%- if valid_count > 0 -%}
 <kapisa-embroidery
   class="kemb"
   id="KapisaEmbroidery-{{ section.id }}"
@@ -415,7 +318,7 @@
         </button>
 
         <div class="kemb-stage" data-kemb-stage>
-          <img class="kemb-stage__img" data-kemb-img src="{{ preview_top_url }}" alt="{{ product.title | escape }} Preview" width="{{ preview_top_w }}" height="{{ preview_top_h }}">
+          <img class="kemb-stage__img" data-kemb-img src="{{ preview_top_url }}" alt="{{ product.title | escape }} embroidery preview" width="{{ preview_top_w }}" height="{{ preview_top_h }}">
           
           <!-- Text Zone: Left Chest above pocket (wearer's left, viewer's right) -->
           <div class="kemb-zone-text" data-kemb-zone-text>

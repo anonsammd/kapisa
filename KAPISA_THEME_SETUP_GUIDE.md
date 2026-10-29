@@ -7,10 +7,10 @@ This comprehensive guide covers how to set up, configure, and launch the **Kapis
 ## 📑 Table of Contents
 1. [Theme Architecture & Overview](#1-theme-architecture--overview)
 2. [Step 1: Store Currency Configuration (INR / Multi-Currency)](#step-1-store-currency-configuration-inr--multi-currency)
-3. [Step 2: Metafields Setup (Required)](#step-2-metafields-setup-required)
+3. [Step 2: Metafields Setup (Audited)](#step-2-metafields-setup-audited)
 4. [Step 3: Setting Up Custom Embroidery Service Product](#step-3-setting-up-custom-embroidery-service-product)
-5. [Step 4: Metaobjects Setup (`embroidery_option`)](#step-4-metaobjects-setup-embroidery_option)
-6. [Step 5: How to Upload & Set Up a Product with Embroidery & Swatches](#step-5-how-to-upload--set-up-a-product-with-embroidery--swatches)
+5. [Step 4: Product setup overview](#step-4-product-setup-overview)
+6. [Production Product Upload Guide](./PRODUCT_UPLOAD_PRODUCTION_GUIDE.md)
 7. [Step 6: Custom Embroidery PDP & Cart Workflow](#step-6-custom-embroidery-pdp--cart-workflow)
 8. [Step 7: Customizing Theme Settings in Shopify Theme Editor](#step-7-customizing-theme-settings-in-shopify-theme-editor)
 
@@ -44,7 +44,7 @@ The **Kapisa Theme** is built natively on Shopify Online Store 2.0 (OS 2.0).
 
 ---
 
-## Step 2: Metafields Setup (Required)
+## Step 2: Metafields Setup (Audited)
 
 Go to **Shopify Admin > Settings > Custom data > Products > Add definition**:
 The live store audit found the color and embroidery-preview definitions below already exist. Verify them before adding anything to avoid creating duplicate definitions; the optional product-detail and embroidery-option definitions are not currently present.
@@ -65,7 +65,7 @@ The live store audit found the color and embroidery-preview definitions below al
 * **Name**: `Color Family`
 * **Namespace and key**: `custom.color_family`
 * **Type**: `Single line text`
-* **Description**: Color group (e.g. `Blue`, `Wine`, `Black`).
+* **Description**: Broad color group used by storefront filters (e.g. `Blue`, `Red`, `Black`).
 
 ### 4. Color Family Products
 * **Name**: `Color Family Products`
@@ -82,32 +82,25 @@ Create these product metafield definitions if the product details accordion shou
 
 The accordion uses these values when present. `custom.fit_guide` also supplies the PDP size-guide modal; its Theme Editor content setting is an optional fallback. Theme Editor accordion content fields are empty by default, so placeholder text is never shown to customers.
 
-### 6. Embroidery Options (Optional)
-The product page can use `custom.embroidery_options` for per-product choices, but this store does not currently have the `embroidery_option` metaobject definition or product metafield definition. Define the metaobject type `embroidery_option` first with:
-* `kind` — Single line text (`top`, `bottom`, or `combo`)
-* `label` — Single line text
-* `service_variant` — Variant reference
-* `sort_order` — Integer
-
-Then define `custom.embroidery_options` as a list of metaobject references to `embroidery_option`. Until configured, the embroidery section uses the live variants on the `Embroidery Options (Service)` product.
-
-### 7. Embroidery Preview Image (Left Chest)
+### 6. Embroidery Preview Image (Left Chest)
 * **Name**: `Embroidery preview image (left chest)`
 * **Namespace and key**: `custom.top_embroidery_image`
 * **Type**: `File` (Image)
-* **Description**: ONE preview image per product/colour (approx 600x640 or 4:5 ratio). Close-up crop of the scrub neckline and left chest pocket. Reused for Top, Bottom, and Combo.
+* **Description**: One product-specific preview image is required to show the customizer. Use consistent portrait framing and restrict accepted files to images in the definition's validation settings.
 
-### 8. Embroidery Disabled (Opt-Out)
+### 7. Embroidery Disabled (Opt-Out)
 * **Name**: `Embroidery disabled`
 * **Namespace and key**: `custom.embroidery_disabled`
 * **Type**: `True/false` (Boolean)
 * **Description**: Check to hide custom embroidery on specific non-embroiderable products (e.g. scrub caps, socks).
 
-### 9. Bottom and Combo Embroidery Preview Images (Optional)
+### 8. Bottom and Combo Embroidery Preview Images (Optional)
 * `custom.bottom_embroidery_image` — File (Image)
 * `custom.combo_embroidery_image` — File (Image)
 
-Shopify's standard `reviews.rating` and `reviews.rating_count` metafields supply the rating summary when a reviews app writes those values; individual review text should come from the review app rather than hardcoded theme copy.
+The live store audit found these three file-reference definitions but no image-only validation rules. It also found no `embroidery_option` metaobject definition and no `custom.embroidery_options` product definition; the theme does not need them. Embroidery choices and prices come from available variants on the service product. See the [Production Product Upload Guide](./PRODUCT_UPLOAD_PRODUCTION_GUIDE.md) for all definition findings and review-app setup.
+
+Shopify's standard `reviews.rating` and `reviews.rating_count` metafields supply the rating summary when a reviews app writes those values; the theme's summary block does not render individual review text or collect submissions. Add the review app's product block to display reviews and configure the theme's review link to the app form.
 
 ---
 
@@ -123,17 +116,18 @@ The cart charges the real Shopify variant for embroidery. You need one service p
 6. **Inventory**: Uncheck `"Track quantity"`.
 7. Under **Variants**, add Option Name: `Type`.
 8. Create 3 variants:
-   * **Variant 1**:
+   * Add service variants whose titles include `Top`, `Bottom`, and `Combo` (or `Bundle` for the bundle). Set production prices and availability intentionally; the sample amounts below are not verified production pricing.
+   * **Example Variant 1**:
      * Option: `Top`
-     * Price: `₹ 299.00`
+     * Price: Set your approved production price.
      * SKU: `EMB-TOP`
-   * **Variant 2**:
+   * **Example Variant 2**:
      * Option: `Bottom`
-     * Price: `₹ 199.00`
+     * Price: Set your approved production price.
      * SKU: `EMB-BOTTOM`
-   * **Variant 3**:
+   * **Example Variant 3**:
      * Option: `Combo`
-     * Price: `₹ 598.00`
+     * Price: Set your approved production price.
      * SKU: `EMB-COMBO`
 9. **Sales Channels**: Ensure **Online Store** is active and checked.
 10. Click **Save**.
@@ -142,42 +136,11 @@ The cart charges the real Shopify variant for embroidery. You need one service p
 
 ---
 
-## Step 4: Metaobjects Setup (`embroidery_option`)
+## Step 4: Product setup overview
 
-Go to **Shopify Admin > Settings > Custom data > Metaobjects > Add definition**:
-1. **Name**: `Embroidery Option`
-2. **Type**: `embroidery_option`
-3. Add Fields:
-   * `label`: Single line text (e.g. `Top Embroidery`, `Bottom Embroidery`, `Embroidery Bundle`)
-   * `kind`: Single line text (`top`, `bottom`, or `combo`)
-   * `service_variant`: Product variant reference (links to the corresponding service variant created in Step 3)
-   * `sort_order`: Integer (`1`, `2`, `3`)
-4. Click **Save**.
-5. Go to **Content > Metaobjects > Embroidery Option** and create 3 entries:
-   * Entry 1: Label: `Top Embroidery`, Kind: `top`, Variant: `Embroidery Options (Service) - Top`, Sort: `1`.
-   * Entry 2: Label: `Bottom Embroidery`, Kind: `bottom`, Variant: `Embroidery Options (Service) - Bottom`, Sort: `2`.
-   * Entry 3: Label: `Embroidery Bundle`, Kind: `combo`, Variant: `Embroidery Options (Service) - Combo`, Sort: `3`.
+The theme reads embroidery choices and their prices from the available variants on the `embroidery-options-service` product. A product-specific `custom.top_embroidery_image` file is required before the customizer is shown; the normal product gallery image is never substituted for the embroidery preview. Bottom and combo preview fields are optional and use the product's top preview when empty.
 
----
-
-## Step 5: How to Upload & Set Up a Product with Embroidery & Swatches
-
-### Creating the Product:
-1. Go to **Products > Add product**.
-2. **Title**: e.g., `Apex V-Neck Scrub Top - Navy`.
-3. **Description**: Add garment features, fabric blend (e.g. 4-way stretch, anti-wrinkle).
-4. **Media / Images**:
-   * Add high-res model photography.
-5. **Variants**:
-   * Option name: `Size`
-   * Values: `XS`, `S`, `M`, `L`, `XL`, `2XL`, `3XL`, `4XL`.
-6. Scroll down to **Metafields**:
-   * **Color Name**: `Navy`
-   * **Color Swatch**: Select `#0E1F3C`
-   * **Color Family**: `Blue`
-   * **Color Family Products**: Select all sibling products (e.g. `Apex V-Neck Scrub Top - Wine`, `Apex V-Neck Scrub Top - Ceil Blue`).
-   * **Embroidery preview image (left chest)**: Upload a cropped close-up of the scrub top showing the neckline, collar, and left chest pocket (approx 600x640px).
-7. Click **Save**.
+Follow the [Production Product Upload Guide](./PRODUCT_UPLOAD_PRODUCTION_GUIDE.md) for audited live metafields, separate products per color, size variants, product details, embroidery image requirements, and review-app setup. The live store currently has no `embroidery_option` metaobject definition, and the theme does not require one.
 
 ---
 

@@ -483,9 +483,21 @@ describe('Kapisa Custom Embroidery & Cart Architecture Tests', () => {
     const fs = require('node:fs');
     const embroideryLiquid = fs.readFileSync('snippets/kapisa-custom-embroidery-inner.liquid', 'utf-8');
 
-    assert.match(embroideryLiquid, /if sv != blank and sv\.available/, 'Configured embroidery options must reference available Shopify variants');
-    assert.match(embroideryLiquid, /if v\.available/, 'Fallback options must exclude unavailable service variants');
+    assert.match(embroideryLiquid, /if v\.available/, 'Embroidery options must exclude unavailable service variants');
+    assert.match(embroideryLiquid, /assign sv_top = v/, 'Top option must resolve from a service variant title');
+    assert.match(embroideryLiquid, /assign sv_bottom = v/, 'Bottom option must resolve from a service variant title');
+    assert.match(embroideryLiquid, /assign sv_combo = v/, 'Combo option must resolve from a service variant title');
     assert.match(embroideryLiquid, /assign valid_count = valid_count \| plus: 1/, 'Only usable options should count toward rendering');
     assert.doesNotMatch(embroideryLiquid, /default:\s*(29900|19900|59800)/, 'Embroidery prices must not fall back to hardcoded amounts');
+  });
+
+  it('12. Embroidery preview requires the product metafield and never falls back to gallery imagery', () => {
+    const fs = require('node:fs');
+    const embroideryLiquid = fs.readFileSync('snippets/kapisa-custom-embroidery-inner.liquid', 'utf-8');
+
+    assert.match(embroideryLiquid, /assign preview_top = product\.metafields\.custom\.top_embroidery_image\.value/);
+    assert.match(embroideryLiquid, /if preview_top == blank\s+assign feature_off = true/);
+    assert.match(embroideryLiquid, /if valid_count > 0/);
+    assert.doesNotMatch(embroideryLiquid, /product\.featured_image|product\.featured_media|kapisa-scrub-default\.svg/);
   });
 });
