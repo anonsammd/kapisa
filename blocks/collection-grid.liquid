@@ -667,20 +667,29 @@
               </div>
 
               {%- liquid
-                assign rel_color_prods = product.metafields.custom.color_family_products.value
+                assign rel_color_prods = product.metafields.custom.color_family_products.value | default: product.metafields.custom.color_family_products
+                if rel_color_prods == blank
+                  assign rel_color_prods = product.metafields.custom.color_products.value | default: product.metafields.custom.color_products
+                endif
+                if rel_color_prods == blank
+                  assign rel_color_prods = product.metafields.custom.related_products.value | default: product.metafields.custom.related_products
+                endif
+                assign card_self_swatch = product.metafields.custom.color_swatch.value | default: product.metafields.custom.color_swatch
               -%}
               {% if rel_color_prods != blank %}
                 <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
                   {% for rel in rel_color_prods limit: 4 %}
-                    {% assign rel_c = rel.metafields.custom.color_swatch.value %}
+                    {% assign rel_c = rel.metafields.custom.color_swatch.value | default: rel.metafields.custom.color_swatch %}
                     {% if rel_c == blank %}
                       {% assign r_title = rel.title | downcase %}
-                      {% if r_title contains 'navy' or r_title contains 'blue' %}{% assign rel_c = '#1B3B6F' %}
+                      {% if r_title contains 'navy' or r_title contains 'blue' %}{% assign rel_c = '#0E1F3C' %}
                       {% elsif r_title contains 'black' %}{% assign rel_c = '#18191C' %}
+                      {% elsif r_title contains 'olive' or r_title contains 'sage' %}{% assign rel_c = '#556B2F' %}
                       {% elsif r_title contains 'green' or r_title contains 'hunter' %}{% assign rel_c = '#1B4942' %}
                       {% elsif r_title contains 'wine' or r_title contains 'red' or r_title contains 'burgundy' %}{% assign rel_c = '#4A1525' %}
-                      {% elsif r_title contains 'grey' or r_title contains 'slate' %}{% assign rel_c = '#40464D' %}
-                      {% else %}{% assign rel_c = '#1E293B' %}
+                      {% elsif r_title contains 'grey' or r_title contains 'slate' %}{% assign rel_c = '#5A626A' %}
+                      {% elsif r_title contains 'ceil' %}{% assign rel_c = '#6BA4B8' %}
+                      {% else %}{% assign rel_c = '#0E1F3C' %}
                       {% endif %}
                     {% endif %}
                     {% assign rel_url = rel.url %}
@@ -694,18 +703,22 @@
                   {% endif %}
                 </div>
               {% else %}
+                {% assign found_opt = false %}
                 {% for option in product.options_with_values %}
                   {% assign opt_name = option.name | downcase %}
                   {% if opt_name contains 'color' or opt_name contains 'colour' %}
+                    {% assign found_opt = true %}
                     <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
                       {% for value in option.values limit: 4 %}
                         {% assign color_clean = value | downcase | strip %}
-                        {% assign bg_color = color_clean %}
-                        {% if color_clean contains 'navy' %}{% assign bg_color = '#1B3B6F' %}
+                        {% assign bg_color = '#0E1F3C' %}
+                        {% if color_clean contains 'olive' or color_clean contains 'sage' %}{% assign bg_color = '#556B2F' %}
+                        {% elsif color_clean contains 'navy' or color_clean contains 'blue' %}{% assign bg_color = '#0E1F3C' %}
                         {% elsif color_clean contains 'black' %}{% assign bg_color = '#18191C' %}
                         {% elsif color_clean contains 'hunter' or color_clean contains 'green' %}{% assign bg_color = '#1B4942' %}
                         {% elsif color_clean contains 'wine' or color_clean contains 'burgundy' %}{% assign bg_color = '#4A1525' %}
-                        {% elsif color_clean contains 'grey' or color_clean contains 'slate' %}{% assign bg_color = '#40464D' %}
+                        {% elsif color_clean contains 'grey' or color_clean contains 'slate' %}{% assign bg_color = '#5A626A' %}
+                        {% elsif color_clean contains 'ceil' %}{% assign bg_color = '#6BA4B8' %}
                         {% elsif color_clean contains 'pastel' or color_clean contains 'lavender' %}{% assign bg_color = '#756B98' %}
                         {% endif %}
                         <span class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ value | escape }}" style="background-color: {{ bg_color }};" aria-label="{{ value | escape }}"></span>
@@ -716,6 +729,13 @@
                     </div>
                   {% endif %}
                 {% endfor %}
+                {% unless found_opt %}
+                  {% if card_self_swatch != blank %}
+                    <div class="kapisa-product-{{ ai_gen_id }}__swatches" aria-label="Available colors">
+                      <span class="kapisa-product-{{ ai_gen_id }}__swatch" title="{{ product.title | escape }}" style="background-color: {{ card_self_swatch }};" aria-label="{{ product.title | escape }}"></span>
+                    </div>
+                  {% endif %}
+                {% endunless %}
               {% endif %}
             </div>
 

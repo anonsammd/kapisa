@@ -137,11 +137,67 @@
             <div class="ai-look__details-{{ ai_gen_id }}">
               <p class="ai-look__name-{{ ai_gen_id }}">{{ product.title }}</p>
               <p class="ai-look__price-{{ ai_gen_id }}">{{ product.price | money }}</p>
-              {% assign color_option = product.options_with_values | where: 'name', 'Color' | first %}
-              {% if color_option != blank %}
+              {%- liquid
+                assign card_color_prods = product.metafields.custom.color_family_products.value | default: product.metafields.custom.color_family_products
+                if card_color_prods == blank
+                  assign card_color_prods = product.metafields.custom.color_products.value | default: product.metafields.custom.color_products
+                endif
+                if card_color_prods == blank
+                  assign card_color_prods = product.metafields.custom.related_products.value | default: product.metafields.custom.related_products
+                endif
+                assign card_color_opt = blank
+                for option in product.options_with_values
+                  assign opt_name_l = option.name | downcase
+                  if opt_name_l contains 'color' or opt_name_l contains 'colour'
+                    assign card_color_opt = option
+                    break
+                  endif
+                endfor
+                assign card_self_swatch = product.metafields.custom.color_swatch.value | default: product.metafields.custom.color_swatch
+              -%}
+
+              {% if card_color_prods != blank %}
                 <div class="ai-look__swatches-{{ ai_gen_id }}" aria-label="Available colors">
-                  {% for color in color_option.values limit: 5 %}<span class="ai-look__swatch-{{ ai_gen_id }}" style="background-color: {{ color | downcase | escape }}" title="{{ color | escape }}"></span>{% endfor %}
-                  {% if color_option.values.size > 5 %}<span class="ai-look__more-{{ ai_gen_id }}">+{{ color_option.values.size | minus: 5 }}</span>{% endif %}
+                  {% for rel in card_color_prods limit: 5 %}
+                    {% assign rel_c = rel.metafields.custom.color_swatch.value | default: rel.metafields.custom.color_swatch %}
+                    {% if rel_c == blank %}
+                      {% assign r_title = rel.title | downcase %}
+                      {% if r_title contains 'navy' or r_title contains 'blue' %}{% assign rel_c = '#0E1F3C' %}
+                      {% elsif r_title contains 'black' %}{% assign rel_c = '#18191C' %}
+                      {% elsif r_title contains 'olive' or r_title contains 'sage' %}{% assign rel_c = '#556B2F' %}
+                      {% elsif r_title contains 'green' or r_title contains 'hunter' %}{% assign rel_c = '#1B4942' %}
+                      {% elsif r_title contains 'wine' or r_title contains 'burgundy' %}{% assign rel_c = '#4A1525' %}
+                      {% elsif r_title contains 'grey' or r_title contains 'slate' %}{% assign rel_c = '#5A626A' %}
+                      {% elsif r_title contains 'ceil' %}{% assign rel_c = '#6BA4B8' %}
+                      {% else %}{% assign rel_c = '#0E1F3C' %}
+                      {% endif %}
+                    {% endif %}
+                    <span class="ai-look__swatch-{{ ai_gen_id }}" style="background-color: {{ rel_c }};" title="{{ rel.title | escape }}"></span>
+                  {% endfor %}
+                  {% if card_color_prods.size > 5 %}
+                    <span class="ai-look__more-{{ ai_gen_id }}">+{{ card_color_prods.size | minus: 5 }}</span>
+                  {% endif %}
+                </div>
+              {% elsif card_color_opt != blank %}
+                <div class="ai-look__swatches-{{ ai_gen_id }}" aria-label="Available colors">
+                  {% for color in card_color_opt.values limit: 5 %}
+                    {% assign color_clean = color | downcase | strip %}
+                    {% assign bg_c = '#0E1F3C' %}
+                    {% if color_clean contains 'olive' or color_clean contains 'sage' %}{% assign bg_c = '#556B2F' %}
+                    {% elsif color_clean contains 'navy' or color_clean contains 'blue' %}{% assign bg_c = '#0E1F3C' %}
+                    {% elsif color_clean contains 'black' %}{% assign bg_c = '#18191C' %}
+                    {% elsif color_clean contains 'hunter' or color_clean contains 'green' %}{% assign bg_c = '#1B4942' %}
+                    {% elsif color_clean contains 'wine' or color_clean contains 'burgundy' %}{% assign bg_c = '#4A1525' %}
+                    {% elsif color_clean contains 'grey' or color_clean contains 'slate' %}{% assign bg_c = '#5A626A' %}
+                    {% elsif color_clean contains 'ceil' %}{% assign bg_c = '#6BA4B8' %}
+                    {% endif %}
+                    <span class="ai-look__swatch-{{ ai_gen_id }}" style="background-color: {{ bg_c }}" title="{{ color | escape }}"></span>
+                  {% endfor %}
+                  {% if card_color_opt.values.size > 5 %}<span class="ai-look__more-{{ ai_gen_id }}">+{{ card_color_opt.values.size | minus: 5 }}</span>{% endif %}
+                </div>
+              {% elsif card_self_swatch != blank %}
+                <div class="ai-look__swatches-{{ ai_gen_id }}" aria-label="Available colors">
+                  <span class="ai-look__swatch-{{ ai_gen_id }}" style="background-color: {{ card_self_swatch }};" title="{{ product.title | escape }}"></span>
                 </div>
               {% endif %}
             </div>

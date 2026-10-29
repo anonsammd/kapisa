@@ -11,28 +11,29 @@
   .kapisa-details-{{ accordion_id }} {
     display: block;
     width: 100%;
-    max-width: none;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 28px 20px;
+    padding: clamp(36px, 4vw, 56px) 24px;
     background: #FAF7F0;
     color: #2B2B2E;
+    box-sizing: border-box;
   }
 
   .kapisa-details-{{ accordion_id }}__heading {
-    margin: 0 0 18px;
-    color: #2B2B2E;
-    font-size: 24px;
-    font-weight: 600;
+    margin: 0 0 24px;
+    color: #0E1F3C;
+    font-size: 26px;
+    font-weight: 700;
     line-height: 1.25;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
   }
 
   .kapisa-details-{{ accordion_id }}__item {
-    border-top: 1px solid #8FA3B8;
+    border-top: 1px solid rgba(14, 31, 60, 0.12);
   }
 
   .kapisa-details-{{ accordion_id }}__item:last-child {
-    border-bottom: 1px solid #8FA3B8;
+    border-bottom: 1px solid rgba(14, 31, 60, 0.12);
   }
 
   .kapisa-details-{{ accordion_id }}__button {
@@ -164,6 +165,15 @@
     {% assign content_key = section_key | append: '_content' %}
     {% assign title = block.settings[title_key] %}
     {% assign content = block.settings[content_key] %}
+    {% if section_key == 'fabric' and product.metafields.custom.fabric_details != blank %}
+      {% assign content = product.metafields.custom.fabric_details.value | default: product.metafields.custom.fabric_details %}
+    {% elsif section_key == 'care' and product.metafields.custom.care_instructions != blank %}
+      {% assign content = product.metafields.custom.care_instructions.value | default: product.metafields.custom.care_instructions %}
+    {% elsif section_key == 'fit' and product.metafields.custom.fit_guide != blank %}
+      {% assign content = product.metafields.custom.fit_guide.value | default: product.metafields.custom.fit_guide %}
+    {% elsif section_key == 'shipping' and product.metafields.custom.shipping_returns != blank %}
+      {% assign content = product.metafields.custom.shipping_returns.value | default: product.metafields.custom.shipping_returns %}
+    {% endif %}
 
     {% if title != blank and content != blank %}
       <div class="kapisa-details-{{ accordion_id }}__item">

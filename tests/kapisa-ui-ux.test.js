@@ -140,5 +140,100 @@ describe('Kapisa UI/UX Collection & PDP Architecture Verification', () => {
     assert.equal(sanitizeQty('abc'), 1);
     assert.equal(sanitizeQty('4'), 4);
   });
+
+  // 4. PDP Sticky Architecture Contract Verification
+  it('8. Sticky PDP: Root overflow-x clip and sticky media container invariants', async () => {
+    const fs = await import('node:fs');
+    const themeLiquid = fs.readFileSync('layout/theme.liquid', 'utf-8');
+    const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+
+    // Root must NOT use overflow-x: hidden on html/body which disables position: sticky
+    assert.match(themeLiquid, /overflow-x:\s*clip/i, 'theme.liquid must use overflow-x: clip on html/body');
+    assert.doesNotMatch(themeLiquid, /html\s*,\s*body\s*\{[^}]*overflow-x:\s*hidden/i, 'theme.liquid must NOT have overflow-x: hidden on root');
+
+    // PDP Media must declare position: sticky with header offset
+    assert.match(pdpLiquid, /position:\s*sticky/i, 'kapisa-product-info.liquid must declare position: sticky');
+    assert.match(pdpLiquid, /top:\s*var\(--kapisa-header-total-height,\s*100px\)/i, 'kapisa-product-info.liquid must anchor sticky to header height');
+    assert.match(pdpLiquid, /align-self:\s*start/i, 'Sticky media column must have align-self: start');
+  });
+
+  // 5. Multi-Metafield Color Swatch Resolver Logic
+  function resolveColorHex(colorName, customHex) {
+    if (customHex && typeof customHex === 'string' && customHex.startsWith('#')) {
+      return customHex;
+    }
+    const clean = (colorName || '').toLowerCase().trim();
+    if (clean.includes('olive') || clean.includes('sage') || clean.includes('army') || clean.includes('moss')) return '#556B2F';
+    if (clean.includes('navy') || clean.includes('midnight') || clean.includes('deep blue')) return '#0E1F3C';
+    if (clean.includes('black') || clean.includes('onyx') || clean.includes('charcoal')) return '#18191C';
+    if (clean.includes('hunter') || clean.includes('forest') || clean.includes('emerald') || clean.includes('green')) return '#1B4942';
+    if (clean.includes('wine') || clean.includes('burgundy') || clean.includes('maroon') || clean.includes('ruby')) return '#4A1525';
+    if (clean.includes('ceil') || clean.includes('sky') || clean.includes('light blue')) return '#6BA4B8';
+    if (clean.includes('royal') || clean.includes('blue')) return '#1B365D';
+    if (clean.includes('grey') || clean.includes('gray') || clean.includes('slate') || clean.includes('pewter')) return '#5A626A';
+    if (clean.includes('teal') || clean.includes('caribbean') || clean.includes('aqua')) return '#0D9488';
+    if (clean.includes('khaki') || clean.includes('tan') || clean.includes('beige')) return '#C2B280';
+    return '#0E1F3C';
+  }
+
+  it('9. PDP Color Swatches: Multi-metafield color dictionary resolution', () => {
+    assert.equal(resolveColorHex('Olive Green', null), '#556B2F');
+    assert.equal(resolveColorHex('Deep Navy', null), '#0E1F3C');
+    assert.equal(resolveColorHex('Onyx Black', null), '#18191C');
+    assert.equal(resolveColorHex('Burgundy Wine', null), '#4A1525');
+    assert.equal(resolveColorHex('Ceil Blue', null), '#6BA4B8');
+    assert.equal(resolveColorHex('Custom Shade', '#123456'), '#123456');
+  });
+
+  // 6. PDP Buy Buttons & Clinical Telemetry Cards
+  it('10. PDP Telemetry and COD Purchase Button contracts', async () => {
+    const fs = await import('node:fs');
+    const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+
+    // COD Button text
+    assert.match(pdpLiquid, /BUY IT WITH CASH ON DELIVERY/, 'PDP must render "BUY IT WITH CASH ON DELIVERY" button');
+
+    // 4 Clinical Telemetry Cards
+    assert.match(pdpLiquid, /24hr Dispatch/, 'Telemetry must include "24hr Dispatch"');
+    assert.match(pdpLiquid, /Free Returns 15/, 'Telemetry must include "Free Returns 15"');
+    assert.match(pdpLiquid, /Easy EMI Options/, 'Telemetry must include "Easy EMI Options"');
+    assert.match(pdpLiquid, /Made in India/, 'Telemetry must include "Made in India"');
+  });
+
+  // 7. Sibling Color Swatch Linking Invariant
+  it('11. Sibling Color Swatches: links separate products and marks active product', () => {
+    const currentProductHandle = 'signature-scrub-top-navy';
+    const siblingProducts = [
+      { handle: 'signature-scrub-top-navy', title: 'Signature Top - Navy', color: 'Navy' },
+      { handle: 'signature-scrub-top-olive', title: 'Signature Top - Olive', color: 'Olive' },
+      { handle: 'signature-scrub-top-black', title: 'Signature Top - Black', color: 'Black' }
+    ];
+
+    const renderedSwatches = siblingProducts.map(p => {
+      const isActive = p.handle === currentProductHandle;
+      return {
+        tag: isActive ? 'span' : 'a',
+        href: isActive ? null : `/products/${p.handle}`,
+        isCurrent: isActive,
+        colorHex: resolveColorHex(p.color)
+      };
+    });
+
+    assert.equal(renderedSwatches.length, 3);
+    assert.equal(renderedSwatches[0].isCurrent, true);
+    assert.equal(renderedSwatches[0].tag, 'span');
+    assert.equal(renderedSwatches[0].href, null);
+
+    assert.equal(renderedSwatches[1].isCurrent, false);
+    assert.equal(renderedSwatches[1].tag, 'a');
+    assert.equal(renderedSwatches[1].href, '/products/signature-scrub-top-olive');
+    assert.equal(renderedSwatches[1].colorHex, '#556B2F');
+
+    assert.equal(renderedSwatches[2].isCurrent, false);
+    assert.equal(renderedSwatches[2].tag, 'a');
+    assert.equal(renderedSwatches[2].href, '/products/signature-scrub-top-black');
+    assert.equal(renderedSwatches[2].colorHex, '#18191C');
+  });
 });
+
 

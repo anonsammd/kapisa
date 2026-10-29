@@ -11,8 +11,93 @@
 
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 {% assign current_variant = product.selected_or_first_available_variant %}
-{% assign color_name = product.metafields.custom.color_name.value | default: 'Current color' %}
-{% assign color_products = product.metafields.custom.color_family_products.value %}
+
+{%- liquid
+  # Resolve current product color name
+  assign current_color_name = product.metafields.custom.color_name.value | default: product.metafields.custom.color_name
+  if current_color_name == blank
+    assign current_color_name = product.metafields.custom.color.value | default: product.metafields.custom.color
+  endif
+  if current_color_name == blank
+    assign current_color_name = product.metafields.custom.colour.value | default: product.metafields.custom.colour
+  endif
+
+  if current_color_name == blank or current_color_name == 'Current color'
+    if product.title contains '—'
+      assign current_color_name = product.title | split: '—' | last | strip
+    elsif product.title contains ' - '
+      assign current_color_name = product.title | split: ' - ' | last | strip
+    else
+      for opt in product.options_with_values
+        assign opt_down = opt.name | downcase
+        if opt_down contains 'color' or opt_down contains 'colour'
+          assign current_color_name = opt.selected_value | default: opt.values.first
+          break
+        endif
+      endfor
+    endif
+  endif
+
+  if current_color_name == blank or current_color_name == 'Current color'
+    assign current_color_name = 'Standard'
+  endif
+
+  # Resolve current product swatch hex code
+  assign current_swatch_raw = product.metafields.custom.color_swatch.value | default: product.metafields.custom.color_swatch
+  assign current_swatch_color = ''
+  if current_swatch_raw.hex != blank
+    assign current_swatch_color = current_swatch_raw.hex
+  elsif current_swatch_raw.color != blank
+    assign current_swatch_color = current_swatch_raw.color
+  elsif current_swatch_raw.rgb != blank
+    assign current_swatch_color = 'rgb(' | append: current_swatch_raw.rgb | append: ')'
+  elsif current_swatch_raw != blank and current_swatch_raw != 'Current color'
+    assign current_swatch_color = current_swatch_raw | strip
+  endif
+
+  if current_swatch_color == blank or current_swatch_color contains 'Current color'
+    assign c_search = current_color_name | append: ' ' | append: product.title | downcase
+    if c_search contains 'olive' or c_search contains 'sage' or c_search contains 'moss' or c_search contains 'army'
+      assign current_swatch_color = '#556B2F'
+    elsif c_search contains 'navy' or c_search contains 'midnight' or c_search contains 'deep blue'
+      assign current_swatch_color = '#0E1F3C'
+    elsif c_search contains 'black' or c_search contains 'onyx' or c_search contains 'charcoal'
+      assign current_swatch_color = '#18191C'
+    elsif c_search contains 'wine' or c_search contains 'burgundy' or c_search contains 'maroon' or c_search contains 'ruby'
+      assign current_swatch_color = '#4A1525'
+    elsif c_search contains 'hunter' or c_search contains 'forest' or c_search contains 'emerald' or c_search contains 'green'
+      assign current_swatch_color = '#1B4942'
+    elsif c_search contains 'ceil' or c_search contains 'sky' or c_search contains 'light blue'
+      assign current_swatch_color = '#6BA4B8'
+    elsif c_search contains 'royal' or c_search contains 'blue'
+      assign current_swatch_color = '#1B365D'
+    elsif c_search contains 'grey' or c_search contains 'gray' or c_search contains 'slate' or c_search contains 'pewter'
+      assign current_swatch_color = '#5A626A'
+    elsif c_search contains 'pastel' or c_search contains 'lavender' or c_search contains 'lilac' or c_search contains 'purple' or c_search contains 'plum'
+      assign current_swatch_color = '#756B98'
+    elsif c_search contains 'teal' or c_search contains 'caribbean' or c_search contains 'aqua'
+      assign current_swatch_color = '#0D9488'
+    elsif c_search contains 'white' or c_search contains 'cream' or c_search contains 'snow'
+      assign current_swatch_color = '#FAF7F0'
+    elsif c_search contains 'khaki' or c_search contains 'tan' or c_search contains 'beige'
+      assign current_swatch_color = '#C2B280'
+    else
+      assign current_swatch_color = '#0E1F3C'
+    endif
+  endif
+
+  # Resolve sibling products across metafields
+  assign color_products = product.metafields.custom.color_family_products.value | default: product.metafields.custom.color_family_products
+  if color_products == blank
+    assign color_products = product.metafields.custom.color_products.value | default: product.metafields.custom.color_products
+  endif
+  if color_products == blank
+    assign color_products = product.metafields.custom.related_products.value | default: product.metafields.custom.related_products
+  endif
+  if color_products == blank
+    assign color_products = product.metafields.custom.sibling_products.value | default: product.metafields.custom.sibling_products
+  endif
+-%}
 
 {% style %}
   /* =========================================================
@@ -39,11 +124,11 @@
   /* MAIN GRID */
   .ai-pdp-{{ ai_gen_id }}__grid {
     width: 100%;
-    max-width: {{ block.settings.content_width }}px;
+    max-width: {{ block.settings.content_width | default: 1240 }}px;
     margin: 0 auto;
     padding: clamp(32px, 4vw, 56px) 24px clamp(48px, 5vw, 72px);
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
     gap: clamp(36px, 4vw, 64px);
     align-items: start;
   }
@@ -58,8 +143,11 @@
     grid-template-columns: 84px minmax(0, 1fr);
     gap: 16px;
     align-items: start;
+    position: -webkit-sticky;
     position: sticky;
-    top: 96px;
+    top: var(--kapisa-header-total-height, 100px);
+    align-self: start;
+    z-index: 10;
   }
 
   /* Vertical Thumbnail Carousel */
@@ -67,7 +155,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 620px;
+    max-height: calc(100vh - var(--kapisa-header-total-height, 100px) - 32px);
     overflow-y: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
@@ -288,11 +376,33 @@
     text-transform: uppercase;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__sku {
-    color: #94A3B8;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+  .ai-pdp-{{ ai_gen_id }}__stock-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    border-radius: 999px;
+    color: #059669;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__stock-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__stock-pill.is-oos {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #DC2626;
   }
 
   /* Title */
@@ -311,6 +421,7 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   .ai-pdp-{{ ai_gen_id }}__stars {
@@ -342,17 +453,22 @@
     font-weight: 600;
   }
 
-  .ai-pdp-{{ ai_gen_id }}__shift-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    background: #F1F5F9;
-    border: 1px solid #E2E8F0;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 700;
+  .ai-pdp-{{ ai_gen_id }}__review-sep {
+    color: #CBD5E1;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__write-review {
     color: #0E1F3C;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__write-review:hover {
+    color: #C9A227;
   }
 
   /* Price Row */
@@ -444,26 +560,27 @@
 
   .ai-pdp-{{ ai_gen_id }}__swatch {
     position: relative;
-    display: block;
-    width: 38px;
-    height: 38px;
+    display: inline-block;
+    width: 36px;
+    height: 36px;
     flex-shrink: 0;
     padding: 0;
     border: 2px solid #FFFFFF;
     border-radius: 50%;
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 0 0 1px rgba(14, 31, 60, 0.15);
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 0 0 1.5px rgba(14, 31, 60, 0.2);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .ai-pdp-{{ ai_gen_id }}__swatch:hover {
-    transform: scale(1.12);
+    transform: scale(1.14);
+    box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 3.5px #C9A227;
   }
 
   .ai-pdp-{{ ai_gen_id }}__swatch.is-current {
-    box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #C9A227;
-    transform: scale(1.08);
+    box-shadow: 0 0 0 2px #FAF7F0, 0 0 0 4px #C9A227;
+    transform: scale(1.06);
   }
 
   /* =========================================================
@@ -1158,15 +1275,17 @@
      RESPONSIVE BREAKPOINTS
      ========================================================= */
 
-  @media (max-width: 749px) {
+  @media screen and (max-width: 989px) {
     .ai-pdp-{{ ai_gen_id }}__grid {
       display: block;
-      padding: 16px 14px 44px;
+      padding: 16px 16px 44px;
     }
 
     .ai-pdp-{{ ai_gen_id }}__media {
       display: block;
-      position: static;
+      position: relative;
+      top: auto;
+      align-self: auto;
     }
 
     .ai-pdp-{{ ai_gen_id }}__thumbs {
@@ -1342,7 +1461,16 @@
       <!-- Eyebrow & Brand -->
       <div class="ai-pdp-{{ ai_gen_id }}__eyebrow-row">
         <span class="ai-pdp-{{ ai_gen_id }}__vendor">KAPISA HEALTHCARE</span>
-        <span class="ai-pdp-{{ ai_gen_id }}__sku">ART. {{ product.id | slice: -4, 4 }}</span>
+        {% if current_variant.available %}
+          <span class="ai-pdp-{{ ai_gen_id }}__stock-pill">
+            <span class="ai-pdp-{{ ai_gen_id }}__stock-dot"></span>
+            IN STOCK
+          </span>
+        {% else %}
+          <span class="ai-pdp-{{ ai_gen_id }}__stock-pill is-oos">
+            OUT OF STOCK
+          </span>
+        {% endif %}
       </div>
 
       <!-- Title -->
@@ -1356,10 +1484,11 @@
           {% for s in (1..5) %}
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
           {% endfor %}
-          <span class="ai-pdp-{{ ai_gen_id }}__rating-num">4.9</span>
+          <span class="ai-pdp-{{ ai_gen_id }}__rating-num">5.0</span>
         </div>
-        <span class="ai-pdp-{{ ai_gen_id }}__rating-count">(1,240+ Verified Reviews)</span>
-        <span class="ai-pdp-{{ ai_gen_id }}__shift-badge">16-Hr Shift Rated</span>
+        <span class="ai-pdp-{{ ai_gen_id }}__rating-count">({{ product.metafields.reviews.rating_count.value | default: 25 }} Reviews)</span>
+        <span class="ai-pdp-{{ ai_gen_id }}__review-sep">·</span>
+        <a href="#kapisa-reviews" class="ai-pdp-{{ ai_gen_id }}__write-review">Write a Review</a>
       </div>
 
       <!-- Price Row -->
@@ -1388,7 +1517,7 @@
 
       <div class="ai-pdp-{{ ai_gen_id }}__tax-note">
         <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-        <span>Inclusive of all taxes • Free express medical shipping</span>
+        <span>Inclusive of all taxes • Free express shipping on all orders</span>
       </div>
 
       <!-- ===================================================
@@ -1403,117 +1532,200 @@
             break
           endif
         endfor
-
-        assign show_color_picker = false
-        if color_products != blank or color_option != blank
-          assign show_color_picker = true
-        endif
       -%}
 
-      {% if show_color_picker %}
-        <div class="ai-pdp-{{ ai_gen_id }}__color-picker">
-          {%- assign active_color_label = color_name -%}
-          {%- if color_option != blank and color_products == blank -%}
-            {%- assign active_color_label = color_option.selected_value | default: color_option.values.first -%}
-          {%- endif -%}
-          <div class="ai-pdp-{{ ai_gen_id }}__label-row">
-            <span class="ai-pdp-{{ ai_gen_id }}__label">
-              Colour: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-color-label>{{ active_color_label }}</span>
-            </span>
-          </div>
-
-          <div class="ai-pdp-{{ ai_gen_id }}__swatches">
-            {% if color_products != blank %}
-              {% for related in color_products %}
-                {%- liquid
-                  assign rel_url = blank
-                  if related.handle != blank
-                    assign rel_url = '/products/' | append: related.handle
-                  elsif related.url != blank
-                    assign rel_url = related.url
-                  endif
-
-                  assign rel_color_name = related.metafields.custom.color_name.value
-                  if rel_color_name == blank
-                    assign rel_color_name = related.title
-                  endif
-
-                  assign rel_color = related.metafields.custom.color_swatch.value
-                  if rel_color == blank
-                    assign title_down = related.title | downcase
-                    if title_down contains 'navy' or title_down contains 'blue'
-                      assign rel_color = '#1B3B6F'
-                    elsif title_down contains 'black'
-                      assign rel_color = '#18191C'
-                    elsif title_down contains 'green' or title_down contains 'hunter'
-                      assign rel_color = '#1B4942'
-                    elsif title_down contains 'red' or title_down contains 'wine' or title_down contains 'burgundy'
-                      assign rel_color = '#4A1525'
-                    elsif title_down contains 'grey' or title_down contains 'gray' or title_down contains 'slate'
-                      assign rel_color = '#40464D'
-                    elsif title_down contains 'pastel' or title_down contains 'lavender' or title_down contains 'lilac'
-                      assign rel_color = '#756B98'
-                    else
-                      assign rel_color = '#1E293B'
-                    endif
-                  endif
-                -%}
-
-                {% if rel_url != blank %}
-                  <a
-                    href="{{ rel_url }}"
-                    data-href="{{ rel_url }}"
-                    class="ai-pdp-{{ ai_gen_id }}__swatch{% if related.id == product.id or related.handle == product.handle %} is-current{% endif %}"
-                    style="background-color: {{ rel_color }};"
-                    title="{{ rel_color_name | escape }}"
-                    aria-label="{{ rel_color_name | escape }}"
-                  ></a>
-                {% endif %}
-              {% endfor %}
-            {% elsif color_option != blank %}
-              {% for val in color_option.values %}
-                {%- liquid
-                  assign color_clean = val | downcase | strip
-                  assign bg_color = color_clean
-                  if color_clean contains 'navy'
-                    assign bg_color = '#1B3B6F'
-                  elsif color_clean contains 'black'
-                    assign bg_color = '#18191C'
-                  elsif color_clean contains 'hunter' or color_clean contains 'green'
-                    assign bg_color = '#1B4942'
-                  elsif color_clean contains 'wine' or color_clean contains 'burgundy' or color_clean contains 'maroon'
-                    assign bg_color = '#4A1525'
-                  elsif color_clean contains 'grey' or color_clean contains 'gray' or color_clean contains 'slate'
-                    assign bg_color = '#40464D'
-                  elsif color_clean contains 'royal' or color_clean contains 'blue'
-                    assign bg_color = '#2563EB'
-                  elsif color_clean contains 'pastel' or color_clean contains 'lavender' or color_clean contains 'lilac'
-                    assign bg_color = '#756B98'
-                  endif
-
-                  assign matched_var = blank
-                  for v in product.variants
-                    if v.options contains val
-                      assign matched_var = v
-                      break
-                    endif
-                  endfor
-                -%}
-                <button
-                  type="button"
-                  class="ai-pdp-{{ ai_gen_id }}__swatch{% if current_variant.options contains val %} is-current{% endif %}"
-                  style="background-color: {{ bg_color }};"
-                  title="{{ val | escape }}"
-                  aria-label="{{ val | escape }}"
-                  data-variant-option
-                  data-variant-id="{{ matched_var.id | default: current_variant.id }}"
-                  data-option-label="{{ val | escape }}"
-                ></button>
-              {% endfor %}
-            {% endif %}
-          </div>
+      <div class="ai-pdp-{{ ai_gen_id }}__color-picker" data-color-picker-wrap>
+        <div class="ai-pdp-{{ ai_gen_id }}__label-row">
+          <span class="ai-pdp-{{ ai_gen_id }}__label">
+            Color: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-color-label data-default-color="{{ current_color_name | escape }}">{{ current_color_name }}</span>
+          </span>
         </div>
-      {% endif %}
+
+        <div class="ai-pdp-{{ ai_gen_id }}__swatches" role="radiogroup" aria-label="Available product colors">
+          {%- if color_products != blank -%}
+            {%- liquid
+              assign current_is_in_siblings = false
+              for item in color_products
+                assign s_prod = item
+                if s_prod.handle == blank
+                  assign s_prod = all_products[item]
+                endif
+                if s_prod.id == product.id or s_prod.handle == product.handle
+                  assign current_is_in_siblings = true
+                  break
+                endif
+              endfor
+            -%}
+
+            {%- unless current_is_in_siblings -%}
+              <span
+                class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
+                style="background-color: {{ current_swatch_color }};"
+                title="{{ current_color_name | escape }} (Selected)"
+                aria-label="{{ current_color_name | escape }} (Selected)"
+                data-color-name="{{ current_color_name | escape }}"
+                data-is-current="true"
+              ></span>
+            {%- endunless -%}
+
+            {%- for item in color_products -%}
+              {%- liquid
+                assign s_prod = item
+                if s_prod.handle == blank
+                  assign s_prod = all_products[item]
+                endif
+
+                if s_prod != blank and s_prod.title != blank
+                  assign is_active_item = false
+                  if s_prod.id == product.id or s_prod.handle == product.handle
+                    assign is_active_item = true
+                  endif
+
+                  assign s_color_name = s_prod.metafields.custom.color_name.value | default: s_prod.metafields.custom.color_name
+                  if s_color_name == blank
+                    assign s_color_name = s_prod.metafields.custom.color.value | default: s_prod.metafields.custom.color
+                  endif
+                  if s_color_name == blank
+                    if s_prod.title contains '—'
+                      assign s_color_name = s_prod.title | split: '—' | last | strip
+                    elsif s_prod.title contains ' - '
+                      assign s_color_name = s_prod.title | split: ' - ' | last | strip
+                    else
+                      assign s_color_name = s_prod.title
+                    endif
+                  endif
+
+                  assign s_swatch_raw = s_prod.metafields.custom.color_swatch.value | default: s_prod.metafields.custom.color_swatch
+                  assign s_color_hex = ''
+                  if s_swatch_raw.hex != blank
+                    assign s_color_hex = s_swatch_raw.hex
+                  elsif s_swatch_raw.color != blank
+                    assign s_color_hex = s_swatch_raw.color
+                  elsif s_swatch_raw.rgb != blank
+                    assign s_color_hex = 'rgb(' | append: s_swatch_raw.rgb | append: ')'
+                  elsif s_swatch_raw != blank and s_swatch_raw != 'Current color'
+                    assign s_color_hex = s_swatch_raw | strip
+                  endif
+
+                  if s_color_hex == blank or s_color_hex contains 'Current color'
+                    assign s_search = s_color_name | append: ' ' | append: s_prod.title | downcase
+                    if s_search contains 'olive' or s_search contains 'sage' or s_search contains 'moss' or s_search contains 'army'
+                      assign s_color_hex = '#556B2F'
+                    elsif s_search contains 'navy' or s_search contains 'midnight' or s_search contains 'deep blue'
+                      assign s_color_hex = '#0E1F3C'
+                    elsif s_search contains 'black' or s_search contains 'onyx' or s_search contains 'charcoal'
+                      assign s_color_hex = '#18191C'
+                    elsif s_search contains 'wine' or s_search contains 'burgundy' or s_search contains 'maroon' or s_search contains 'ruby'
+                      assign s_color_hex = '#4A1525'
+                    elsif s_search contains 'hunter' or s_search contains 'forest' or s_search contains 'emerald' or s_search contains 'green'
+                      assign s_color_hex = '#1B4942'
+                    elsif s_search contains 'ceil' or s_search contains 'sky' or s_search contains 'light blue'
+                      assign s_color_hex = '#6BA4B8'
+                    elsif s_search contains 'royal' or s_search contains 'blue'
+                      assign s_color_hex = '#1B365D'
+                    elsif s_search contains 'grey' or s_search contains 'gray' or s_search contains 'slate' or s_search contains 'pewter'
+                      assign s_color_hex = '#5A626A'
+                    elsif s_search contains 'pastel' or s_search contains 'lavender' or s_search contains 'lilac' or s_search contains 'purple' or s_search contains 'plum'
+                      assign s_color_hex = '#756B98'
+                    elsif s_search contains 'teal' or s_search contains 'caribbean' or s_search contains 'aqua'
+                      assign s_color_hex = '#0D9488'
+                    elsif s_search contains 'white' or s_search contains 'cream' or s_search contains 'snow'
+                      assign s_color_hex = '#FAF7F0'
+                    elsif s_search contains 'khaki' or s_search contains 'tan' or s_search contains 'beige'
+                      assign s_color_hex = '#C2B280'
+                    else
+                      assign s_color_hex = '#0E1F3C'
+                    endif
+                  endif
+                -%}
+
+                {%- if is_active_item -%}
+                  <span
+                    class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
+                    style="background-color: {{ s_color_hex }};"
+                    title="{{ s_color_name | escape }} (Selected)"
+                    aria-label="{{ s_color_name | escape }} (Selected)"
+                    data-color-name="{{ s_color_name | escape }}"
+                    data-is-current="true"
+                  ></span>
+                {%- else -%}
+                  <a
+                    href="{{ s_prod.url }}"
+                    class="ai-pdp-{{ ai_gen_id }}__swatch"
+                    style="background-color: {{ s_color_hex }};"
+                    title="{{ s_color_name | escape }}"
+                    aria-label="{{ s_color_name | escape }}"
+                    data-color-name="{{ s_color_name | escape }}"
+                  ></a>
+                {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+          {%- elsif color_option != blank -%}
+            {%- for val in color_option.values -%}
+              {%- liquid
+                assign color_clean = val | downcase | strip
+                assign bg_color = '#0E1F3C'
+                if color_clean contains 'olive' or color_clean contains 'sage' or color_clean contains 'army'
+                  assign bg_color = '#556B2F'
+                elsif color_clean contains 'navy' or color_clean contains 'midnight' or color_clean contains 'blue'
+                  assign bg_color = '#0E1F3C'
+                elsif color_clean contains 'black' or color_clean contains 'onyx'
+                  assign bg_color = '#18191C'
+                elsif color_clean contains 'hunter' or color_clean contains 'green'
+                  assign bg_color = '#1B4942'
+                elsif color_clean contains 'wine' or color_clean contains 'burgundy' or color_clean contains 'maroon'
+                  assign bg_color = '#4A1525'
+                elsif color_clean contains 'grey' or color_clean contains 'gray' or color_clean contains 'slate'
+                  assign bg_color = '#5A626A'
+                elsif color_clean contains 'royal' or color_clean contains 'blue'
+                  assign bg_color = '#1B365D'
+                elsif color_clean contains 'ceil'
+                  assign bg_color = '#6BA4B8'
+                elsif color_clean contains 'pastel' or color_clean contains 'lavender' or color_clean contains 'lilac'
+                  assign bg_color = '#756B98'
+                elsif color_clean contains 'teal'
+                  assign bg_color = '#0D9488'
+                endif
+
+                assign matched_var = blank
+                for v in product.variants
+                  if v.options contains val
+                    assign matched_var = v
+                    break
+                  endif
+                endfor
+
+                assign is_selected_var = false
+                if current_variant.options contains val
+                  assign is_selected_var = true
+                endif
+              -%}
+              <button
+                type="button"
+                class="ai-pdp-{{ ai_gen_id }}__swatch{% if is_selected_var %} is-current{% endif %}"
+                style="background-color: {{ bg_color }};"
+                title="{{ val | escape }}"
+                aria-label="{{ val | escape }}"
+                data-variant-option
+                data-variant-id="{{ matched_var.id | default: current_variant.id }}"
+                data-option-label="{{ val | escape }}"
+                data-color-name="{{ val | escape }}"
+              ></button>
+            {%- endfor -%}
+
+          {%- else -%}
+            <span
+              class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
+              style="background-color: {{ current_swatch_color }};"
+              title="{{ current_color_name | escape }} (Selected)"
+              aria-label="{{ current_color_name | escape }} (Selected)"
+              data-color-name="{{ current_color_name | escape }}"
+              data-is-current="true"
+            ></span>
+          {%- endif -%}
+        </div>
+      </div>
 
       <!-- ===================================================
            SHOPIFY PRODUCT FORM (SIZE, QTY, BUY)
@@ -1637,7 +1849,7 @@
             class="ai-pdp-{{ ai_gen_id }}__now"
             data-buy
           >
-            Instant Buy Now
+            BUY IT WITH CASH ON DELIVERY
           </button>
         </div>
       </form>
@@ -1646,31 +1858,31 @@
       <div class="ai-pdp-{{ ai_gen_id }}__telemetry">
         <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
           <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
           </div>
           <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">16-Hr Shift Verified</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Tested with Chief Residents</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">24hr Dispatch</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Free shipping on orders</div>
           </div>
         </div>
 
         <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
           <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
           </div>
           <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Fluid Repellent 4A</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Hydrophobic barrier protection</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Free Returns 15</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Complimentary returns policy</div>
           </div>
         </div>
 
         <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
           <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 9 2 12 5 15"></polyline><polyline points="9 5 12 2 15 5"></polyline><polyline points="15 19 12 22 9 19"></polyline><polyline points="19 9 22 12 19 15"></polyline><line x1="2" y1="12" x2="22" y2="12"></line><line x1="12" y1="2" x2="12" y2="22"></line></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
           </div>
           <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">4-Way Omnidirectional</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Unrestricted surgical range</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Easy EMI Options</div>
+            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Available at checkout</div>
           </div>
         </div>
 
@@ -2037,7 +2249,25 @@
       }
 
       bindColorSwatches() {
+        const colorLabel = this.querySelector('[data-active-color-label]');
+        const defaultColor = colorLabel ? (colorLabel.getAttribute('data-default-color') || colorLabel.textContent.trim()) : '';
+
         this.querySelectorAll('.ai-pdp-{{ ai_gen_id }}__swatch').forEach(swatch => {
+          swatch.addEventListener('mouseenter', () => {
+            const hoverColor = swatch.getAttribute('data-color-name') || swatch.getAttribute('title');
+            if (colorLabel && hoverColor) {
+              colorLabel.textContent = hoverColor.replace(' (Selected)', '').trim();
+            }
+          });
+
+          swatch.addEventListener('mouseleave', () => {
+            if (colorLabel) {
+              const activeSwatch = this.querySelector('.ai-pdp-{{ ai_gen_id }}__swatch.is-current');
+              const activeColor = activeSwatch ? (activeSwatch.getAttribute('data-color-name') || activeSwatch.getAttribute('title') || '').replace(' (Selected)', '').trim() : defaultColor;
+              colorLabel.textContent = activeColor || defaultColor;
+            }
+          });
+
           swatch.addEventListener('click', (event) => {
             const targetUrl = swatch.getAttribute('href') || swatch.dataset.href;
             if (targetUrl && targetUrl !== '#' && targetUrl !== '') {

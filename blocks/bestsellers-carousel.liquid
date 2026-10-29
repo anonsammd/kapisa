@@ -574,7 +574,13 @@
               <div class="ai-best-{{ ai_gen_id }}__price">{{ product.price | money }}</div>
 
               {%- liquid
-                assign color_family_prods = product.metafields.custom.color_family_products.value
+                assign color_family_prods = product.metafields.custom.color_family_products.value | default: product.metafields.custom.color_family_products
+                if color_family_prods == blank
+                  assign color_family_prods = product.metafields.custom.color_products.value | default: product.metafields.custom.color_products
+                endif
+                if color_family_prods == blank
+                  assign color_family_prods = product.metafields.custom.related_products.value | default: product.metafields.custom.related_products
+                endif
                 assign color_option = blank
                 for option in product.options_with_values
                   assign opt_name = option.name | downcase
@@ -583,7 +589,7 @@
                     break
                   endif
                 endfor
-                assign custom_swatches = product.metafields.custom.color_swatch.value
+                assign custom_swatches = product.metafields.custom.color_swatch.value | default: product.metafields.custom.color_swatch
               -%}
               {% if color_family_prods != blank %}
                 <div class="ai-best-{{ ai_gen_id }}__swatches" aria-label="Available colors">
