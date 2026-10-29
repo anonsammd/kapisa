@@ -1,0 +1,4 @@
+# Theme Editor data is merchant-owned; do not overwrite it during routine code pushes.
+config/settings_data.json
+templates/*.json
+sections/*-group.json

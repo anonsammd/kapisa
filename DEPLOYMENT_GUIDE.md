@@ -32,6 +32,14 @@ The **Kapisa Theme** is built on Shopify Online Store 2.0 (OS 2.0) architecture 
 
 ## Step 1: Uploading Theme to Shopify
 
+### Updating an existing store without resetting Theme Editor content
+
+Shopify stores section settings—including uploaded hero videos, Instagram tiles, and institutional banner images—in JSON files such as `templates/index.json`. Those files are merchant-managed configuration, not just theme code. A normal push of stale local JSON can replace the values saved in Shopify with the local defaults or older file references.
+
+The root `.shopifyignore` protects `config/settings_data.json`, all `templates/*.json` files, and `sections/*-group.json` during routine Shopify CLI pushes. Keep this file in the theme folder and use Shopify CLI for incremental updates to an existing theme. Deploy code changes to a duplicate/staging theme first, preview it, and publish only after verifying the hero video, homepage imagery, and other Theme Editor content.
+
+Do not upload a fresh ZIP over an existing production theme for routine code updates: ZIP uploads do not use this CLI ignore safeguard. For an initial installation or a deliberate template/layout change, explicitly include the protected JSON files only after merging the current Theme Editor settings from Shopify into the local files and reviewing the result. Never publish a newly created theme with unreviewed defaults as a replacement for the configured production theme.
+
 1. Select all files and folders in this directory:
    - `assets/`
    - `blocks/`
@@ -43,6 +51,8 @@ The **Kapisa Theme** is built on Shopify Online Store 2.0 (OS 2.0) architecture 
    - `templates/`
    - `DEPLOYMENT_GUIDE.md`
 
+   Do not include `.shopifyignore` in the ZIP; it is a local Shopify CLI deployment safeguard, not a theme asset.
+
 2. Compress these files into a single `.zip` file (e.g. `kapisa-theme.zip`).
 
 3. Log in to your **Shopify Admin**.
@@ -50,6 +60,8 @@ The **Kapisa Theme** is built on Shopify Online Store 2.0 (OS 2.0) architecture 
 5. In the **Theme library** section, click **Add theme > Upload zip file**.
 6. Select `kapisa-theme.zip` and click **Upload file**.
 7. Once uploaded, click **Actions > Publish** when you are ready to make it live.
+
+The ZIP workflow above is for an initial theme installation. For existing production stores, follow **Updating an existing store without resetting Theme Editor content** instead.
 
 ---
 

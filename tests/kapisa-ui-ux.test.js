@@ -155,8 +155,10 @@ describe('Kapisa UI/UX Collection & PDP Architecture Verification', () => {
     assert.match(pdpLiquid, /position:\s*sticky/i, 'kapisa-product-info.liquid must declare position: sticky');
     assert.match(pdpLiquid, /top:\s*var\(--kapisa-header-total-height,\s*100px\)/i, 'kapisa-product-info.liquid must anchor sticky to header height');
     assert.match(pdpLiquid, /align-self:\s*start/i, 'Sticky media column must have align-self: start');
-    assert.match(pdpLiquid, /__main\s*\{[^}]*aspect-ratio:\s*1\s*\/\s*1\.18[^}]*background:\s*#FFFFFF/is, 'PDP image frame must keep a consistent ratio and white backdrop');
-    assert.match(pdpLiquid, /__slide img\s*\{[^}]*object-fit:\s*contain/is, 'Product media must remain uncropped inside the image frame');
+    assert.match(pdpLiquid, /__main-wrap\s*\{[^}]*border-radius:\s*22px[^}]*background:\s*transparent[^}]*border:\s*0[^}]*box-shadow:\s*0\s*14px\s*36px/is, 'PDP image should have a subtle premium frame without its own background');
+    assert.match(pdpLiquid, /__main\s*\{[^}]*height:\s*auto[^}]*background:\s*transparent/is, 'PDP gallery height must follow its image without a background canvas');
+    assert.match(pdpLiquid, /__slide img\s*\{[^}]*height:\s*auto[^}]*object-fit:\s*contain/is, 'Product image must retain its natural ratio and remain uncropped');
+    assert.match(pdpLiquid, /__slide\s*\{[^}]*height:\s*auto/is, 'Product slides must size to their image instead of a fixed gallery frame');
   });
 
   // 5. Multi-Metafield Color Swatch Resolver Logic
