@@ -174,8 +174,9 @@
     {% elsif section_key == 'shipping' and product.metafields.custom.shipping_returns != blank %}
       {% assign content = product.metafields.custom.shipping_returns.value | default: product.metafields.custom.shipping_returns %}
     {% endif %}
+    {% assign content_text = content | strip_html | strip %}
 
-    {% if title != blank and content != blank %}
+    {% if title != blank and content_text != blank %}
       <div class="kapisa-details-{{ accordion_id }}__item">
 
         <button
@@ -274,7 +275,7 @@
       "type": "richtext",
       "id": "fabric_content",
       "label": "Fabric content",
-      "default": "<p>Describe the fabric, comfort, stretch and construction.</p>"
+      "default": "<p></p>"
     },
     {
       "type": "text",
@@ -286,7 +287,7 @@
       "type": "richtext",
       "id": "care_content",
       "label": "Care content",
-      "default": "<p>Follow the recommended washing and care instructions.</p>"
+      "default": "<p></p>"
     },
     {
       "type": "text",
@@ -298,7 +299,7 @@
       "type": "richtext",
       "id": "fit_content",
       "label": "Fit content",
-      "default": "<p>Use the size guide to find your best fit.</p>"
+      "default": "<p></p>"
     },
     {
       "type": "text",
@@ -310,7 +311,7 @@
       "type": "richtext",
       "id": "shipping_content",
       "label": "Shipping content",
-      "default": "<p>Add your shipping and return information here.</p>"
+      "default": "<p></p>"
     }
   ],
   "presets": [

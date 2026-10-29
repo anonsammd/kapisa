@@ -47,6 +47,7 @@ The **Kapisa Theme** is built natively on Shopify Online Store 2.0 (OS 2.0).
 ## Step 2: Metafields Setup (Required)
 
 Go to **Shopify Admin > Settings > Custom data > Products > Add definition**:
+The live store audit found the color and embroidery-preview definitions below already exist. Verify them before adding anything to avoid creating duplicate definitions; the optional product-detail and embroidery-option definitions are not currently present.
 
 ### 1. Color Name
 * **Name**: `Color Name`
@@ -72,23 +73,41 @@ Go to **Shopify Admin > Settings > Custom data > Products > Add definition**:
 * **Type**: `List of Products` (`product_reference` - list)
 * **Description**: Links related color products so customers can switch colors on PDP with one click.
 
-### 5. Embroidery Preview Image (Left Chest)
+### 5. Product Details (Optional)
+Create these product metafield definitions if the product details accordion should show product-specific content. Use `Rich text` for each:
+* `custom.fabric_details`
+* `custom.care_instructions`
+* `custom.fit_guide`
+* `custom.shipping_returns`
+
+The accordion uses these values when present. `custom.fit_guide` also supplies the PDP size-guide modal; its Theme Editor content setting is an optional fallback. Theme Editor accordion content fields are empty by default, so placeholder text is never shown to customers.
+
+### 6. Embroidery Options (Optional)
+The product page can use `custom.embroidery_options` for per-product choices, but this store does not currently have the `embroidery_option` metaobject definition or product metafield definition. Define the metaobject type `embroidery_option` first with:
+* `kind` — Single line text (`top`, `bottom`, or `combo`)
+* `label` — Single line text
+* `service_variant` — Variant reference
+* `sort_order` — Integer
+
+Then define `custom.embroidery_options` as a list of metaobject references to `embroidery_option`. Until configured, the embroidery section uses the live variants on the `Embroidery Options (Service)` product.
+
+### 7. Embroidery Preview Image (Left Chest)
 * **Name**: `Embroidery preview image (left chest)`
 * **Namespace and key**: `custom.top_embroidery_image`
 * **Type**: `File` (Image)
 * **Description**: ONE preview image per product/colour (approx 600x640 or 4:5 ratio). Close-up crop of the scrub neckline and left chest pocket. Reused for Top, Bottom, and Combo.
 
-### 6. Embroidery Disabled (Opt-Out)
+### 8. Embroidery Disabled (Opt-Out)
 * **Name**: `Embroidery disabled`
 * **Namespace and key**: `custom.embroidery_disabled`
 * **Type**: `True/false` (Boolean)
 * **Description**: Check to hide custom embroidery on specific non-embroiderable products (e.g. scrub caps, socks).
 
-### 7. Embroidery Options
-* **Name**: `Embroidery options`
-* **Namespace and key**: `custom.embroidery_options`
-* **Type**: `List of Metaobjects` (Metaobject type: `embroidery_option`)
-* **Description**: Optional per-product embroidery option list.
+### 9. Bottom and Combo Embroidery Preview Images (Optional)
+* `custom.bottom_embroidery_image` — File (Image)
+* `custom.combo_embroidery_image` — File (Image)
+
+Shopify's standard `reviews.rating` and `reviews.rating_count` metafields supply the rating summary when a reviews app writes those values; individual review text should come from the review app rather than hardcoded theme copy.
 
 ---
 
@@ -215,4 +234,3 @@ Go to **Shopify Admin > Settings > Custom data > Metaobjects > Add definition**:
 4. Under Blocks:
    * **Thread colour blocks**: Add, edit, or reorder thread color dots (`White`, `Black`, `Gold`, `Grey`, `Neon Green`, `Pink`).
 5. Click **Save**.
-

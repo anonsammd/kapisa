@@ -138,13 +138,7 @@
               <p class="ai-look__name-{{ ai_gen_id }}">{{ product.title }}</p>
               <p class="ai-look__price-{{ ai_gen_id }}">{{ product.price | money }}</p>
               {%- liquid
-                assign card_color_prods = product.metafields.custom.color_family_products.value | default: product.metafields.custom.color_family_products
-                if card_color_prods == blank
-                  assign card_color_prods = product.metafields.custom.color_products.value | default: product.metafields.custom.color_products
-                endif
-                if card_color_prods == blank
-                  assign card_color_prods = product.metafields.custom.related_products.value | default: product.metafields.custom.related_products
-                endif
+                assign card_color_prods = product.metafields.custom.color_family_products.value
                 assign card_color_opt = blank
                 for option in product.options_with_values
                   assign opt_name_l = option.name | downcase

@@ -1,26 +1,38 @@
 {% comment %}
-  KAPISA — Luxury Clinical Product Information & Multi-Angle Media Viewer
-  - Multi-angle clinical viewer with smooth thumbnail carousel & mobile swipe gallery
+  KAPISA — Product Information & Multi-Angle Media Viewer
+  - Multi-angle viewer with smooth thumbnail carousel & mobile swipe gallery
   - Luxury pill size selector with availability indicators & size guide modal
-  - Rich color swatches with active gold ring & live label
-  - Clinical telemetry cards (16-Hr Verified, Fluid Repellent 4A, 4-Way Stretch, Autoclave Safe)
+  - Color swatches linked to Shopify product references or native variants
   - Seamless Custom Embroidery Module hook (sections/kapisa-custom-embroidery.liquid)
-  - Interactive clinical tabs (Fabric Science, Surgical Specs, Fit & Drape, Care)
   - Native mobile sticky bottom action bar
 {% endcomment %}
 
 {% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
 {% assign current_variant = product.selected_or_first_available_variant %}
+{% assign rating_value = product.metafields.reviews.rating.value %}
+{% assign rating_score = rating_value.rating | default: 0 %}
+{% assign rating_scale = rating_value.scale_max | default: 5 %}
+{% assign review_count = product.metafields.reviews.rating_count.value | default: 0 %}
+{% assign embroidery_service_product = all_products['embroidery-options-service'] %}
+{% assign embroidery_starting_price = blank %}
+{% assign embroidery_disabled = false %}
 
 {%- liquid
-  # Resolve current product color name
+  if product.metafields.custom.embroidery_disabled.value == true or product.gift_card? or product.type == 'Gift Card' or product.handle contains 'gift-card' or product.handle contains 'embroidery-options'
+    assign embroidery_disabled = true
+  endif
+
+  if embroidery_service_product != blank
+    for service_variant in embroidery_service_product.variants
+      if service_variant.available
+        if embroidery_starting_price == blank or service_variant.price < embroidery_starting_price
+          assign embroidery_starting_price = service_variant.price
+        endif
+      endif
+    endfor
+  endif
+
   assign current_color_name = product.metafields.custom.color_name.value | default: product.metafields.custom.color_name
-  if current_color_name == blank
-    assign current_color_name = product.metafields.custom.color.value | default: product.metafields.custom.color
-  endif
-  if current_color_name == blank
-    assign current_color_name = product.metafields.custom.colour.value | default: product.metafields.custom.colour
-  endif
 
   if current_color_name == blank or current_color_name == 'Current color'
     if product.title contains '—'
@@ -38,34 +50,10 @@
     endif
   endif
 
-  if current_color_name == blank or current_color_name == 'Current color'
-    assign current_color_name = 'Standard'
-  endif
-
-  # Resolve current product swatch hex code or image
   assign current_swatch_raw = product.metafields.custom.color_swatch.value | default: product.metafields.custom.color_swatch
-  assign current_swatch_color = ''
-  assign current_swatch_image = ''
-  if current_swatch_raw.image_url != blank
-    assign current_swatch_image = current_swatch_raw | image_url: width: 72
-  elsif current_swatch_raw.preview_image != blank
-    assign current_swatch_image = current_swatch_raw.preview_image | image_url: width: 72
-  elsif current_swatch_raw.hex != blank
-    assign current_swatch_color = current_swatch_raw.hex
-  elsif current_swatch_raw.color != blank
-    assign current_swatch_color = current_swatch_raw.color
-  elsif current_swatch_raw.rgb != blank
-    assign current_swatch_color = 'rgb(' | append: current_swatch_raw.rgb | append: ')'
-  elsif current_swatch_raw != blank and current_swatch_raw != 'Current color'
-    assign raw_str = current_swatch_raw | strip
-    if raw_str contains '#' or raw_str contains 'rgb'
-      assign current_swatch_color = raw_str
-    elsif raw_str contains 'http' or raw_str contains 'shopify://'
-      assign current_swatch_image = raw_str
-    endif
-  endif
+  assign current_swatch_color = current_swatch_raw
 
-  if current_swatch_color == blank and current_swatch_image == blank
+  if current_swatch_color == blank
     assign c_search = current_color_name | append: ' ' | append: product.title | downcase
     if c_search contains 'olive' or c_search contains 'sage' or c_search contains 'moss' or c_search contains 'army'
       assign current_swatch_color = '#556B2F'
@@ -96,51 +84,11 @@
     endif
   endif
 
-  # Resolve sibling products across metafields
-  assign color_products = product.metafields.custom.color_family_products.value | default: product.metafields.custom.color_family_products
-  if color_products == blank
-    assign color_products = product.metafields.custom.color_products.value | default: product.metafields.custom.color_products
-  endif
-  if color_products == blank
-    assign color_products = product.metafields.custom.related_products.value | default: product.metafields.custom.related_products
-  endif
-  if color_products == blank
-    assign color_products = product.metafields.custom.sibling_products.value | default: product.metafields.custom.sibling_products
-  endif
-
-  # Smart Collection Sibling Discovery Fallback:
-  # When color_family_products is not yet manually filled out, discover siblings from collection by base title or custom.color_family
-  if color_products == blank
-    assign p_coll = collection | default: product.collections.first
-    if p_coll == blank
-      assign p_coll = collections['scrubs'] | default: collections.all
-    endif
-
-    assign p_base_title = product.title | split: '—' | first | split: ' - ' | first | strip | downcase
-    assign p_family_val = product.metafields.custom.color_family.value | default: product.metafields.custom.color_family | downcase | strip
-
-    if p_coll != blank and p_coll.products != blank
-      assign discovered_list = ''
-      for p in p_coll.products limit: 30
-        assign other_base = p.title | split: '—' | first | split: ' - ' | first | strip | downcase
-        assign other_fam = p.metafields.custom.color_family.value | default: p.metafields.custom.color_family | downcase | strip
-
-        assign is_matching_sibling = false
-        if p_family_val != blank and other_fam == p_family_val
-          assign is_matching_sibling = true
-        elsif p_base_title.size > 3 and other_base == p_base_title
-          assign is_matching_sibling = true
-        endif
-
-        if is_matching_sibling
-          assign discovered_list = discovered_list | append: p.handle | append: ','
-        endif
-      endfor
-
-      if discovered_list != blank
-        assign color_products = discovered_list | split: ','
-      endif
-    endif
+  assign color_products = product.metafields.custom.color_family_products.value
+  assign size_guide_content = product.metafields.custom.fit_guide.value | default: product.metafields.custom.fit_guide | default: block.settings.size_guide
+  assign has_explicit_color_name = false
+  if product.metafields.custom.color_name.value != blank and product.metafields.custom.color_name.value != 'Current color'
+    assign has_explicit_color_name = true
   endif
 -%}
 
@@ -173,9 +121,10 @@
     margin: 0 auto;
     padding: clamp(32px, 4vw, 56px) 24px clamp(48px, 5vw, 72px);
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
-    gap: clamp(36px, 4vw, 64px);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: clamp(24px, 3.2vw, 48px);
     align-items: start;
+    box-sizing: border-box;
   }
 
   /* =========================================================
@@ -192,7 +141,7 @@
     position: sticky;
     top: var(--kapisa-header-total-height, 100px);
     align-self: start;
-    z-index: 10;
+    z-index: 1;
   }
 
   .ai-pdp-{{ ai_gen_id }}__media.no-thumbs {
@@ -248,8 +197,8 @@
     width: 100%;
     height: auto;
     aspect-ratio: 1 / 1.15;
-    object-fit: cover;
-    object-position: center top;
+    object-fit: contain;
+    object-position: center;
   }
 
   /* Main Slide Viewport */
@@ -289,7 +238,7 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center top;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     transform-origin: var(--x, 50%) var(--y, 50%);
@@ -489,6 +438,10 @@
     width: 12px;
     height: 12px;
     fill: currentColor;
+  }
+
+  .ai-pdp-{{ ai_gen_id }}__stars svg:not(.is-filled) {
+    color: #CBD5E1;
   }
 
   .ai-pdp-{{ ai_gen_id }}__rating-num {
@@ -762,6 +715,7 @@
 
   /* CUSTOM EMBROIDERY LUXURY MODULE TRIGGER */
   .ai-pdp-{{ ai_gen_id }}__embroidery-box {
+    width: 100%;
     margin-bottom: 24px;
     padding: 16px 18px;
     background: linear-gradient(135deg, rgba(201, 162, 39, 0.08) 0%, rgba(14, 31, 60, 0.03) 100%);
@@ -771,6 +725,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 14px;
+    color: inherit;
+    font: inherit;
+    text-align: left;
     cursor: pointer;
     transition: all 0.25s ease;
   }
@@ -800,6 +757,7 @@
   }
 
   .ai-pdp-{{ ai_gen_id }}__embroidery-title {
+    display: block;
     font-size: 13px;
     font-weight: 700;
     color: #0E1F3C;
@@ -807,6 +765,7 @@
   }
 
   .ai-pdp-{{ ai_gen_id }}__embroidery-sub {
+    display: block;
     font-size: 11px;
     color: #64748B;
     margin: 0;
@@ -1505,7 +1464,7 @@
                 type="button"
                 class="ai-pdp-{{ ai_gen_id }}__thumb{% if image_index == 0 %} is-active{% endif %}"
                 data-gallery-index="{{ image_index }}"
-                aria-label="View clinical angle {{ image_index | plus: 1 }}"
+                aria-label="View product image {{ image_index | plus: 1 }}"
               >
                 <img
                   src="{{ media | image_url: width: 160 }}"
@@ -1524,12 +1483,6 @@
       <!-- Main Slide Viewport -->
       <div>
         <div class="ai-pdp-{{ ai_gen_id }}__main-wrap">
-          <!-- Signature Badge Overlay -->
-          <div class="ai-pdp-{{ ai_gen_id }}__media-badge">
-            <span class="ai-pdp-{{ ai_gen_id }}__media-badge-dot"></span>
-            <span>Clinical Grade • Grade 4A</span>
-          </div>
-
           <!-- Counter Pill for Mobile -->
           <div class="ai-pdp-{{ ai_gen_id }}__counter-pill">
             <span data-active-slide-num>1</span> / <span>{{ product.media.size }}</span>
@@ -1580,17 +1533,18 @@
          ===================================================== -->
     <div class="ai-pdp-{{ ai_gen_id }}__info">
       
-      <!-- Eyebrow & Brand -->
       <div class="ai-pdp-{{ ai_gen_id }}__eyebrow-row">
-        <span class="ai-pdp-{{ ai_gen_id }}__vendor">KAPISA HEALTHCARE</span>
+        {% if product.vendor != blank %}
+          <span class="ai-pdp-{{ ai_gen_id }}__vendor">{{ product.vendor | escape }}</span>
+        {% endif %}
         {% if current_variant.available %}
-          <span class="ai-pdp-{{ ai_gen_id }}__stock-pill">
+          <span class="ai-pdp-{{ ai_gen_id }}__stock-pill" data-stock-status>
             <span class="ai-pdp-{{ ai_gen_id }}__stock-dot"></span>
-            IN STOCK
+            <span data-stock-label>In stock</span>
           </span>
         {% else %}
-          <span class="ai-pdp-{{ ai_gen_id }}__stock-pill is-oos">
-            OUT OF STOCK
+          <span class="ai-pdp-{{ ai_gen_id }}__stock-pill is-oos" data-stock-status>
+            <span data-stock-label>Sold out</span>
           </span>
         {% endif %}
       </div>
@@ -1600,18 +1554,23 @@
         {{ product.title }}
       </h1>
 
-      <!-- Review & Shift Rating Metric -->
-      <div class="ai-pdp-{{ ai_gen_id }}__review-row">
-        <div class="ai-pdp-{{ ai_gen_id }}__stars">
-          {% for s in (1..5) %}
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          {% endfor %}
-          <span class="ai-pdp-{{ ai_gen_id }}__rating-num">5.0</span>
+      {% if rating_score > 0 and review_count > 0 %}
+        <div class="ai-pdp-{{ ai_gen_id }}__review-row">
+          <div
+            class="ai-pdp-{{ ai_gen_id }}__stars"
+            role="img"
+            aria-label="{{ rating_score }} out of {{ rating_scale }} stars"
+          >
+            {% for s in (1..5) %}
+              <svg class="{% if s <= rating_score %}is-filled{% endif %}" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            {% endfor %}
+            <span class="ai-pdp-{{ ai_gen_id }}__rating-num">{{ rating_score | round: 1 }}</span>
+          </div>
+          <span class="ai-pdp-{{ ai_gen_id }}__rating-count">({{ review_count }} reviews)</span>
+          <span class="ai-pdp-{{ ai_gen_id }}__review-sep" aria-hidden="true">|</span>
+          <a href="#kapisa-reviews" class="ai-pdp-{{ ai_gen_id }}__write-review">See all {{ review_count }} reviews</a>
         </div>
-        <span class="ai-pdp-{{ ai_gen_id }}__rating-count">({{ product.metafields.reviews.rating_count.value | default: 42 }} verified reviews)</span>
-        <span class="ai-pdp-{{ ai_gen_id }}__review-sep">|</span>
-        <a href="#kapisa-reviews" class="ai-pdp-{{ ai_gen_id }}__write-review">See all {{ product.metafields.reviews.rating_count.value | default: 42 }} reviews</a>
-      </div>
+      {% endif %}
 
       <!-- Price Row -->
       <div class="ai-pdp-{{ ai_gen_id }}__price" data-product-price>
@@ -1631,16 +1590,26 @@
           {% endif %}
         </span>
 
+        {% assign save_pct = 0 %}
         {% if current_variant.compare_at_price > current_variant.price %}
           {% assign save_pct = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round %}
-          <span class="ai-pdp-{{ ai_gen_id }}__save-chip">Save {{ save_pct }}%</span>
         {% endif %}
+        <span class="ai-pdp-{{ ai_gen_id }}__save-chip" data-save-chip {% unless current_variant.compare_at_price > current_variant.price %}hidden{% endunless %}>Save {{ save_pct }}%</span>
       </div>
 
-      <div class="ai-pdp-{{ ai_gen_id }}__tax-note">
-        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
-        <span>Inclusive of all taxes • Free express shipping on all orders</span>
-      </div>
+      {% if cart.taxes_included or shop.shipping_policy.body != blank %}
+        <div class="ai-pdp-{{ ai_gen_id }}__tax-note">
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/></svg>
+          <span>
+            {% if cart.taxes_included %}
+              {{ 'products.product.taxes_included' | t }}
+            {% endif %}
+            {% if shop.shipping_policy.body != blank %}
+              {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+            {% endif %}
+          </span>
+        </div>
+      {% endif %}
 
       <!-- ===================================================
            COLOR SELECTOR
@@ -1656,22 +1625,20 @@
         endfor
       -%}
 
+      {% if color_products != blank or color_option != blank or has_explicit_color_name %}
       <div class="ai-pdp-{{ ai_gen_id }}__color-picker" data-color-picker-wrap>
         <div class="ai-pdp-{{ ai_gen_id }}__label-row">
           <span class="ai-pdp-{{ ai_gen_id }}__label">
-            Color: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-color-label data-default-color="{{ current_color_name | escape }}">{{ current_color_name }}</span>
+            Color: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-color-label data-selected-option-label="{% if color_option != blank %}{{ color_option.position | minus: 1 }}{% endif %}" data-default-color="{{ current_color_name | escape }}">{{ current_color_name | escape }}</span>
           </span>
         </div>
 
-        <div class="ai-pdp-{{ ai_gen_id }}__swatches" role="radiogroup" aria-label="Available product colors">
+        <div class="ai-pdp-{{ ai_gen_id }}__swatches" role="group" aria-label="Available product colors">
           {%- if color_products != blank -%}
             {%- liquid
               assign current_is_in_siblings = false
               for item in color_products
                 assign s_prod = item
-                if s_prod.handle == blank
-                  assign s_prod = all_products[item]
-                endif
                 if s_prod.id == product.id or s_prod.handle == product.handle
                   assign current_is_in_siblings = true
                   break
@@ -1682,7 +1649,7 @@
             {%- unless current_is_in_siblings -%}
               <span
                 class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
-                style="{% if current_swatch_image != blank %}background-image: url('{{ current_swatch_image }}'); background-size: cover;{% else %}background-color: {{ current_swatch_color }};{% endif %}"
+                style="background-color: {{ current_swatch_color }};"
                 title="{{ current_color_name | escape }} (Selected)"
                 aria-label="{{ current_color_name | escape }} (Selected)"
                 data-color-name="{{ current_color_name | escape }}"
@@ -1694,9 +1661,6 @@
             {%- for item in color_products -%}
               {%- liquid
                 assign s_prod = item
-                if s_prod.handle == blank
-                  assign s_prod = all_products[item]
-                endif
 
                 assign s_valid = false
                 if s_prod != blank and s_prod.title != blank
@@ -1708,9 +1672,6 @@
 
                   assign s_color_name = s_prod.metafields.custom.color_name.value | default: s_prod.metafields.custom.color_name
                   if s_color_name == blank
-                    assign s_color_name = s_prod.metafields.custom.color.value | default: s_prod.metafields.custom.color
-                  endif
-                  if s_color_name == blank
                     if s_prod.title contains '—'
                       assign s_color_name = s_prod.title | split: '—' | last | strip
                     elsif s_prod.title contains ' - '
@@ -1720,29 +1681,9 @@
                     endif
                   endif
 
-                  assign s_swatch_raw = s_prod.metafields.custom.color_swatch.value | default: s_prod.metafields.custom.color_swatch
-                  assign s_color_hex = ''
-                  assign s_swatch_img = ''
-                  if s_swatch_raw.image_url != blank
-                    assign s_swatch_img = s_swatch_raw | image_url: width: 72
-                  elsif s_swatch_raw.preview_image != blank
-                    assign s_swatch_img = s_swatch_raw.preview_image | image_url: width: 72
-                  elsif s_swatch_raw.hex != blank
-                    assign s_color_hex = s_swatch_raw.hex
-                  elsif s_swatch_raw.color != blank
-                    assign s_color_hex = s_swatch_raw.color
-                  elsif s_swatch_raw.rgb != blank
-                    assign s_color_hex = 'rgb(' | append: s_swatch_raw.rgb | append: ')'
-                  elsif s_swatch_raw != blank and s_swatch_raw != 'Current color'
-                    assign s_raw_str = s_swatch_raw | strip
-                    if s_raw_str contains '#' or s_raw_str contains 'rgb'
-                      assign s_color_hex = s_raw_str
-                    elsif s_raw_str contains 'http' or s_raw_str contains 'shopify://'
-                      assign s_swatch_img = s_raw_str
-                    endif
-                  endif
+                  assign s_color_hex = s_prod.metafields.custom.color_swatch.value | default: s_prod.metafields.custom.color_swatch
 
-                  if s_color_hex == blank and s_swatch_img == blank
+                  if s_color_hex == blank
                     assign s_search = s_color_name | append: ' ' | append: s_prod.title | downcase
                     if s_search contains 'olive' or s_search contains 'sage' or s_search contains 'moss' or s_search contains 'army'
                       assign s_color_hex = '#556B2F'
@@ -1779,7 +1720,7 @@
                 {%- if is_active_item -%}
                   <span
                     class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
-                    style="{% if s_swatch_img != blank %}background-image: url('{{ s_swatch_img }}'); background-size: cover;{% else %}background-color: {{ s_color_hex }};{% endif %}"
+                    style="background-color: {{ s_color_hex }};"
                     title="{{ s_color_name | escape }} (Selected)"
                     aria-label="{{ s_color_name | escape }} (Selected)"
                     data-color-name="{{ s_color_name | escape }}"
@@ -1794,7 +1735,7 @@
                   <a
                     href="{{ s_url }}"
                     class="ai-pdp-{{ ai_gen_id }}__swatch"
-                    style="{% if s_swatch_img != blank %}background-image: url('{{ s_swatch_img }}'); background-size: cover;{% else %}background-color: {{ s_color_hex }};{% endif %}"
+                    style="background-color: {{ s_color_hex }};"
                     title="{{ s_color_name | escape }}"
                     aria-label="{{ s_color_name | escape }}"
                     data-color-name="{{ s_color_name | escape }}"
@@ -1804,6 +1745,7 @@
             {%- endfor -%}
 
           {%- elsif color_option != blank -%}
+            {%- assign color_option_index = color_option.position | minus: 1 -%}
             {%- for val in color_option.values -%}
               {%- liquid
                 assign color_clean = val | downcase | strip
@@ -1830,16 +1772,8 @@
                   assign bg_color = '#0D9488'
                 endif
 
-                assign matched_var = blank
-                for v in product.variants
-                  if v.options contains val
-                    assign matched_var = v
-                    break
-                  endif
-                endfor
-
                 assign is_selected_var = false
-                if current_variant.options contains val
+                if current_variant.options[color_option_index] == val
                   assign is_selected_var = true
                 endif
               -%}
@@ -1849,8 +1783,10 @@
                 style="background-color: {{ bg_color }};"
                 title="{{ val | escape }}"
                 aria-label="{{ val | escape }}"
+                aria-pressed="{{ is_selected_var }}"
                 data-variant-option
-                data-variant-id="{{ matched_var.id | default: current_variant.id }}"
+                data-option-position="{{ color_option_index }}"
+                data-option-value="{{ val | escape }}"
                 data-option-label="{{ val | escape }}"
                 data-color-name="{{ val | escape }}"
               ></button>
@@ -1859,7 +1795,7 @@
           {%- else -%}
             <span
               class="ai-pdp-{{ ai_gen_id }}__swatch is-current"
-              style="{% if current_swatch_image != blank %}background-image: url('{{ current_swatch_image }}'); background-size: cover;{% else %}background-color: {{ current_swatch_color }};{% endif %}"
+              style="background-color: {{ current_swatch_color }};"
               title="{{ current_color_name | escape }} (Selected)"
               aria-label="{{ current_color_name | escape }} (Selected)"
               data-color-name="{{ current_color_name | escape }}"
@@ -1869,6 +1805,7 @@
           {%- endif -%}
         </div>
       </div>
+      {% endif %}
 
       <!-- ===================================================
            SHOPIFY PRODUCT FORM (SIZE, QTY, BUY)
@@ -1897,13 +1834,14 @@
             {%- continue -%}
           {%- endif -%}
 
-          <div class="ai-pdp-{{ ai_gen_id }}__size-section">
+          {%- assign option_index = option.position | minus: 1 -%}
+          <div class="ai-pdp-{{ ai_gen_id }}__size-section" data-option-group="{{ option_index }}">
             <div class="ai-pdp-{{ ai_gen_id }}__label-row">
               <span class="ai-pdp-{{ ai_gen_id }}__label">
-                {{ option.name }}: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-size-label>{{ option.selected_value | default: option.values.first }}</span>
+                {{ option.name }}: <span class="ai-pdp-{{ ai_gen_id }}__label-val" data-active-size-label data-selected-option-label="{{ option_index }}">{{ current_variant.options[option_index] | default: option.selected_value | default: option.values.first }}</span>
               </span>
 
-              {%- if opt_down contains 'size' -%}
+              {%- if opt_down contains 'size' and size_guide_content != blank -%}
                 <button
                   type="button"
                   class="ai-pdp-{{ ai_gen_id }}__guide-btn"
@@ -1917,23 +1855,18 @@
 
             <div class="ai-pdp-{{ ai_gen_id }}__sizes">
               {%- for value in option.values -%}
-                {%- liquid
-                  assign matched_variant = blank
-                  for v in product.variants
-                    if v.options contains value
-                      assign matched_variant = v
-                      break
-                    endif
-                  endfor
-                  assign is_avail = matched_variant.available
-                -%}
+                {%- assign is_selected_value = false -%}
+                {%- if current_variant.options[option_index] == value -%}
+                  {%- assign is_selected_value = true -%}
+                {%- endif -%}
                 <button
                   type="button"
-                  class="ai-pdp-{{ ai_gen_id }}__size{% if current_variant.options contains value %} is-selected{% endif %}"
+                  class="ai-pdp-{{ ai_gen_id }}__size{% if is_selected_value %} is-selected{% endif %}"
                   data-variant-option
-                  data-variant-id="{{ matched_variant.id | default: current_variant.id }}"
+                  data-option-position="{{ option_index }}"
+                  data-option-value="{{ value | escape }}"
                   data-option-label="{{ value | escape }}"
-                  {% unless is_avail %}disabled{% endunless %}
+                  aria-pressed="{{ is_selected_value }}"
                 >
                   {{ value }}
                 </button>
@@ -1950,8 +1883,10 @@
             <input
               type="number"
               name="quantity"
-              value="1"
-              min="1"
+              value="{{ current_variant.quantity_rule.min }}"
+              min="{{ current_variant.quantity_rule.min }}"
+              step="{{ current_variant.quantity_rule.increment }}"
+              {% if current_variant.quantity_rule.max != null %}max="{{ current_variant.quantity_rule.max }}"{% endif %}
               inputmode="numeric"
               aria-label="Quantity"
               data-quantity
@@ -1961,21 +1896,23 @@
         </div>
 
         <!-- CUSTOM EMBROIDERY LUXURY MODULE TRIGGER -->
-        <div class="ai-pdp-{{ ai_gen_id }}__embroidery-box" data-open-embroidery-trigger>
-          <div class="ai-pdp-{{ ai_gen_id }}__embroidery-left">
-            <div class="ai-pdp-{{ ai_gen_id }}__embroidery-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div>
-              <p class="ai-pdp-{{ ai_gen_id }}__embroidery-title">Personalized Custom Embroidery</p>
-              <p class="ai-pdp-{{ ai_gen_id }}__embroidery-sub">Add your Name, Medical Title & Surgical Icon</p>
-            </div>
-          </div>
-          <span class="ai-pdp-{{ ai_gen_id }}__embroidery-badge">+ ₹299</span>
-        </div>
-
-        <!-- ANCHOR HOOK FOR KAPISA EMBROIDERY SECTION -->
-        <div class="kapisa-embroidery-hook" data-kapisa-embroidery-hook></div>
+        {% unless embroidery_disabled %}
+          <button type="button" class="ai-pdp-{{ ai_gen_id }}__embroidery-box" data-open-embroidery-trigger>
+            <span class="ai-pdp-{{ ai_gen_id }}__embroidery-left">
+              <span class="ai-pdp-{{ ai_gen_id }}__embroidery-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </span>
+              <span>
+                <span class="ai-pdp-{{ ai_gen_id }}__embroidery-title">Personalized Custom Embroidery</span>
+                <span class="ai-pdp-{{ ai_gen_id }}__embroidery-sub">Add your name, medical title &amp; surgical icon</span>
+              </span>
+            </span>
+            {% if embroidery_starting_price != blank %}
+              <span class="ai-pdp-{{ ai_gen_id }}__embroidery-badge">From {{ embroidery_starting_price | money }}</span>
+            {% endif %}
+          </button>
+          <div class="kapisa-embroidery-hook" data-kapisa-embroidery-hook></div>
+        {% endunless %}
 
         <!-- BUY BUTTONS -->
         <div class="ai-pdp-{{ ai_gen_id }}__buy">
@@ -1983,8 +1920,10 @@
             type="submit"
             class="ai-pdp-{{ ai_gen_id }}__add"
             data-add
+            data-add-label="{{ 'products.product.add_to_cart' | t | escape }}"
+            data-sold-out-label="{{ 'products.product.sold_out' | t | escape }}"
           >
-            Add to Bag
+            {{ 'products.product.add_to_cart' | t }}
           </button>
 
           <button
@@ -1992,77 +1931,19 @@
             class="ai-pdp-{{ ai_gen_id }}__now"
             data-buy
           >
-            BUY IT WITH CASH ON DELIVERY
+            Buy it now
           </button>
         </div>
       </form>
 
-      <!-- CLINICAL TELEMETRY CARDS -->
-      <div class="ai-pdp-{{ ai_gen_id }}__telemetry">
-        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
-          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-          </div>
-          <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">24hr Dispatch</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Free shipping on orders</div>
+      {% if product.description != blank %}
+        <div class="ai-pdp-{{ ai_gen_id }}__product-story">
+          <h2 class="ai-pdp-{{ ai_gen_id }}__story-title">Product details</h2>
+          <div class="ai-pdp-{{ ai_gen_id }}__description-preview rte">
+            {{ product.description }}
           </div>
         </div>
-
-        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
-          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
-          </div>
-          <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Free Returns 15</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Complimentary returns policy</div>
-          </div>
-        </div>
-
-        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
-          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-          </div>
-          <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Easy EMI Options</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Available at checkout</div>
-          </div>
-        </div>
-
-        <div class="ai-pdp-{{ ai_gen_id }}__telemetry-item">
-          <div class="ai-pdp-{{ ai_gen_id }}__telemetry-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-          </div>
-          <div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-text">Made in India</div>
-            <div class="ai-pdp-{{ ai_gen_id }}__telemetry-sub">Master crafted medical grade</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- THE PRODUCT OVERVIEW & CLINICAL BULLETS (REFERENCE SCREENSHOT DESIGN) -->
-      <div class="ai-pdp-{{ ai_gen_id }}__product-story">
-        <h3 class="ai-pdp-{{ ai_gen_id }}__story-title">THE PRODUCT</h3>
-        <div class="ai-pdp-{{ ai_gen_id }}__description-preview">
-          {{ product.description | default: 'Classic medical apparel engineered for healing hands. Tailored with an ergonomic silhouette, reinforced high-tension stress points, and breathable comfort for 12+ hour clinical shifts.' }}
-        </div>
-
-        <!-- 4 CLINICAL PILL BADGES -->
-        <div class="ai-pdp-{{ ai_gen_id }}__pills-row">
-          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">Antimicrobial</span>
-          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">Liquid Repellent</span>
-          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">4-Way Stretch</span>
-          <span class="ai-pdp-{{ ai_gen_id }}__story-pill">Breathable</span>
-        </div>
-
-        <!-- CLINICAL BULLET HIGHLIGHTS -->
-        <ul class="ai-pdp-{{ ai_gen_id }}__story-bullets">
-          <li><strong>Four-way stretch fabric</strong> that moves with you all day long without losing shape.</li>
-          <li><strong>Silvadur™ Antimicrobial</strong> Silver ions protect against odor-causing bacteria and reduce wash frequency.</li>
-          <li><strong>Water-Repellent Coating</strong> ensures fluids bead up and roll off without staining the fabric.</li>
-          <li><strong>Breathable Lining</strong> Keeps you cool and dry even during 12-hour shifts.</li>
-        </ul>
-      </div>
+      {% endif %}
 
     </div>
   </div>
@@ -2087,61 +1968,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
 
-      <h2>Clinical Size Guide</h2>
-      <p style="color: #64748B; font-size: 13px; margin-top: 0;">Measure around the fullest part of your chest and waist for the best clinical fit.</p>
-
-      <table class="ai-pdp-{{ ai_gen_id }}__size-table">
-        <thead>
-          <tr>
-            <th>Size</th>
-            <th>Chest (in)</th>
-            <th>Waist (in)</th>
-            <th>Length (in)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>XS</strong></td>
-            <td>34 – 36"</td>
-            <td>28 – 30"</td>
-            <td>28"</td>
-          </tr>
-          <tr>
-            <td><strong>S</strong></td>
-            <td>37 – 39"</td>
-            <td>31 – 33"</td>
-            <td>28.5"</td>
-          </tr>
-          <tr>
-            <td><strong>M</strong></td>
-            <td>40 – 42"</td>
-            <td>34 – 36"</td>
-            <td>29"</td>
-          </tr>
-          <tr>
-            <td><strong>L</strong></td>
-            <td>43 – 45"</td>
-            <td>37 – 39"</td>
-            <td>29.5"</td>
-          </tr>
-          <tr>
-            <td><strong>XL</strong></td>
-            <td>46 – 48"</td>
-            <td>40 – 42"</td>
-            <td>30"</td>
-          </tr>
-          <tr>
-            <td><strong>2XL</strong></td>
-            <td>49 – 51"</td>
-            <td>43 – 45"</td>
-            <td>30.5"</td>
-          </tr>
-        </tbody>
-      </table>
-
-      {% if block.settings.size_guide != blank %}
-        <div style="font-size: 13px; color: #475569; margin-top: 16px;">
-          {{ block.settings.size_guide }}
+      <h2>Size guide</h2>
+      {% if size_guide_content != blank %}
+        <div class="rte">
+          {{ size_guide_content }}
         </div>
       {% endif %}
     </div>
@@ -2170,10 +2000,10 @@
   <!-- =======================================================
        CLINICAL ZOOM MODAL / LIGHTBOX
        ======================================================= -->
-  <div class="ai-pdp-{{ ai_gen_id }}__zoom-modal" data-zoom-modal role="dialog" aria-modal="true" aria-label="Clinical Image Zoom">
+  <div class="ai-pdp-{{ ai_gen_id }}__zoom-modal" data-zoom-modal role="dialog" aria-modal="true" aria-label="Product image zoom">
     <div class="ai-pdp-{{ ai_gen_id }}__zoom-badge">
       <span class="ai-pdp-{{ ai_gen_id }}__zoom-badge-dot"></span>
-      <span>Clinical Inspector • <span data-zoom-counter>1 / {{ product.media.size }}</span></span>
+      <span>Product image • <span data-zoom-counter>1 / {{ product.media.size }}</span></span>
     </div>
 
     <button type="button" class="ai-pdp-{{ ai_gen_id }}__zoom-close" data-zoom-close aria-label="Close zoom viewer">
@@ -2185,7 +2015,9 @@
     </button>
 
     <div class="ai-pdp-{{ ai_gen_id }}__zoom-stage" data-zoom-stage>
-      <img src="" alt="" class="ai-pdp-{{ ai_gen_id }}__zoom-img" data-zoom-active-img width="1200" height="1400">
+      {% if product.featured_image %}
+        <img src="{{ product.featured_image | image_url: width: 1600 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" class="ai-pdp-{{ ai_gen_id }}__zoom-img" data-zoom-active-img width="1200" height="1400">
+      {% endif %}
     </div>
 
     <button type="button" class="ai-pdp-{{ ai_gen_id }}__zoom-nav ai-pdp-{{ ai_gen_id }}__zoom-next" data-zoom-next aria-label="Next angle">
@@ -2322,20 +2154,27 @@
 
         minus.addEventListener('click', () => {
           const current = Number(this.quantityInput.value || 1);
-          this.quantityInput.value = Math.max(1, current - 1);
+          const min = Number(this.quantityInput.min) || 1;
+          const step = Number(this.quantityInput.step) || 1;
+          this.quantityInput.value = Math.max(min, current - step);
           this.updateQuantityState();
         });
 
         plus.addEventListener('click', () => {
           const current = Number(this.quantityInput.value || 1);
-          this.quantityInput.value = Math.max(1, current + 1);
+          const max = Number(this.quantityInput.max) || Infinity;
+          const step = Number(this.quantityInput.step) || 1;
+          this.quantityInput.value = Math.min(max, current + step);
           this.updateQuantityState();
         });
 
         this.quantityInput.addEventListener('change', () => {
-          let value = Number(this.quantityInput.value || 1);
-          value = Math.max(1, Math.floor(value));
-          this.quantityInput.value = value;
+          const min = Number(this.quantityInput.min) || 1;
+          const max = Number(this.quantityInput.max) || Infinity;
+          const step = Number(this.quantityInput.step) || 1;
+          const value = Number(this.quantityInput.value || min);
+          const normalized = min + Math.ceil((Math.max(min, value) - min) / step) * step;
+          this.quantityInput.value = Math.min(max, normalized);
           this.updateQuantityState();
         });
       }
@@ -2344,50 +2183,77 @@
         const minus = this.querySelector('[data-minus]');
         const plus = this.querySelector('[data-plus]');
         if (!minus || !plus) return;
-        minus.disabled = false;
-        plus.disabled = false;
+        const quantity = Number(this.quantityInput?.value || 1);
+        const min = Number(this.quantityInput?.min) || 1;
+        const max = Number(this.quantityInput?.max) || Infinity;
+        const step = Number(this.quantityInput?.step) || 1;
+        minus.disabled = quantity <= min;
+        plus.disabled = quantity + step > max;
       }
 
       /* =====================================================
          VARIANTS
          ===================================================== */
       bindVariants() {
-        this.querySelectorAll('[data-variant-option]').forEach(button => {
+        const selectedVariant = this.variants.find(item => String(item.id) === this.variantInput?.value);
+        this.selectedOptions = selectedVariant?.options ? [...selectedVariant.options] : [];
+
+        this.querySelectorAll('[data-variant-option][data-option-position]').forEach(button => {
           button.addEventListener('click', () => {
             if (button.disabled) return;
-
-            const variantId = Number(button.dataset.variantId);
-            const variant = this.variants.find(item => Number(item.id) === variantId);
-            if (!variant) return;
-
-            this.variantInput.value = variantId;
-
-            // Deselect siblings in the same group
-            const parentSection = button.closest('.ai-pdp-{{ ai_gen_id }}__size-section, .ai-pdp-{{ ai_gen_id }}__color-picker');
-            if (parentSection) {
-              parentSection.querySelectorAll('[data-variant-option]').forEach(item => {
-                item.classList.remove('is-selected');
-                item.classList.remove('is-current');
-              });
-            } else {
-              this.querySelectorAll('[data-variant-option]').forEach(item => {
-                item.classList.remove('is-selected');
-              });
-            }
-
-            button.classList.add('is-selected');
-            if (button.classList.contains('ai-pdp-{{ ai_gen_id }}__swatch')) {
-              button.classList.add('is-current');
-            }
-
-            // Update label
-            const labelEl = this.querySelector('[data-active-size-label]');
-            if (labelEl && button.dataset.optionLabel) {
-              labelEl.textContent = button.dataset.optionLabel;
-            }
-
-            this.updateVariantDisplay(variant);
+            this.selectVariantOption(button);
           });
+        });
+
+        if (selectedVariant) this.updateVariantOptionStates(selectedVariant);
+      }
+
+      selectVariantOption(button) {
+        const position = Number(button.dataset.optionPosition);
+        const nextOptions = [...this.selectedOptions];
+        if (!Number.isInteger(position) || position < 0 || !button.dataset.optionValue) return;
+        nextOptions[position] = button.dataset.optionValue;
+
+        const variant = this.variants.find(item =>
+          Array.isArray(item.options) &&
+          item.options.length === nextOptions.length &&
+          item.options.every((value, index) => value === nextOptions[index])
+        );
+        if (!variant) return;
+
+        this.selectedOptions = [...variant.options];
+        this.variantInput.value = variant.id;
+        this.updateVariantOptionStates(variant);
+        this.updateVariantDisplay(variant);
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('variant', variant.id);
+        window.history.replaceState({}, '', url);
+      }
+
+      updateVariantOptionStates(selectedVariant) {
+        this.querySelectorAll('[data-variant-option][data-option-position]').forEach(button => {
+          const position = Number(button.dataset.optionPosition);
+          const candidateOptions = [...this.selectedOptions];
+          candidateOptions[position] = button.dataset.optionValue;
+          const matchingVariant = this.variants.find(item =>
+            Array.isArray(item.options) &&
+            item.options.length === candidateOptions.length &&
+            item.options.every((value, index) => value === candidateOptions[index])
+          );
+          const isSelected = selectedVariant.options[position] === button.dataset.optionValue;
+
+          button.disabled = !matchingVariant || (!matchingVariant.available && !isSelected);
+          button.classList.toggle('is-selected', isSelected);
+          button.classList.toggle('is-current', isSelected && button.classList.contains('ai-pdp-{{ ai_gen_id }}__swatch'));
+          button.setAttribute('aria-pressed', String(isSelected));
+        });
+
+        this.querySelectorAll('[data-selected-option-label]').forEach(label => {
+          const position = Number(label.dataset.selectedOptionLabel);
+          if (Number.isInteger(position) && selectedVariant.options[position] != null) {
+            label.textContent = selectedVariant.options[position];
+          }
         });
       }
 
@@ -2435,29 +2301,45 @@
 
         const price = this.querySelector('[data-price]');
         const compare = this.querySelector('[data-compare-price]');
+        const saveChip = this.querySelector('[data-save-chip]');
         const stickyPrice = this.querySelector('[data-sticky-price]');
+        const stockStatus = this.querySelector('[data-stock-status]');
+        const stockLabel = this.querySelector('[data-stock-label]');
 
         const formatted = this.formatMoney(variant.price);
         if (price) price.textContent = formatted;
         if (stickyPrice) stickyPrice.textContent = formatted;
 
+        const hasComparePrice = Number(variant.compare_at_price) > Number(variant.price);
         if (compare) {
-          if (variant.compare_at_price && Number(variant.compare_at_price) > Number(variant.price)) {
-            compare.hidden = false;
-            compare.textContent = this.formatMoney(variant.compare_at_price);
-          } else {
-            compare.hidden = true;
-            compare.textContent = '';
+          compare.hidden = !hasComparePrice;
+          compare.textContent = hasComparePrice ? this.formatMoney(variant.compare_at_price) : '';
+        }
+
+        if (saveChip) {
+          saveChip.hidden = !hasComparePrice;
+          if (hasComparePrice) {
+            const savings = Math.round((Number(variant.compare_at_price) - Number(variant.price)) * 100 / Number(variant.compare_at_price));
+            saveChip.textContent = `Save ${savings}%`;
           }
+        }
+
+        if (stockStatus && stockLabel) {
+          stockStatus.classList.toggle('is-oos', !variant.available);
+          stockLabel.textContent = variant.available ? 'In stock' : 'Sold out';
         }
 
         if (this.stickyVariantSummary) {
           this.stickyVariantSummary.textContent = variant.title;
         }
 
+        this.updateQuantityConstraints(variant);
+
         if (this.addButton) {
           this.addButton.disabled = !variant.available;
-          this.addButton.textContent = variant.available ? 'Add to Bag' : 'Sold Out';
+          this.addButton.textContent = variant.available
+            ? this.addButton.dataset.addLabel
+            : this.addButton.dataset.soldOutLabel;
         }
 
         if (this.buyButton) {
@@ -2466,8 +2348,31 @@
 
         if (this.stickyAddBtn) {
           this.stickyAddBtn.disabled = !variant.available;
-          this.stickyAddBtn.textContent = variant.available ? 'Add to Bag' : 'Sold Out';
+          this.stickyAddBtn.textContent = variant.available
+            ? this.addButton?.dataset.addLabel || 'Add to cart'
+            : this.addButton?.dataset.soldOutLabel || 'Sold out';
         }
+      }
+
+      updateQuantityConstraints(variant) {
+        if (!this.quantityInput) return;
+        const rules = variant.quantity_rule || {};
+        const min = Math.max(1, Number(rules.min) || 1);
+        const increment = Math.max(1, Number(rules.increment) || 1);
+        const max = Number(rules.max);
+
+        this.quantityInput.min = String(min);
+        this.quantityInput.step = String(increment);
+        if (Number.isFinite(max) && max > 0) {
+          this.quantityInput.max = String(max);
+        } else {
+          this.quantityInput.removeAttribute('max');
+        }
+
+        const current = Number(this.quantityInput.value) || min;
+        const normalized = min + Math.ceil((Math.max(min, current) - min) / increment) * increment;
+        this.quantityInput.value = String(Math.min(Number.isFinite(max) && max > 0 ? max : Infinity, normalized));
+        this.updateQuantityState();
       }
 
       formatMoney(cents) {
@@ -2551,7 +2456,8 @@
           }
 
           if (goToCheckout) {
-            window.location.href = '/checkout';
+            const root = window.Shopify?.routes?.root || '/';
+            window.location.href = `${root}checkout`;
           } else {
             const cartDrawer = document.querySelector('cart-drawer');
             if (cartDrawer && typeof cartDrawer.open === 'function') {
@@ -2575,17 +2481,17 @@
       setLoading(loading) {
         if (this.addButton) {
           this.addButton.disabled = loading;
-          this.addButton.textContent = loading ? 'Adding…' : 'Add to Bag';
+          this.addButton.textContent = loading ? 'Adding…' : this.addButton.dataset.addLabel;
         }
 
         if (this.buyButton) {
           this.buyButton.disabled = loading;
-          this.buyButton.textContent = loading ? 'Processing…' : 'Instant Buy Now';
+          this.buyButton.textContent = loading ? 'Redirecting…' : 'Buy it now';
         }
 
         if (this.stickyAddBtn) {
           this.stickyAddBtn.disabled = loading;
-          this.stickyAddBtn.textContent = loading ? 'Adding…' : 'Add to Bag';
+          this.stickyAddBtn.textContent = loading ? 'Adding…' : this.addButton?.dataset.addLabel || 'Add to cart';
         }
       }
 

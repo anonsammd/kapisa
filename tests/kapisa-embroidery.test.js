@@ -478,5 +478,14 @@ describe('Kapisa Custom Embroidery & Cart Architecture Tests', () => {
     const groups = buildCartGroups(mixedCart);
     assert.equal(groups.length, 2, 'Both unembroidered pants and unlinked service must be visible in cart');
   });
-});
 
+  it('11. Embroidery options require available Shopify service variants', () => {
+    const fs = require('node:fs');
+    const embroideryLiquid = fs.readFileSync('snippets/kapisa-custom-embroidery-inner.liquid', 'utf-8');
+
+    assert.match(embroideryLiquid, /if sv != blank and sv\.available/, 'Configured embroidery options must reference available Shopify variants');
+    assert.match(embroideryLiquid, /if v\.available/, 'Fallback options must exclude unavailable service variants');
+    assert.match(embroideryLiquid, /assign valid_count = valid_count \| plus: 1/, 'Only usable options should count toward rendering');
+    assert.doesNotMatch(embroideryLiquid, /default:\s*(29900|19900|59800)/, 'Embroidery prices must not fall back to hardcoded amounts');
+  });
+});

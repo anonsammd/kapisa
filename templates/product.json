@@ -9,32 +9,13 @@
             "desktop_width_percent": 100,
             "content_width": 1200,
             "body_font": "assistant_n4",
-            "size_guide": "<p>Choose your usual size. For a relaxed fit, select one size up.</p>"
-          },
-          "blocks": {}
-        },
-        "ai_gen_block_e3a21f5_JHByXM": {
-          "type": "marquee-strip",
-          "name": "Marquee strip",
-          "settings": {
-            "item_one": "500+ Healthcare Heroes Dressed",
-            "item_two": "Premium 4-Way Stretch Fabric",
-            "item_three": "Custom Embroidery Available",
-            "item_four": "Cash on Delivery",
-            "accessibility_label": "Store highlights",
-            "desktop_width_percent": 100,
-            "strip_height": 44,
-            "text_font": "assistant_n4",
-            "text_size": 12,
-            "letter_spacing": 1,
-            "scroll_speed": 28
+            "size_guide": ""
           },
           "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_684b868_eKTA9r",
-        "ai_gen_block_e3a21f5_JHByXM"
+        "ai_gen_block_684b868_eKTA9r"
       ],
       "settings": {}
     },
@@ -193,13 +174,13 @@
           "settings": {
             "heading": "Product details",
             "fabric_title": "Fabric & technology",
-            "fabric_content": "<p>Describe the fabric, comfort, stretch and construction.</p>",
+            "fabric_content": "<p></p>",
             "care_title": "Care instructions",
-            "care_content": "<p>Follow the recommended washing and care instructions.</p>",
+            "care_content": "<p></p>",
             "fit_title": "Fit & size guide",
-            "fit_content": "<p>Use the size guide to find your best fit.</p>",
+            "fit_content": "<p></p>",
             "shipping_title": "Shipping & returns",
-            "shipping_content": "<p>Add your shipping and return information here.</p>"
+            "shipping_content": "<p></p>"
           },
           "blocks": {}
         }
@@ -236,60 +217,12 @@
           },
           "blocks": {}
         },
-        "ai_gen_block_52abba8_TYjEVc": {
-          "type": "trust-badges-strip",
-          "name": "Trust badges strip",
-          "settings": {
-            "label_one": "Cash on Delivery",
-            "label_two": "Easy 7-Day Exchange",
-            "label_three": "1–3 Day Express Delivery",
-            "label_four": "Secure Checkout",
-            "desktop_width_percent": 100,
-            "label_size": 13,
-            "vertical_padding": 14,
-            "mobile_padding": 12,
-            "background_color": "#FAF9F5",
-            "border_color": "#8FA3B8",
-            "icon_color": "#C9A227",
-            "text_color": "#2B2B2B"
-          },
-          "blocks": {}
-        },
         "ai_gen_block_9e74eb1_kjqUEf": {
           "type": "customer-reviews",
           "settings": {
-            "eyebrow": "The Kapisa community",
             "heading": "Customer Reviews",
-            "average_rating": "5.0",
-            "review_count": "0",
-            "review_count_label": "reviews",
-            "rating_5_percentage": 100,
-            "rating_5_count": "0",
-            "rating_4_percentage": 85,
-            "rating_4_count": "0",
-            "rating_3_percentage": 0,
-            "rating_3_count": "0",
-            "rating_2_percentage": 0,
-            "rating_2_count": "0",
-            "rating_1_percentage": 0,
-            "rating_1_count": "0",
             "review_link": "",
             "button_label": "Write a Review",
-            "review_1_name": "Dr. Sarah Jenkins",
-            "review_1_stars": 5,
-            "review_1_text": "<p>Extremely comfortable scrubs. The fabric stretches with every move and keeps its crisp look throughout long 12-hour shifts.</p>",
-            "review_1_verified": true,
-            "review_1_photo": "shopify://shop_images/photo-1559757148-5c350d0d3c56.jpg",
-            "review_2_name": "Michael Vance, RN",
-            "review_2_stars": 5,
-            "review_2_text": "<p>Best scrubs I've owned. Premium material, great fit, and super breathable. Highly recommended!</p>",
-            "review_2_verified": true,
-            "review_2_photo": "shopify://shop_images/photo-1576091160399-112ba8d25d1d.jpg",
-            "review_3_name": "Priya Sharma",
-            "review_3_stars": 5,
-            "review_3_text": "<p>High quality stitching and fast delivery. The color remains vibrant even after multiple washes.</p>",
-            "review_3_verified": true,
-            "review_3_photo": "shopify://shop_images/model-with-leather-jacket-over-shoulders.jpg",
             "background_color": "#faf7f0",
             "card_background": "#ffffff",
             "heading_color": "#2b2b2e",
@@ -307,7 +240,6 @@
       },
       "block_order": [
         "ai_gen_block_baf30a3_XPbYzY",
-        "ai_gen_block_52abba8_TYjEVc",
         "ai_gen_block_9e74eb1_kjqUEf"
       ],
       "settings": {}

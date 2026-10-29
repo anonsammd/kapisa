@@ -18,10 +18,6 @@
   assign preview_top = blank
   if product.metafields.custom.top_embroidery_image.value != blank
     assign preview_top = product.metafields.custom.top_embroidery_image.value
-  elsif product.metafields.custom.embroidery_preview_top.value != blank
-    assign preview_top = product.metafields.custom.embroidery_preview_top.value
-  elsif product.metafields.custom.embroidery_preview_image.value != blank
-    assign preview_top = product.metafields.custom.embroidery_preview_image.value
   elsif product.featured_image != blank
     assign preview_top = product.featured_image
   elsif product.images.first != blank
@@ -31,15 +27,11 @@
   assign preview_bottom = blank
   if product.metafields.custom.bottom_embroidery_image.value != blank
     assign preview_bottom = product.metafields.custom.bottom_embroidery_image.value
-  elsif product.metafields.custom.embroidery_preview_bottom.value != blank
-    assign preview_bottom = product.metafields.custom.embroidery_preview_bottom.value
   endif
 
   assign preview_combo = blank
   if product.metafields.custom.combo_embroidery_image.value != blank
     assign preview_combo = product.metafields.custom.combo_embroidery_image.value
-  elsif product.metafields.custom.embroidery_preview_combo.value != blank
-    assign preview_combo = product.metafields.custom.embroidery_preview_combo.value
   endif
 
   if preview_bottom == blank
@@ -108,9 +100,11 @@
           if sv == blank and svc_prod != blank
             for v in svc_prod.variants
               assign vt = v.title | downcase
-              if vt contains kind or kind contains vt
-                assign sv = v
-                break
+              if v.available
+                if vt contains kind or kind contains vt
+                  assign sv = v
+                  break
+                endif
               endif
             endfor
           endif
@@ -124,30 +118,28 @@
                 assign label = 'Top Embroidery'
             endcase
           endif
-          assign p_price = 39900
-          assign p_var_id = ''
-          if sv != blank
+          assign p_price = blank
+          assign p_var_id = blank
+          if sv != blank and sv.available
             assign p_price = sv.price
             assign p_var_id = sv.id
+            if min_price == 0 or p_price < min_price
+              assign min_price = p_price
+            endif
           endif
           assign badge = ''
           assign desc = ''
           case kind
             when 'combo'
-              assign badge = 'Value Bundle'
               assign desc = 'Name and Designation + Icon + Name on bottoms'
             when 'bottom'
-              assign badge = 'New'
               assign desc = 'Your name on your scrub bottom'
             else
               assign desc = 'Your name and icon/logo, stitched on your scrub top.'
           endcase
-          if min_price == 0 or p_price < min_price
-            assign min_price = p_price
-          endif
-          assign valid_count = valid_count | plus: 1
         -%}
-        {%- unless forloop.first -%},{%- endunless -%}
+        {%- if sv != blank and sv.available -%}
+        {%- if valid_count > 0 -%},{%- endif -%}
         {
           "handle": {{ handle | json }},
           "label": {{ label | json }},
@@ -159,6 +151,8 @@
           "variantId": {{ p_var_id | json }},
           "sortOrder": {{ opt.sort_order.value | default: forloop.index | json }}
         }
+        {%- assign valid_count = valid_count | plus: 1 -%}
+        {%- endif -%}
       {%- endfor -%}
     {%- else -%}
       {%- comment -%} Standard fallback if no metafields set {%- endcomment -%}
@@ -166,67 +160,81 @@
         assign sv_top = blank
         assign sv_bottom = blank
         assign sv_combo = blank
-        for v in svc_prod.variants
-          assign vt = v.title | downcase
-          if vt contains 'combo' or vt contains 'bundle'
-            assign sv_combo = v
-          elsif vt contains 'bottom'
-            assign sv_bottom = v
-          elsif vt contains 'top'
-            assign sv_top = v
+        if svc_prod != blank
+          for v in svc_prod.variants
+            if v.available
+              assign vt = v.title | downcase
+              if vt contains 'combo' or vt contains 'bundle'
+                assign sv_combo = v
+              elsif vt contains 'bottom'
+                assign sv_bottom = v
+              elsif vt contains 'top'
+                assign sv_top = v
+              endif
+            endif
+          endfor
+        endif
+        assign min_price = 0
+        if sv_top != blank
+          assign min_price = sv_top.price
+        endif
+        if sv_bottom != blank
+          if min_price == 0 or sv_bottom.price < min_price
+            assign min_price = sv_bottom.price
           endif
-        endfor
-        if sv_top == blank
-          assign sv_top = svc_prod.variants[0]
         endif
-        if sv_bottom == blank
-          assign sv_bottom = svc_prod.variants[1]
+        if sv_combo != blank
+          if min_price == 0 or sv_combo.price < min_price
+            assign min_price = sv_combo.price
+          endif
         endif
-        if sv_combo == blank
-          assign sv_combo = svc_prod.variants[2]
-        endif
-        assign p_top = sv_top.price | default: 29900
-        assign p_bot = sv_bottom.price | default: 19900
-        assign p_com = sv_combo.price | default: 59800
-        assign min_price = p_bot
-        if p_top < min_price
-          assign min_price = p_top
-        endif
-        assign valid_count = 3
+        assign valid_count = 0
       -%}
+      {%- if sv_combo != blank -%}
+        {%- if valid_count > 0 -%},{%- endif -%}
       {
         "handle": "combo",
         "label": "Embroidery Bundle",
         "kind": "combo",
-        "badge": "Value Bundle",
+        "badge": "",
         "description": "Name and Designation + Icon + Name on bottoms",
-        "price": {{ p_com | json }},
-        "formattedPrice": {{ p_com | money | json }},
+        "price": {{ sv_combo.price | json }},
+        "formattedPrice": {{ sv_combo.price | money | json }},
         "variantId": {{ sv_combo.id | json }},
         "sortOrder": 1
-      },
+      }
+        {%- assign valid_count = valid_count | plus: 1 -%}
+      {%- endif -%}
+      {%- if sv_top != blank -%}
+        {%- if valid_count > 0 -%},{%- endif -%}
       {
         "handle": "top",
         "label": "Top Embroidery",
         "kind": "top",
         "badge": "",
         "description": "Your name and icon/logo, stitched on your scrub top.",
-        "price": {{ p_top | json }},
-        "formattedPrice": {{ p_top | money | json }},
+        "price": {{ sv_top.price | json }},
+        "formattedPrice": {{ sv_top.price | money | json }},
         "variantId": {{ sv_top.id | json }},
         "sortOrder": 2
-      },
+      }
+        {%- assign valid_count = valid_count | plus: 1 -%}
+      {%- endif -%}
+      {%- if sv_bottom != blank -%}
+        {%- if valid_count > 0 -%},{%- endif -%}
       {
         "handle": "bottom",
         "label": "Bottom Embroidery",
         "kind": "bottom",
-        "badge": "New",
+        "badge": "",
         "description": "Your name on your scrub bottom",
-        "price": {{ p_bot | json }},
-        "formattedPrice": {{ p_bot | money | json }},
+        "price": {{ sv_bottom.price | json }},
+        "formattedPrice": {{ sv_bottom.price | money | json }},
         "variantId": {{ sv_bottom.id | json }},
         "sortOrder": 3
       }
+        {%- assign valid_count = valid_count | plus: 1 -%}
+      {%- endif -%}
     {%- endif -%}
   {%- endunless -%}
 ]

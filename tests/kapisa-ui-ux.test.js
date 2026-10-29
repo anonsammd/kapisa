@@ -185,67 +185,39 @@ describe('Kapisa UI/UX Collection & PDP Architecture Verification', () => {
     assert.equal(resolveColorHex('Custom Shade', '#123456'), '#123456');
   });
 
-  // 6. PDP Buy Buttons & Clinical Telemetry Cards
-  it('10. PDP Telemetry and COD Purchase Button contracts', async () => {
+  // 6. PDP Purchase and Shopify Data Contracts
+  it('10. PDP uses Shopify purchase data and avoids unsupported claims', async () => {
     const fs = await import('node:fs');
     const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+    const productTemplate = fs.readFileSync('templates/product.json', 'utf-8');
 
-    // COD Button text
-    assert.match(pdpLiquid, /BUY IT WITH CASH ON DELIVERY/, 'PDP must render "BUY IT WITH CASH ON DELIVERY" button');
-
-    // 4 Clinical Telemetry Cards
-    assert.match(pdpLiquid, /24hr Dispatch/, 'Telemetry must include "24hr Dispatch"');
-    assert.match(pdpLiquid, /Free Returns 15/, 'Telemetry must include "Free Returns 15"');
-    assert.match(pdpLiquid, /Easy EMI Options/, 'Telemetry must include "Easy EMI Options"');
-    assert.match(pdpLiquid, /Made in India/, 'Telemetry must include "Made in India"');
+    assert.match(pdpLiquid, /Buy it now/, 'PDP must label its checkout action accurately');
+    assert.match(pdpLiquid, /current_variant\.available/, 'PDP must use Shopify variant availability');
+    assert.match(pdpLiquid, /product\.description/, 'PDP must render the Shopify product description');
+    assert.doesNotMatch(pdpLiquid, /Cash on Delivery|Clinical Grade • Grade 4A|24hr Dispatch|Free Returns 15|Easy EMI Options/, 'PDP must not make unsupported purchase or product claims');
+    assert.doesNotMatch(productTemplate, /500\+ Healthcare Heroes|Premium 4-Way Stretch Fabric|Cash on Delivery|Easy 7-Day Exchange|16-Hr Rated/, 'Product template must not render hardcoded promotional or shipping claims');
   });
 
   // 7. Sibling Color Swatch Linking Invariant
-  it('11. Sibling Color Swatches: links separate products and marks active product', () => {
-    const currentProductHandle = 'signature-scrub-top-navy';
-    const siblingProducts = [
-      { handle: 'signature-scrub-top-navy', title: 'Signature Top - Navy', color: 'Navy' },
-      { handle: 'signature-scrub-top-olive', title: 'Signature Top - Olive', color: 'Olive' },
-      { handle: 'signature-scrub-top-black', title: 'Signature Top - Black', color: 'Black' }
-    ];
-
-    const renderedSwatches = siblingProducts.map(p => {
-      const isActive = p.handle === currentProductHandle;
-      return {
-        tag: isActive ? 'span' : 'a',
-        href: isActive ? null : `/products/${p.handle}`,
-        isCurrent: isActive,
-        colorHex: resolveColorHex(p.color)
-      };
-    });
-
-    assert.equal(renderedSwatches.length, 3);
-    assert.equal(renderedSwatches[0].isCurrent, true);
-    assert.equal(renderedSwatches[0].tag, 'span');
-    assert.equal(renderedSwatches[0].href, null);
-
-    assert.equal(renderedSwatches[1].isCurrent, false);
-    assert.equal(renderedSwatches[1].tag, 'a');
-    assert.equal(renderedSwatches[1].href, '/products/signature-scrub-top-olive');
-    assert.equal(renderedSwatches[1].colorHex, '#556B2F');
-
-    assert.equal(renderedSwatches[2].isCurrent, false);
-    assert.equal(renderedSwatches[2].tag, 'a');
-    assert.equal(renderedSwatches[2].href, '/products/signature-scrub-top-black');
-    assert.equal(renderedSwatches[2].colorHex, '#18191C');
-  });
-
-  // 8. PDP Product Story & Reference Visual Contracts
-  it('12. PDP Product Story, Clinical Pills & Single-Media Layout Contracts', async () => {
+  it('11. Sibling color swatches use Shopify product references', async () => {
     const fs = await import('node:fs');
     const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
 
-    // "THE PRODUCT" story header and 4 clinical pills
-    assert.match(pdpLiquid, /THE PRODUCT/, 'PDP must render "THE PRODUCT" section');
-    assert.match(pdpLiquid, /Antimicrobial/, 'PDP pills must include Antimicrobial');
-    assert.match(pdpLiquid, /Liquid Repellent/, 'PDP pills must include Liquid Repellent');
-    assert.match(pdpLiquid, /4-Way Stretch/, 'PDP pills must include 4-Way Stretch');
-    assert.match(pdpLiquid, /Breathable/, 'PDP pills must include Breathable');
+    assert.match(pdpLiquid, /product\.metafields\.custom\.color_family_products\.value/, 'PDP must use the canonical product-reference metafield');
+    assert.match(pdpLiquid, /href="\{\{ s_url \}\}"/, 'Related product swatches must link to their Shopify product');
+    assert.match(pdpLiquid, /data-is-current="true"/, 'PDP must identify the active product swatch');
+    assert.match(pdpLiquid, /has_explicit_color_name/, 'PDP must not infer a color swatch from the product title alone');
+    assert.doesNotMatch(pdpLiquid, /metafields\.custom\.(color_products|related_products)/, 'PDP must not guess color families from legacy metafields');
+  });
+
+  // 8. PDP description and media contracts
+  it('12. PDP uses Shopify product content and responsive media layout', async () => {
+    const fs = await import('node:fs');
+    const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+
+    assert.match(pdpLiquid, /\{% if product\.description != blank %\}/, 'PDP must hide an empty product description');
+    assert.match(pdpLiquid, /\{\{ product\.description \}\}/, 'PDP must render the Shopify product description');
+    assert.doesNotMatch(pdpLiquid, /Antimicrobial|Liquid Repellent|4-Way Stretch|Autoclave Safe/, 'PDP must not make unsupported technical claims');
 
     // Single media condition & no-thumbs class
     assert.match(pdpLiquid, /no-thumbs/, 'PDP must declare .no-thumbs class when media size <= 1');
@@ -255,35 +227,48 @@ describe('Kapisa UI/UX Collection & PDP Architecture Verification', () => {
     assert.match(pdpLiquid, /initHeaderOffset/, 'PDP must measure sticky header dynamically in JS');
   });
 
-  // 9. Smart Sibling Discovery & Swatch Image Support
-  it('13. Smart Sibling Discovery & Image Swatch Fallback Contracts', async () => {
+  // 9. Shopify Swatch Metadata & Image Support
+  it('13. Shopify swatches use canonical color metafields', async () => {
     const fs = await import('node:fs');
     const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
 
-    // Image swatch support
-    assert.match(pdpLiquid, /background-image:\s*url/, 'PDP must support image-based fabric swatches');
+    assert.match(pdpLiquid, /metafields\.custom\.color_name/, 'PDP must read the canonical color name metafield');
+    assert.match(pdpLiquid, /metafields\.custom\.color_swatch/, 'PDP must read the canonical color swatch metafield');
+    assert.match(pdpLiquid, /background-color: \{\{ s_color_hex \}\};/, 'PDP must apply the Shopify Color value as a swatch background');
   });
 
-  // 10. Liquid Syntax Safety, Review Anchor & Image Dimensions
-  it('14. Liquid Syntax Safety, Review Anchor & Image Dimensions', async () => {
+  // 10. Product swatch links, honest reviews, and image dimensions
+  it('14. Product swatch links and review summaries use Shopify data', async () => {
     const fs = await import('node:fs');
     const pdpLiquid = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+    const reviewsLiquid = fs.readFileSync('blocks/customer-reviews.liquid', 'utf-8');
     const rackSection = fs.readFileSync('sections/virtual-rack.liquid', 'utf-8');
     const rackSnippet = fs.readFileSync('snippets/virtual-rack-item.liquid', 'utf-8');
 
-    // Sibling product swatch valid guard and url fallback
+    // Product-reference validation and URL fallback
     assert.match(pdpLiquid, /s_valid/, 'PDP must guard sibling swatch rendering with s_valid');
     assert.match(pdpLiquid, /assign s_url = '\/products\/' \| append: s_prod\.handle/, 'PDP must provide fallback URL for sibling products');
 
-    // Verified reviews copy and anchor link
-    assert.match(pdpLiquid, /verified reviews/, 'PDP must display "verified reviews"');
+    // Review summaries appear only when real Shopify review data exists
+    assert.match(reviewsLiquid, /product\.metafields\.reviews\.rating\.value/, "Review summary must use Shopify's rating metafield");
+    assert.match(reviewsLiquid, /product\.metafields\.reviews\.rating_count\.value/, "Review summary must use Shopify's review count metafield");
+    assert.match(reviewsLiquid, /No reviews yet\./, 'Review block must show an honest empty state');
     assert.match(pdpLiquid, /href="#kapisa-reviews"/, 'PDP must link directly to #kapisa-reviews');
 
     // Virtual rack img dimensions
     assert.match(rackSection, /<img class="ai-rack__f-img"[^>]*width="480"[^>]*height="600"/, 'virtual-rack section img must have width and height');
     assert.match(rackSnippet, /<img[^>]*width="480"[^>]*height="600"/, 'virtual-rack snippet img must have width and height');
   });
+
+  it('15. Product cards display only Shopify review data', async () => {
+    const fs = await import('node:fs');
+    const collectionGrid = fs.readFileSync('blocks/collection-grid.liquid', 'utf-8');
+    const bestsellersCarousel = fs.readFileSync('blocks/bestsellers-carousel.liquid', 'utf-8');
+
+    for (const cardBlock of [collectionGrid, bestsellersCarousel]) {
+      assert.match(cardBlock, /product\.metafields\.reviews\.rating\.value/, 'Product cards must source ratings from Shopify');
+      assert.match(cardBlock, /product\.metafields\.reviews\.rating_count\.value/, 'Product cards must source review counts from Shopify');
+      assert.doesNotMatch(cardBlock, /4\.9|16-Hr Rated/, 'Product cards must not use seeded rating or performance claims');
+    }
+  });
 });
-
-
-
