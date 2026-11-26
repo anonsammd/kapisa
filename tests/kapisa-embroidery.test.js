@@ -496,8 +496,36 @@ describe('Kapisa Custom Embroidery & Cart Architecture Tests', () => {
     const embroideryLiquid = fs.readFileSync('snippets/kapisa-custom-embroidery-inner.liquid', 'utf-8');
 
     assert.match(embroideryLiquid, /assign preview_top = product\.metafields\.custom\.top_embroidery_image\.value/);
-    assert.match(embroideryLiquid, /if preview_top == blank\s+assign feature_off = true/);
+    assert.match(embroideryLiquid, /assign preview_top_w = preview_top\.width \| default: 0/);
+    assert.match(embroideryLiquid, /if preview_top_type != 'image' or preview_top_w <= 0 or preview_top_h <= 0\s+assign feature_off = true/);
     assert.match(embroideryLiquid, /if valid_count > 0/);
     assert.doesNotMatch(embroideryLiquid, /product\.featured_image|product\.featured_media|kapisa-scrub-default\.svg/);
+    assert.doesNotMatch(embroideryLiquid, /assign preview_top_w = 600|assign preview_top_h = 640/);
+  });
+
+  it('13. Embroidery CTA requires a valid product preview and opens only an initialized modal', () => {
+    const fs = require('node:fs');
+    const productInfo = fs.readFileSync('blocks/kapisa-product-info.liquid', 'utf-8');
+    const embroideryLiquid = fs.readFileSync('snippets/kapisa-custom-embroidery-inner.liquid', 'utf-8');
+    const embroideryJs = fs.readFileSync('assets/kapisa-embroidery.js', 'utf-8');
+
+    assert.match(productInfo, /if embroidery_preview_type == 'image' and embroidery_preview_width > 0 and embroidery_preview_height > 0/);
+    assert.match(productInfo, /if embroidery_service_product != blank and embroidery_image_is_valid and embroidery_disabled == false/);
+    assert.match(productInfo, /if embroidery_configured[\s\S]*data-open-embroidery-trigger hidden/);
+    assert.match(productInfo, /trigger has no initialized customization modal/);
+    assert.doesNotMatch(productInfo, /section\.scrollIntoView\(\{ behavior: 'smooth' \}\)/);
+    assert.match(embroideryLiquid, /class="kemb-trigger-wrap" data-kemb-trigger-wrap hidden/);
+    assert.match(embroideryJs, /if \(this\.options\.length > 0\) \{[\s\S]*this\.triggerWrap\.hidden = false;[\s\S]*trigger\.hidden = false/);
+  });
+
+  it('14. Preview image is fully visible and stage sizing follows each image aspect ratio', () => {
+    const fs = require('node:fs');
+    const css = fs.readFileSync('assets/kapisa-embroidery.css', 'utf-8');
+    const embroideryJs = fs.readFileSync('assets/kapisa-embroidery.js', 'utf-8');
+
+    assert.match(css, /\.kemb-stage__img\s*\{[^}]*object-fit: contain/s);
+    assert.match(embroideryJs, /stageHeight = stageWidth \* imageHeight \/ imageWidth/);
+    assert.match(embroideryJs, /this\.stage\.style\.aspectRatio = `\$\{imageWidth\} \/ \$\{imageHeight\}`/);
+    assert.match(embroideryJs, /new ResizeObserver/);
   });
 });

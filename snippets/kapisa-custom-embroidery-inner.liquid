@@ -15,42 +15,42 @@
   endif
 
   assign preview_top = product.metafields.custom.top_embroidery_image.value
-  if preview_top == blank
+  assign preview_top_type = preview_top.media_type
+  assign preview_top_w = preview_top.width | default: 0
+  assign preview_top_h = preview_top.height | default: 0
+  if preview_top_type != 'image' or preview_top_w <= 0 or preview_top_h <= 0
     assign feature_off = true
   endif
 
-  assign preview_bottom = product.metafields.custom.bottom_embroidery_image.value | default: preview_top
-  assign preview_combo = product.metafields.custom.combo_embroidery_image.value | default: preview_top
-
   assign preview_top_url = blank
-  assign preview_top_w = 600
-  assign preview_top_h = 640
-  if preview_top != blank
+  if feature_off == false
     assign preview_top_url = preview_top | image_url: width: 1200
-    assign preview_top_w = preview_top.width | default: 600
-    assign preview_top_h = preview_top.height | default: 640
   endif
 
-  assign preview_bot_url = blank
-  assign preview_bot_w = 600
-  assign preview_bot_h = 640
-  if preview_bottom != blank
+  assign preview_bottom = product.metafields.custom.bottom_embroidery_image.value
+  assign preview_bottom_type = preview_bottom.media_type
+  assign preview_bot_url = preview_top_url
+  assign preview_bot_w = preview_top_w
+  assign preview_bot_h = preview_top_h
+  assign preview_bottom_w = preview_bottom.width | default: 0
+  assign preview_bottom_h = preview_bottom.height | default: 0
+  if preview_bottom_type == 'image' and preview_bottom_w > 0 and preview_bottom_h > 0
     assign preview_bot_url = preview_bottom | image_url: width: 1200
-    assign preview_bot_w = preview_bottom.width | default: 600
-    assign preview_bot_h = preview_bottom.height | default: 640
-  else
-    assign preview_bot_url = preview_top_url
+    assign preview_bot_w = preview_bottom_w
+    assign preview_bot_h = preview_bottom_h
   endif
 
-  assign preview_com_url = blank
-  assign preview_com_w = 600
-  assign preview_com_h = 640
-  if preview_combo != blank
+  assign preview_combo = product.metafields.custom.combo_embroidery_image.value
+  assign preview_combo_type = preview_combo.media_type
+  assign preview_com_url = preview_top_url
+  assign preview_com_w = preview_top_w
+  assign preview_com_h = preview_top_h
+  assign preview_combo_w = preview_combo.width | default: 0
+  assign preview_combo_h = preview_combo.height | default: 0
+  if preview_combo_type == 'image' and preview_combo_w > 0 and preview_combo_h > 0
     assign preview_com_url = preview_combo | image_url: width: 1200
-    assign preview_com_w = preview_combo.width | default: 600
-    assign preview_com_h = preview_combo.height | default: 640
-  else
-    assign preview_com_url = preview_top_url
+    assign preview_com_w = preview_combo_w
+    assign preview_com_h = preview_combo_h
   endif
 
   # Service product fallback
@@ -196,7 +196,7 @@
   </script>
 
   {%- if valid_count > 0 -%}
-    <div class="kemb-trigger-wrap" data-kemb-trigger-wrap>
+    <div class="kemb-trigger-wrap" data-kemb-trigger-wrap hidden>
       
       <!-- 1. INITIAL PDP WIDGET (Before Customization) -->
       <div class="kemb-pdp-card kemb-pdp-card--initial" data-kemb-initial-view>

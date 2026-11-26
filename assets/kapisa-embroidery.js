@@ -101,6 +101,7 @@
       this.qat = (s) => (this.triggerWrap || this).querySelectorAll(s);
 
       // Elements inside Modal
+      this.previewCol = this.q('.kemb-preview-col');
       this.stage = this.q('[data-kemb-stage]');
       this.img = this.q('[data-kemb-img]');
       this.zoneText = this.q('[data-kemb-zone-text]');
@@ -123,11 +124,18 @@
       this.placeTrigger();
       this.renderChooser();
       this.renderIcons();
+      if (typeof ResizeObserver !== 'undefined' && this.previewCol) {
+        this.previewResizeObserver = new ResizeObserver(() => {
+          this.updatePreviewStageDimensions(this.activePreviewConfig);
+        });
+        this.previewResizeObserver.observe(this.previewCol);
+      }
 
       // Initialize UI state: apply show/hide logic and sync from state
       if (this.state.option) {
         this.syncModalFromState();
       }
+      this.renderPreview();
 
       // Register provider with KapisaPurchase
       if (window.KapisaPurchase && typeof window.KapisaPurchase.registerEmbroideryProvider === 'function') {
@@ -136,9 +144,16 @@
           getItems: (context) => this.buildCartItems(context)
         });
       }
+
+      if (this.options.length > 0) {
+        if (this.triggerWrap) this.triggerWrap.hidden = false;
+        const trigger = document.querySelector('[data-open-embroidery-trigger]');
+        if (trigger) trigger.hidden = false;
+      }
     }
 
     disconnectedCallback() {
+      this.previewResizeObserver?.disconnect();
       if (this.locked) this.unlock();
       if (window.KapisaPurchase && typeof window.KapisaPurchase.unregisterEmbroideryProvider === 'function') {
         window.KapisaPurchase.unregisterEmbroideryProvider(this.dataset.sectionId || 'pdp-embroidery');
@@ -377,6 +392,7 @@
       this.lock();
       this.syncModalFromState();
       this.dialog.showModal();
+      this.updatePreviewStageDimensions(this.activePreviewConfig);
       this.showStep(this.state.option ? 'custom' : 'choose');
     }
 
@@ -761,9 +777,11 @@
 
       // Switch stage image based on kind if configured
       const imgConfig = (this.cfg.previewImages && this.cfg.previewImages[kind]) || this.cfg.previewImage;
+      this.activePreviewConfig = imgConfig;
       if (imgConfig && imgConfig.url && this.img && this.img.getAttribute('src') !== imgConfig.url) {
         this.img.src = imgConfig.url;
       }
+      this.updatePreviewStageDimensions(imgConfig);
 
       // 1. Text on Left Chest (above pocket)
       if (isBottom) {
@@ -798,6 +816,30 @@
       } else {
         this.zoneIcon.hidden = true;
         this.iconDisplay.innerHTML = '';
+      }
+    }
+
+    updatePreviewStageDimensions(imgConfig) {
+      const imageWidth = Number(imgConfig && imgConfig.width);
+      const imageHeight = Number(imgConfig && imgConfig.height);
+      if (!this.stage || !this.previewCol || imageWidth <= 0 || imageHeight <= 0) return;
+
+      const bounds = this.previewCol.getBoundingClientRect();
+      if (bounds.width <= 0 || bounds.height <= 0) return;
+
+      let stageWidth = bounds.width;
+      let stageHeight = stageWidth * imageHeight / imageWidth;
+      if (stageHeight > bounds.height) {
+        stageHeight = bounds.height;
+        stageWidth = stageHeight * imageWidth / imageHeight;
+      }
+
+      this.stage.style.width = `${stageWidth}px`;
+      this.stage.style.height = `${stageHeight}px`;
+      this.stage.style.aspectRatio = `${imageWidth} / ${imageHeight}`;
+      if (this.img) {
+        this.img.width = imageWidth;
+        this.img.height = imageHeight;
       }
     }
 

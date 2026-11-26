@@ -14,19 +14,32 @@
 {% assign rating_scale = rating_value.scale_max | default: 5 %}
 {% assign review_count = product.metafields.reviews.rating_count.value | default: 0 %}
 {% assign embroidery_service_product = all_products['embroidery-options-service'] %}
+{% assign embroidery_preview_image = product.metafields.custom.top_embroidery_image.value %}
+{% assign embroidery_preview_type = embroidery_preview_image.media_type %}
+{% assign embroidery_preview_width = embroidery_preview_image.width | default: 0 %}
+{% assign embroidery_preview_height = embroidery_preview_image.height | default: 0 %}
+{% assign embroidery_image_is_valid = false %}
+{% if embroidery_preview_type == 'image' and embroidery_preview_width > 0 and embroidery_preview_height > 0 %}
+  {% assign embroidery_image_is_valid = true %}
+{% endif %}
 {% assign embroidery_starting_price = blank %}
 {% assign embroidery_disabled = false %}
+{% assign embroidery_configured = false %}
 
 {%- liquid
   if product.metafields.custom.embroidery_disabled.value == true or product.gift_card? or product.type == 'Gift Card' or product.handle contains 'gift-card' or product.handle contains 'embroidery-options'
     assign embroidery_disabled = true
   endif
 
-  if embroidery_service_product != blank
+  if embroidery_service_product != blank and embroidery_image_is_valid and embroidery_disabled == false
     for service_variant in embroidery_service_product.variants
       if service_variant.available
-        if embroidery_starting_price == blank or service_variant.price < embroidery_starting_price
-          assign embroidery_starting_price = service_variant.price
+        assign service_variant_title = service_variant.title | downcase
+        if service_variant_title contains 'top' or service_variant_title contains 'bottom' or service_variant_title contains 'combo' or service_variant_title contains 'bundle'
+          assign embroidery_configured = true
+          if embroidery_starting_price == blank or service_variant.price < embroidery_starting_price
+            assign embroidery_starting_price = service_variant.price
+          endif
         endif
       endif
     endfor
@@ -1896,8 +1909,8 @@
         </div>
 
         <!-- CUSTOM EMBROIDERY LUXURY MODULE TRIGGER -->
-        {% unless embroidery_disabled %}
-          <button type="button" class="ai-pdp-{{ ai_gen_id }}__embroidery-box" data-open-embroidery-trigger>
+        {% if embroidery_configured %}
+          <button type="button" class="ai-pdp-{{ ai_gen_id }}__embroidery-box" data-open-embroidery-trigger hidden>
             <span class="ai-pdp-{{ ai_gen_id }}__embroidery-left">
               <span class="ai-pdp-{{ ai_gen_id }}__embroidery-icon" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1912,7 +1925,7 @@
             {% endif %}
           </button>
           <div class="kapisa-embroidery-hook" data-kapisa-embroidery-hook></div>
-        {% endunless %}
+        {% endif %}
 
         <!-- BUY BUTTONS -->
         <div class="ai-pdp-{{ ai_gen_id }}__buy">
@@ -2617,17 +2630,8 @@
             const kemb = document.querySelector('kapisa-embroidery');
             if (kemb && typeof kemb.open === 'function') {
               kemb.open();
-            } else if (kemb) {
-              const radio = kemb.querySelector('[data-kemb-radio-add]');
-              if (radio) {
-                radio.click();
-              } else {
-                const btn = kemb.querySelector('button');
-                if (btn) btn.click();
-              }
             } else {
-              const section = document.querySelector('.section-kapisa-custom-embroidery');
-              if (section) section.scrollIntoView({ behavior: 'smooth' });
+              console.error('Kapisa Embroidery: trigger has no initialized customization modal.');
             }
           });
         }

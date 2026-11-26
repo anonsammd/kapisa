@@ -1,20 +1,29 @@
-# Kapisa custom embroidery — rebuild notes
+# Kapisa custom embroidery
 
-## What changed
-- `sections/kapisa-custom-embroidery.liquid` + `snippets/kapisa-custom-embroidery-inner.liquid`: single implementation; server-side option resolution; markup. Inline CSS/JS removed.
-- `assets/kapisa-embroidery.css|js`: new modal (native `<dialog>`: top layer, focus trap, Esc, inert background), live preview, validation, add-to-cart.
-- `assets/kapisa-purchase.js`: JSON-safe error handling, network error message. `assets/kapisa-cart-sync.js`: uses store root for /cart.js.
-- `blocks/kapisa-cart-page.liquid`: shows new property names (Thread Colour / Font / Embroidery type), locks personalized garment qty at 1.
-- `templates/product.json`: 2 fonts (Serif = Playfair Display Bold, Modern = Inter Bold).
+## Verified store setup
 
-## Pricing
-Charged price = the real service variant (metaobject `service_variant`) added in the same `/cart/add.js` request as the garment. The modal total is display-only, computed in Liquid (multi-currency safe). Change prices by editing the service variant in Admin.
+A read-only Shopify Admin audit on 2026-11-26 found these product definitions:
 
-## Theme editor
-Product page > Kapisa Custom Embroidery: set "Default embroidery options" (or the per-product metafield), edit thread colours, up to 4 font blocks (any font; "Fallback style" is used while loading). The trigger button moves next to the buy buttons (`data-kapisa-embroidery-hook`).
+- `custom.top_embroidery_image`, `custom.bottom_embroidery_image`, and `custom.combo_embroidery_image`: `file_reference`.
+- `custom.embroidery_disabled`: `boolean`.
+- `custom.embroidery_options` and the `embroidery_option` metaobject definition/entries: **not found**.
 
-## Re-tuning placement
-Open `/products/<handle>?embroidery_debug=1` in the theme editor or an unpublished theme preview, open the modal, click the image (Shift+click = bottom zone) and paste the JSON into the option's `placement` field. x,y = centre %, w = max width %, rot = degrees.
+The three file definitions were updated during this task with upload descriptions and image-only file validation. The descriptions recommend a consistent 7:10 portrait crop (700 x 1000 px); Shopify cannot enforce that ratio. The failing `selling-plans-ski-wax` product had no embroidery metafield values. The previous CTA logic only checked the opt-out flag, so it showed a button even though no preview component was rendered.
+
+## Current storefront behavior
+
+- Embroidery is enabled per product by assigning a valid image with pixel dimensions to `custom.top_embroidery_image`. Set `custom.embroidery_disabled` to `true` to opt out.
+- The modal options are resolved from available variants on the `embroidery-options-service` product whose titles contain Top, Bottom, Combo, or Bundle. Prices are Shopify variant prices, not hardcoded values or metaobject references.
+- The audited service variants were Top 299.00, Bottom 199.00, and Combo 598.00 in the store's configured currency. Confirm the currency and final pricing in Admin before publishing.
+- Bottom and Combo preview images are optional; when absent or invalid, the Top image is used. A missing/invalid Top image or missing usable service variant hides the CTA.
+- The modal preview now preserves the selected image's aspect ratio and uses `object-fit: contain`, so the garment is not cropped. Keep images consistently framed so the fixed embroidery overlay lands on the correct chest area.
+
+## Merchant workflow
+
+For the full product creation, metafield audit, upload recommendations, service-variant setup, and pre-launch checklist, follow [PRODUCT_UPLOAD_PRODUCTION_GUIDE.md](./PRODUCT_UPLOAD_PRODUCTION_GUIDE.md).
+
+Use portrait artwork near 7:10 (recommended 700 × 1000 px; Knya's inspected preview was 661 × 941 px). Keep the garment's position and crop consistent. Shopify's native file validation cannot enforce this aspect ratio, so verify each uploaded image in the preview.
 
 ## Known limits
-Client-side validation is not enforcement; someone could add the service variant alone via /cart/add. Checkout enforcement would need a Shopify Function (limited on non-Plus). Colour-override images must share the framing of the option's default image.
+
+Cart pairing and browser-side validation improve the normal theme flow, but they are not checkout enforcement. Customers or integrations could still add a service variant directly; checkout-level enforcement requires a server-side Shopify mechanism. The store audit found no metaobject-backed option list, so per-product option selection beyond the enabled/disabled toggle is not currently configured.

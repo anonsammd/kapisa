@@ -1,3 +1,5 @@
+> **Status note (2026-11-26):** This document describes a previous target design, not verified live store data. A read-only audit found no `embroidery_option` metaobject definition or entries and no `custom.embroidery_options` product metafield. The current theme uses product image metafields plus available service-product variants. See [EMBROIDERY_README.md](./EMBROIDERY_README.md) and [PRODUCT_UPLOAD_PRODUCTION_GUIDE.md](./PRODUCT_UPLOAD_PRODUCTION_GUIDE.md) for verified setup and workflow.
+
 ROLE
 You are a senior Shopify theme engineer. Work inside the existing Kapisa Shopify theme repository (local, run with Shopify CLI against the dev store kapisa-9cbbfhcv.myshopify.com, on an unpublished/development theme only). Do not build a demo. Do not rewrite unrelated working features. Follow the theme's existing conventions. Vanilla JS, no paid apps, no external APIs, no new dependencies.
 

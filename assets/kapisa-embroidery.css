@@ -417,8 +417,9 @@ html.kemb-lock {
 }
 .kemb-stage {
   position: relative;
-  width: 100%;
-  height: 100%;
+  flex: 0 1 auto;
+  max-width: 100%;
+  max-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -426,8 +427,8 @@ html.kemb-lock {
 .kemb-stage__img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  object-fit: contain;
+  object-position: center center;
   display: block;
 }
 
@@ -1293,15 +1294,16 @@ html.kemb-lock {
   }
   .kemb-sheet {
     flex-direction: column;
+    --kemb-preview-height: min(34dvh, 220px);
   }
   .kemb-preview-col {
     width: 100%;
     min-width: 0;
-    height: 220px;
+    height: var(--kemb-preview-height);
     flex: none;
   }
   .kemb-form-col {
-    height: calc(100dvh - 220px);
+    height: calc(100dvh - var(--kemb-preview-height));
   }
   .kemb-icon-grid {
     grid-template-columns: repeat(4, 1fr);

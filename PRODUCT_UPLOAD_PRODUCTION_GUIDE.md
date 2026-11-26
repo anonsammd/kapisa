@@ -42,7 +42,9 @@ The following product definitions were found and are used by the theme:
 | `custom.combo_embroidery_image` | File reference | Optional bundle preview | Set only when a distinct bundle view is needed |
 | `custom.embroidery_disabled` | Boolean | Hides the embroidery feature when true | Turn on for products that cannot be embroidered |
 
-The three embroidery file-reference definitions exist but have no file-type validation rules. For production, edit each definition under **Shopify Admin > Settings > Custom data > Products** and restrict accepted files to **Images**. The theme requires `custom.top_embroidery_image` to display the customizer; bottom and combo images can be omitted and will use the top preview.
+The three embroidery file-reference definitions now have upload descriptions and image-only file validation. Shopify cannot enforce a 7:10 aspect ratio. The theme requires a valid `custom.top_embroidery_image` to display the customizer; bottom and combo images are optional and fall back to the top preview if omitted or invalid.
+
+The audit also found two unrelated test definitions: `test_data.snowboard_length` (`dimension`) and `test_data.binding_mount` (`single_line_text_field`). The theme does not use them. The `reviews.rating` and `reviews.rating_count` fields used by the reviews block were not among the product definitions returned by this audit; a reviews app may populate them.
 
 The theme also reads these product-specific detail keys, but their definitions were **not found** in the live audit. Create them if you want to manage these details per product:
 
@@ -55,19 +57,20 @@ The theme also reads these product-specific detail keys, but their definitions w
 
 Define each under **Settings > Custom data > Products** with the exact namespace/key above. They are optional: the theme can use its configured size-guide content when `custom.fit_guide` is empty, while other empty detail fields should remain absent from the product content. Review each new definition in a development theme before publishing.
 
-The live store had no metaobject definitions and no `custom.embroidery_options` product metafield. The current theme does not depend on either: embroidery option names and prices come from available variants on the service product described below. Do not create the old `embroidery_option` metaobject solely for this theme.
+The read-only audit found no `embroidery_option` metaobject definition or entries and no `custom.embroidery_options` product metafield. The current theme does not depend on either: embroidery choices and prices come from available variants on the service product described below. Do not create the old `embroidery_option` metaobject solely for this implementation.
 
 ## 3. Product-specific embroidery image
 
-Each product that offers embroidery needs its own `custom.top_embroidery_image` value:
+Assign `custom.top_embroidery_image` to explicitly enable embroidery for a product:
 
-1. Prepare a clean, high-resolution image of the garment for the modal preview. Show the area customers will personalize, with the garment and chest/pocket placement clearly visible.
-2. Use a consistent portrait crop and framing across the product family (the theme's default preview sizing is approximately 600 × 640). Keep the garment position consistent so the embroidery overlay aligns.
-3. Upload the image in Shopify's Files area, then select that file in the product's `Top embroidery image` metafield. Do not assign the normal product gallery image as a substitute.
-4. Preview the product page and test top, bottom, and bundle selections. If a distinct preview is needed for either latter option, upload it and set `custom.bottom_embroidery_image` or `custom.combo_embroidery_image`; otherwise those options use the top image.
-5. Set `custom.embroidery_disabled` to true for products that must not show customization.
+1. Prepare a clean front view of the scrub top with the chest and pocket visible. Use a portrait image near **7:10**, for example **700 × 1000 px**. Knya's inspected product preview was **661 × 941 px** (approximately the same ratio).
+2. Keep the garment scale, chest position, and crop consistent across colors/products. Do not stretch the image, add large margins, or use a landscape/gallery image. The embroidery overlay is positioned relative to the preview image, so inconsistent framing moves the text away from the garment.
+3. Upload the file in Shopify's Files area, then select it in the product's **Embroidery preview image (left chest)** metafield. The standard product gallery is not used as a fallback.
+4. Optionally add distinct bottom or combo images with matching garment framing in `custom.bottom_embroidery_image` and `custom.combo_embroidery_image`. The preview scales to each selected image's own dimensions and shows the full image without cropping; absent/invalid optional files use the top image.
+5. To opt out, set `custom.embroidery_disabled` to true. To opt in again, clear that flag and provide a valid top image.
+6. Open the product preview and verify the chest overlay on desktop and mobile before publishing.
 
-The modal keeps a white preview canvas and the image is cropped to fill its stage; upload consistently framed images with a compatible background and aspect ratio to avoid visible bars or a shifted overlay. The theme cannot automatically sample an image's background color.
+The image metafield definitions now restrict values to images and provide 7:10 upload guidance. The theme also hides the option if the required top file has no image dimensions; it does not crop or stretch valid images. Admin descriptions cannot technically enforce the ratio.
 
 ## 4. Embroidery service product and pricing
 
@@ -77,7 +80,22 @@ The theme looks up the product with handle `embroidery-options-service`. Keep it
 - `Bottom` for bottom embroidery.
 - `Combo` or `Bundle` for the top-and-bottom option.
 
-Set the correct price on each Shopify variant. Only available variants are offered; the theme uses the Shopify variant price and does not provide hardcoded fallback prices. Before launch, confirm the product handle, variant titles, availability, and prices in Shopify Admin, then test each choice through cart and checkout. Do not use the service product as a customer-facing garment.
+Set the correct price on each Shopify variant. The audit found Top 299.00, Bottom 199.00, and Combo 598.00; these are amounts in the store's configured currency, which must be confirmed before launch. Only available variants with recognized titles are offered. The theme uses Shopify variant prices and has no hardcoded price fallback. Confirm the service product status, variant titles, availability, currency, and prices in Admin, then test each choice through cart and checkout. Do not use the service product as a customer-facing garment.
+
+The store has no `custom.embroidery_options` product field or `embroidery_option` metaobject. Therefore, a product with a valid Top preview gets every recognized, available service variant. Making a service variant unavailable removes that option globally; the current setup cannot make a Top-only choice for one product and a Top/Bottom choice for another.
+
+### Theme editor and customer test
+
+The product template already includes the **Kapisa Custom Embroidery** section. In **Online Store > Themes > Customize**, open the product template and review that section's heading, character limit, acknowledgment setting, thread-colour blocks, and font blocks. Keep the section enabled and do not duplicate it.
+
+Test a product from start to finish:
+
+1. Select the garment colour product and a size; confirm its normal Shopify price and availability.
+2. Verify the embroidery CTA appears only when the product has a valid Top preview, at least one available service variant, and `custom.embroidery_disabled` is not true.
+3. Open the customizer, choose an offered embroidery type, enter the required text, choose a thread colour and font, and review the service price shown.
+4. Add to cart and check that the garment variant and one matching embroidery service variant are paired. Confirm the garment size is correct and the service charge matches its Shopify variant price.
+5. Test without embroidery and with the opt-out flag. The regular garment purchase should still work, with no embroidery CTA or service charge.
+6. Repeat on desktop and a narrow mobile viewport. Verify that the whole preview image is visible and the embroidered text stays over the chest/pocket area.
 
 ## 5. Product details and reviews
 
@@ -103,8 +121,9 @@ Never create or manually edit review aggregates to simulate customer feedback.
 
 - [ ] Every color is a separate product, and sizes are native variants with correct SKU, price, and inventory.
 - [ ] Color name, swatch color, filter family, and sibling product references are set consistently.
-- [ ] Each embroidery-enabled product has its own image in `custom.top_embroidery_image`.
-- [ ] Embroidery image metafields are validated as image files; optional bottom/combo images render correctly when assigned.
+- [ ] Each embroidery-enabled product has a valid image in `custom.top_embroidery_image`; products without one have no embroidery CTA.
+- [ ] Preview images follow a consistent 7:10 portrait crop and chest framing; optional bottom/combo images render correctly when assigned.
+- [ ] `custom.embroidery_disabled` is true on products that must not offer embroidery.
 - [ ] Embroidery service product handle and variant titles match the theme's lookup rules; prices and availability are correct.
 - [ ] Product-specific detail metafields are defined where needed and the storefront accordion is checked.
 - [ ] Review app blocks, aggregate ratings, moderation, and the product review link work as intended.

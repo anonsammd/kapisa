@@ -1,4 +1,2 @@
-# Theme Editor data is merchant-owned; do not overwrite it during routine code pushes.
+# Theme Editor settings are merchant-owned; keep theme structure files in sync.
 config/settings_data.json
-templates/*.json
-sections/*-group.json
